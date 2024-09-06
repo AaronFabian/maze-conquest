@@ -1,7 +1,7 @@
 import { canvas, ctx, input, TWEEN } from './global';
 import { StartState } from './script/states/games/StartState';
 import { LoadingAssetScreen } from './script/world/LoadingAssetScreen';
-import { generateQuads } from './utils';
+import { __newImage, generateQuads } from './utils';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -13,7 +13,8 @@ async function init() {
 	// in general "screen" still inherit from BaseState but they not relate to game update nor render
 	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
 	const loadingScreen = new LoadingAssetScreen(imageToAwait);
-	// imageToAwait.push(__newImage(`ui/health.png`, 'health-panel', loadingScreen));
+
+	imageToAwait.push(__newImage(`ui/background.png`, 'start-screen-bg', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));

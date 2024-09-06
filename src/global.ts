@@ -41,8 +41,8 @@ _window.gStateStack = gStateStack;
 export const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 export const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-canvas.width = 352;
-canvas.height = 544;
+canvas.width = 1280;
+canvas.height = 720;
 
 export const input = {
 	mouse: {

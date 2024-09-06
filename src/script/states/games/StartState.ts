@@ -47,15 +47,12 @@ export class StartState extends BaseState {
 	override render() {
 		ctx.save();
 
-		ctx.scale(PTM, PTM);
+		ctx.drawImage(_window.gImages.get('start-screen-bg'), 0, 0);
 
-		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, pixelToWorld(canvas.width), pixelToWorld(canvas.height));
-
-		ctx.font = '0.32px zig';
+		ctx.font = '32px zig';
 		ctx.fillStyle = `rgba(255,255,255, ${this.blinkOpacity})`;
 		ctx.textAlign = 'center';
-		ctx.fillText('push enter button', pixelToWorld(canvas.width / 2), pixelToWorld(canvas.height / 2));
+		ctx.fillText('push enter button', canvas.width / 2, canvas.height / 2);
 
 		ctx.restore();
 	}

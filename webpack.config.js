@@ -46,7 +46,7 @@ module.exports = {
 			filename: 'main.[hash].css',
 		}),
 		new CopyPlugin({
-			patterns: [{ from: './src/assets', to: '.' }],
+			patterns: [{ from: './src/assets/game', to: '.' }],
 		}),
 		new Dotenv(),
 	],
