@@ -1,8 +1,8 @@
 // this StateMachine is a bit different from StateStack
 // in this StateMachine, we import EntityBaseState, WeaponBaseState
 // while in StateStack we use BaseState
-import { CanvasRendering } from '../interface/states/CanvasRendering';
-import { EntityBaseState } from './entity/EntityBaseState';
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
+import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 
 // StateMachine accept 2 state type
 type StateType = EntityBaseState;

@@ -5,6 +5,9 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"noImplicitAny": true,
-		"downlevelIteration": true
+		"downlevelIteration": true,
+		"paths": {
+			"@/*": ["./src/*"]
+		}
 	}
 }

@@ -1,12 +1,21 @@
+/**
+ * Author: Aaron Fabian Saputra
+ * Title: Maze Conquest
+ * A single game where player will explore the maze, every level will
+ * recorded and post online to see someone explored the highest maze game.
+ *
+ * Game World hierarchy: World (state) -> Level -> MazeGame
+ */
+
 // style for webpack to apply css and minified the html css
-import './style.css';
+import '@/style.css';
 
 // this import will make our library globally available
-import './lib/tween.js';
-import './lib/howler.core.min.js';
+import '@/lib/tween.js';
+import '@/lib/howler.core.min.js';
 
-import { _QuadImage } from './utils';
-import { StateStack } from './script/states/StateStack';
+import { _QuadImage } from '@/utils';
+import { StateStack } from '@/script/state/StateStack';
 
 const _window = window as any;
 
@@ -19,6 +28,7 @@ export const Tween = _window.TWEEN.Tween;
 export const Howl = _window.Howl;
 
 export const PTM = 32;
+export const TILE_SIZE = 16;
 
 // assets
 const gImages = new Map<string, HTMLImageElement>();
@@ -43,6 +53,8 @@ export const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 canvas.width = 1280;
 canvas.height = 720;
+canvas.style.border = '1px solid white'; // ! delete dev purpose
+canvas.style.scale = '0.9'; // ! delete dev purpose
 
 export const input = {
 	mouse: {

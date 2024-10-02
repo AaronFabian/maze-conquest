@@ -1,4 +1,4 @@
-import { BaseState } from './BaseState';
+import { BaseState } from '@/script/state/BaseState';
 
 export class StateStack {
 	private states: Array<BaseState> = [];

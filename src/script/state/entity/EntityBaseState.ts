@@ -1,7 +1,7 @@
-import { ctx } from '../../../global';
-import { _QuadImage, worldToPixel } from '../../../utils';
-import { Entity } from '../../entity/Entity';
-import { CanvasRendering } from '../../interface/states/CanvasRendering';
+import { ctx } from '@/global';
+import { Entity } from '@/script/object/entity/Entity';
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
+import { _QuadImage } from '@/utils';
 
 const _window = window as any;
 

@@ -1,8 +1,7 @@
 // utility function and class
 
-import { PTM, Howl, canvas } from './global';
-import { LoadingAssetScreen } from './script/world/LoadingAssetScreen.js';
-// import { LoadingAssetScreen } from './script/world/LoadingAssetScreen';
+import { PTM, Howl, canvas } from '@/global';
+import { LoadingAssetScreen } from '@/script/world/LoadingAssetScreen.js';
 
 export class Animation {
 	frames: number[];
@@ -104,16 +103,16 @@ export function newQuad(image: HTMLImageElement, sx: number, sy: number, width: 
 	return new _QuadImage(image, sx, sy, width, height);
 }
 
-export function newImage(src: string, alt: string): Promise<HTMLImageElement> {
-	const imgElement = new Image();
-	imgElement.src = src;
-	imgElement.alt = alt;
+// export function newImage(src: string, alt: string): Promise<HTMLImageElement> {
+// 	const imgElement = new Image();
+// 	imgElement.src = src;
+// 	imgElement.alt = alt;
 
-	return new Promise((resolve, reject) => {
-		imgElement.onload = () => resolve(imgElement);
-		imgElement.onerror = e => reject(e);
-	});
-}
+// 	return new Promise((resolve, reject) => {
+// 		imgElement.onload = () => resolve(imgElement);
+// 		imgElement.onerror = e => reject(e);
+// 	});
+// }
 
 export function newHowler(src: string, loop: boolean = false): Promise<unknown> {
 	return new Promise((resolve, reject) => {
@@ -127,7 +126,7 @@ export function newHowler(src: string, loop: boolean = false): Promise<unknown> 
 }
 
 // under experiment
-export function __newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
+export function newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
 	const imgElement = new Image();
 	imgElement.src = src;
 	imgElement.alt = alt;
@@ -142,22 +141,6 @@ export function __newImage(src: string, alt: string, state: LoadingAssetScreen):
 	});
 }
 
-// ...
-// Box2D
-// export function newEdgeShape(world: any, x: number, y: number, width: number, height: number) {
-// 	const groundBodyDef = new Box2D.b2BodyDef();
-// 	groundBodyDef.set_type(Box2D.b2_staticBody);
-// 	groundBodyDef.set_position(new Box2D.b2Vec2(pixelToWorld(-canvas.width), pixelToWorld(canvas.height + PTM)));
-// 	this.groundBody = this.world.CreateBody(groundBodyDef);
-
-// 	this.groundShape = new Box2D.b2EdgeShape();
-// 	this.groundShape.set_m_vertex1(new Box2D.b2Vec2(0, 0));
-// 	this.groundShape.set_m_vertex2(new Box2D.b2Vec2(pixelToWorld(canvas.width * 3), 0));
-
-// 	const groundFixtureDef = new Box2D.b2FixtureDef();
-// 	groundFixtureDef.set_shape(this.groundShape);
-// 	groundFixtureDef.set_friction(1);
-// 	groundFixtureDef.set_userData('ground');
-// 	this.groundFixture = this.groundBody.CreateFixture(groundFixtureDef);
-
-// }
+export function random(from: number = 0, to: number = 1) {
+	return Math.floor(Math.random() * (to - from + 1)) + from;
+}

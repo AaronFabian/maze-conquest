@@ -1,7 +1,11 @@
-import { canvas, ctx, input, TWEEN } from './global';
-import { StartState } from './script/states/games/StartState';
-import { LoadingAssetScreen } from './script/world/LoadingAssetScreen';
-import { __newImage, generateQuads } from './utils';
+// *** Application Entry Point ***
+import { canvas, ctx, input, TWEEN } from '@/global';
+import { StartState } from '@/script/state/game/StartState';
+import { GameState } from '@/script/state/game/GameState';
+import { LoadingAssetScreen } from '@/script/world/LoadingAssetScreen';
+import { newImage, generateQuads } from '@/utils';
+import { SystemError } from '@/script/world/Error/SystemError';
+import { FatalErrorScreen } from './script/world/FatalErrorScreen';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -14,15 +18,18 @@ async function init() {
 	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
 	const loadingScreen = new LoadingAssetScreen(imageToAwait);
 
-	imageToAwait.push(__newImage(`ui/background.png`, 'start-screen-bg', loadingScreen));
+	imageToAwait.push(newImage('ui/background.png', 'start-screen-bg', loadingScreen));
+	imageToAwait.push(newImage('component/level1-tileset.png', 'level1-tileset', loadingScreen));
+	imageToAwait.push(newImage('component/level1.png', 'level1', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));
 
-	// _window.gFrames.set('asteroid', generateQuads(_window.gImages.get('asteroid'), 96, 96));
+	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
+	_window.gFrames.set('level1', generateQuads(_window.gImages.get('level1'), 80, 80));
 
-	_window.gStateStack.push(new StartState());
-	// _window.gStateStack.push(new GameState());
+	// _window.gStateStack.push(new StartState());
+	_window.gStateStack.push(new GameState());
 
 	animation();
 }
@@ -73,7 +80,15 @@ function animation() {
 		update();
 		render();
 	} catch (error) {
-		console.error('Fatal Error while animating', error);
+		switch (true) {
+			case error instanceof SystemError:
+				error.print();
+				break;
+			default:
+				console.error('Fatal Error while animating', error);
+				break;
+		}
+
 		document.title = 'Game crashed !';
 
 		// will stop the game looping and freeze the screen so we know where crash happen

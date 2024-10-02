@@ -1,5 +1,5 @@
-import { Tween, canvas, ctx } from '../../../global';
-import { BaseState } from '../BaseState';
+import { Tween, canvas, ctx } from '@/global';
+import { BaseState } from '@/script/state/BaseState';
 
 export class CurtainCloseState extends BaseState {
 	curtainOpacity: number = 1;

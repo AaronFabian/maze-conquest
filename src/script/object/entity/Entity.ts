@@ -1,9 +1,9 @@
-import { Animation } from '../../utils';
-import { EntityDef } from '../interface/entity/EntityDef';
-import { AnimationDefInterface } from '../interface/game/AnimationDefInterface';
-import { CanvasRendering } from '../interface/states/CanvasRendering';
-import { StateMachine } from '../states/StateMachine';
-import { EntityBaseState } from '../states/entity/EntityBaseState';
+import { EntityDef } from '@/script/interface/entity/EntityDef';
+import { AnimationDefInterface } from '@/script/interface/game/AnimationDefInterface';
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
+import { StateMachine } from '@/script/state/StateMachine';
+import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
+import { Animation } from '@/utils';
 
 export class Entity implements CanvasRendering {
 	HP: number;

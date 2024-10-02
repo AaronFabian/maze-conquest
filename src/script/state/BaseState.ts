@@ -1,4 +1,4 @@
-import { CanvasRendering } from '../interface/states/CanvasRendering';
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 
 export class BaseState implements CanvasRendering {
 	enter(_enterParams: any) {}

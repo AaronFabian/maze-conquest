@@ -1,5 +1,5 @@
-import { Tween, canvas, ctx } from '../../../global';
-import { BaseState } from '../BaseState';
+import { Tween, canvas, ctx } from '@/global';
+import { BaseState } from '@/script/state/BaseState';
 
 // this class only for UI and animation in our game so
 // we don't need convert pixel to world
