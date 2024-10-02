@@ -13,8 +13,16 @@ enum BlockType {
 export class Path implements CanvasRendering {
 	structure: number[][] | null;
 	spriteId: number | null;
+	xPos: number;
+	yPos: number;
+	renderPosY: number;
+	renderPosX: number;
 
-	constructor(public xPos: number, public yPos: number) {
+	constructor(xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.renderPosX = renderPosX;
+		this.renderPosY = renderPosY;
 		this.structure = null;
 		this.spriteId = null;
 	}
@@ -70,12 +78,12 @@ export class Path implements CanvasRendering {
 
 		// Evaluate this path
 		switch (left) {
-			case 7:
+			case MazeObjectType.SPACE:
 				break;
-			case 1:
+			case MazeObjectType.WALL:
 				break;
 
-			case 0:
+			case MazeObjectType.PATH:
 				structure[1][0] = BlockType.NONE;
 				structure[2][0] = BlockType.NONE;
 				structure[3][0] = BlockType.NONE;
@@ -83,16 +91,17 @@ export class Path implements CanvasRendering {
 				break;
 
 			default:
+				console.warn(left);
 				throw new Error('Unexpected configuration at Left block');
 		}
 
 		switch (right) {
-			case 7:
+			case MazeObjectType.SPACE:
 				break;
-			case 1:
+			case MazeObjectType.WALL:
 				break;
 
-			case 0:
+			case MazeObjectType.PATH:
 				structure[1][4] = BlockType.NONE;
 				structure[2][4] = BlockType.NONE;
 				structure[3][4] = BlockType.NONE;
@@ -100,16 +109,17 @@ export class Path implements CanvasRendering {
 				break;
 
 			default:
+				console.warn(right);
 				throw new Error('Unexpected configuration at Right block');
 		}
 
 		switch (top) {
-			case 7:
+			case MazeObjectType.SPACE:
 				break;
-			case 1:
+			case MazeObjectType.WALL:
 				break;
 
-			case 0:
+			case MazeObjectType.PATH:
 				structure[0][1] = BlockType.NONE;
 				structure[0][2] = BlockType.NONE;
 				structure[0][3] = BlockType.NONE;
@@ -117,16 +127,17 @@ export class Path implements CanvasRendering {
 				break;
 
 			default:
+				console.warn(top);
 				throw new Error('Unexpected configuration at Top block');
 		}
 
 		switch (bottom) {
-			case 7:
+			case MazeObjectType.SPACE:
 				break;
-			case 1:
+			case MazeObjectType.WALL:
 				break;
 
-			case 0:
+			case MazeObjectType.PATH:
 				structure[4][1] = BlockType.NONE;
 				structure[4][2] = BlockType.NONE;
 				structure[4][3] = BlockType.NONE;
@@ -134,6 +145,7 @@ export class Path implements CanvasRendering {
 				break;
 
 			default:
+				console.warn(bottom);
 				throw new Error('Unexpected configuration at Bottom block');
 		}
 
@@ -167,17 +179,16 @@ export class Path implements CanvasRendering {
 
 	render() {
 		const sprites = _window.gFrames.get('level1') as _QuadImage[];
-		if (!this.spriteId) throw new Error('(Path) spriteId found null');
-		sprites[this.spriteId!].drawImage(ctx, this.xPos * 80, this.yPos * 80);
+		if (!this.spriteId === null) throw new Error('[Path] spriteId found null');
+		sprites[this.spriteId!].drawImage(ctx, this.renderPosX * 80, this.renderPosY * 80);
 
 		ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
 				const block = this.structure![y][x];
-				if (block === BlockType.RED) {
+				if (block === BlockType.RED)
 					// For debugging purpose
-					ctx.fillRect(this.xPos * 80 + 16 * x, this.yPos * 80 + 16 * y, 16, 16);
-				}
+					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
 			}
 		}
 	}

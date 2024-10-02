@@ -48,7 +48,6 @@ export class MazeGame extends Maze {
 		const renderHeight = 8;
 		const slicedWidth = Math.floor(this.width / renderWidth);
 		const slicedHeight = Math.floor(this.height / renderHeight);
-		console.log(slicedWidth);
 
 		const slicedMap: Array<Array<Array<Array<MazeObjectType>>>> = [];
 		for (let y = 0; y <= slicedHeight; y++) {
@@ -61,7 +60,6 @@ export class MazeGame extends Maze {
 			}
 		}
 
-		console.log(slicedMap);
 		this.slicedMap = slicedMap;
 	}
 
