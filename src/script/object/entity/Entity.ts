@@ -22,7 +22,7 @@ export class Entity implements CanvasRendering {
 
 	constructor(def: EntityDef) {
 		this.HP = def.HP;
-		this.direction = 'up';
+		this.direction = 'down';
 		this.animations = this.createAnimations(def.animations);
 
 		// x, y only for initializer because we calculate our pixel by Box2D

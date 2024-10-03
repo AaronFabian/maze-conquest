@@ -21,12 +21,14 @@ async function init() {
 	imageToAwait.push(newImage('ui/background.png', 'start-screen-bg', loadingScreen));
 	imageToAwait.push(newImage('component/level1-tileset.png', 'level1-tileset', loadingScreen));
 	imageToAwait.push(newImage('component/level1.png', 'level1', loadingScreen));
+	imageToAwait.push(newImage('component/player.png', 'player', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));
 
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 	_window.gFrames.set('level1', generateQuads(_window.gImages.get('level1'), 80, 80));
+	_window.gFrames.set('player', generateQuads(_window.gImages.get('player'), 32, 32));
 
 	// _window.gStateStack.push(new StartState());
 	_window.gStateStack.push(new GameState());

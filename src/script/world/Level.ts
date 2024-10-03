@@ -8,6 +8,8 @@ export class Level implements CanvasRendering {
 	maze: MazeGame;
 	world: GameState;
 	paths: Path[][];
+	currentMapPartX: number | null;
+	currentMapPartY: number | null;
 	constructor(state: GameState) {
 		this.world = state;
 
@@ -20,6 +22,8 @@ export class Level implements CanvasRendering {
 		// 03 start digging for path, 1,1 mean start from left right at position 1,1 2D Array
 		this.maze.dig(1, 1);
 
+		this.currentMapPartX = null;
+		this.currentMapPartY = null;
 		this.paths = [];
 	}
 
@@ -81,7 +85,13 @@ export class Level implements CanvasRendering {
 		}
 
 		// console.log(paths);
+		this.currentMapPartX = mapPartX;
+		this.currentMapPartY = mapPartY;
 		this.paths = paths;
+
+		// Set the player position in this current map with player and the middle
+		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
+		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
 	}
 
 	update() {}
