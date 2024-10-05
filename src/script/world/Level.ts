@@ -3,6 +3,7 @@ import { Path } from '@/script/object/world/Path';
 import { GameState } from '@/script/state/game/GameState';
 import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
+import { Event } from '@/utils';
 
 export class Level implements CanvasRendering {
 	maze: MazeGame;
@@ -25,6 +26,10 @@ export class Level implements CanvasRendering {
 		this.currentMapPartX = null;
 		this.currentMapPartY = null;
 		this.paths = [];
+
+		Event.on('shift-left', () => {
+			console.log('begin shifting left');
+		});
 	}
 
 	setup() {
@@ -42,6 +47,9 @@ export class Level implements CanvasRendering {
 		const [playerXCoord, playerYCoord] = [this.world.player.x, this.world.player.y];
 		const [mapPartX, mapPartY] = [Math.floor(playerXCoord / 15), Math.floor(playerYCoord / 8)];
 		const currentMap = this.maze.slicedMap[mapPartY][mapPartX];
+
+		this.currentMapPartX = mapPartX;
+		this.currentMapPartY = mapPartY;
 		console.log('[System] Player position ', playerXCoord, playerYCoord);
 		console.log(`[System] Player using mapPartX ${mapPartX}, mapPartY ${mapPartY}`);
 
@@ -78,15 +86,13 @@ export class Level implements CanvasRendering {
 				const renderPosY = y;
 				const xPos = mapPartX * 15 + x;
 				const yPos = mapPartY * 8 + y;
-				const path = new Path(xPos, yPos, renderPosX, renderPosY);
-				path.generate(this.maze.data);
+				const path = new Path(this, xPos, yPos, renderPosX, renderPosY);
+				path.generate();
 				paths[y].push(path);
 			}
 		}
 
 		// console.log(paths);
-		this.currentMapPartX = mapPartX;
-		this.currentMapPartY = mapPartY;
 		this.paths = paths;
 
 		// Set the player position in this current map with player and the middle
