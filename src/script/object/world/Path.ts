@@ -43,7 +43,10 @@ export class Path implements CanvasRendering {
 			for (let y = 0; y <= 4; y++) {
 				structure.push([]);
 				for (let x = 0; x <= 4; x++) {
-					structure[y].push(BlockType.RED);
+					// The corner of the block don't need to check, make more efficient performance
+					if (x >= 1 && x <= 3 && y >= 1 && y <= 3) {
+						structure[y].push(BlockType.NONE);
+					} else structure[y].push(BlockType.RED);
 				}
 			}
 
