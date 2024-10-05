@@ -15,7 +15,7 @@ export class EntityBaseState implements CanvasRendering {
 		const anim = this.entity.currentAnimation;
 
 		const quad = _window.gFrames.get(anim!.texture)[anim!.getCurrentFrame()] as _QuadImage;
-		quad.drawImage(ctx, this.entity.x, this.entity.y);
+		quad.drawImage(ctx, this.entity.x + this.entity.renderOffSetX, this.entity.y + this.entity.renderOffSetY);
 	}
 
 	processAI(_params: any) {

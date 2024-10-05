@@ -1,15 +1,12 @@
-import { _QuadImage } from '@/utils';
 import { ctx } from '@/global';
-import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
+import { _QuadImage } from '@/utils';
+import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 
 const _window = window as any;
 
-export class PlayerBaseState extends EntityIdleState {
+export class PlayerBaseState extends EntityBaseState {
 	override render() {
-		const anim = this.entity.currentAnimation;
-
-		const quad = _window.gFrames.get(anim!.texture)[anim!.getCurrentFrame()] as _QuadImage;
-		quad.drawImage(ctx, this.entity.x + this.entity.renderOffSetX, this.entity.y + this.entity.renderOffSetX);
+		super.render();
 
 		// debug-purpose
 		ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';

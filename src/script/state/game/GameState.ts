@@ -3,11 +3,11 @@ import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 import { Player } from '@/script/object/entity/Player';
 import { BaseState } from '@/script/state/BaseState';
-import { Level } from '@/script/world/Level';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
-import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
-import { StateMachine } from '@/script/state/StateMachine';
 import { PlayerIdleState } from '@/script/state/entity/player/PlayerIdleState';
+import { StateMachine } from '@/script/state/StateMachine';
+import { Level } from '@/script/world/Level';
+import { PlayerWalkState } from '../entity/player/PlayerWalkState';
 
 const _window = window as any;
 
@@ -28,6 +28,7 @@ export class GameState extends BaseState {
 		// defining ship state
 		const playerState = new Map<string, () => EntityBaseState>();
 		playerState.set('idle', () => new PlayerIdleState(this.player));
+		playerState.set('walk', () => new PlayerWalkState(this.player, this.level));
 
 		// use defined state and assign to the late init and immediately to 'idle' state
 		// one thing should considered is state name and animation name could be different,
@@ -43,13 +44,11 @@ export class GameState extends BaseState {
 	}
 
 	override update() {
-		this.player.update();
 		this.level.update();
 	}
 
 	override render() {
 		this.level.render();
-		this.player.render();
 	}
 
 	override exit = () => TWEEN.removeAll();

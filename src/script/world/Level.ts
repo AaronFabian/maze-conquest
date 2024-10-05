@@ -94,7 +94,15 @@ export class Level implements CanvasRendering {
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
 	}
 
-	update() {}
+	update() {
+		// for (const yRow of this.paths) {
+		// 	for (const path of yRow) {
+		// 		path.update(this.world.player);
+		// 	}
+		// }
+
+		this.world.player.update();
+	}
 
 	render() {
 		// const test = new Path(2, 1);
@@ -107,5 +115,7 @@ export class Level implements CanvasRendering {
 				path.render();
 			}
 		}
+
+		this.world.player.render();
 	}
 }

@@ -2,8 +2,17 @@ import { ctx } from '@/global';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 import { MazeObjectType } from '@/script/world/Maze';
 import { _QuadImage } from '@/utils';
+import { Player } from '@/script/object/entity/Player';
+import { SystemError } from '@/script/world/Error/SystemError';
 
 const _window = window as any;
+
+interface AABB {
+	x: number; // x position (top-left corner)
+	y: number; // y position (top-left corner)
+	width: number;
+	height: number;
+}
 
 enum BlockType {
 	NONE = 0,
@@ -177,6 +186,52 @@ export class Path implements CanvasRendering {
 
 	update() {}
 
+	evaluate(player: Player): boolean {
+		for (let y = 0; y <= 4; y++) {
+			for (let x = 0; x <= 4; x++) {
+				const block = this.structure![y][x];
+				if (block === BlockType.NONE) continue;
+
+				// Using AABB
+				const box1: AABB = {
+					// Path
+					x: (this.xPos - 15 * player.level.currentMapPartX!) * 80 + x * 16,
+					y: (this.yPos - 8 * player.level.currentMapPartY!) * 80 + y * 16,
+					width: 16,
+					height: 16,
+				};
+				const box2: AABB = {
+					// Player
+					x: player.x,
+					y: player.y,
+					width: player.width,
+					height: player.height,
+				};
+
+				// If the Player hit the collision box then cancel the movement
+				if (this.checkCollision(box1, box2)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+
+		/**
+		 * TODO:
+		 * Refactor code, player reference looks weird
+		 */
+	}
+
+	// Function to check AABB collision
+	checkCollision(box1: AABB, box2: AABB): boolean {
+		return (
+			box1.x < box2.x + box2.width &&
+			box1.x + box1.width > box2.x &&
+			box1.y < box2.y + box2.height &&
+			box1.y + box1.height > box2.y
+		);
+	}
 	render() {
 		const sprites = _window.gFrames.get('level1') as _QuadImage[];
 		if (!this.spriteId === null) throw new Error('[Path] spriteId found null');
