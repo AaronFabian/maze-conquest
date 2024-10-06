@@ -49,11 +49,15 @@ export class PlayerWalkState extends PlayerBaseState {
 						break;
 					}
 
-					if (path.openMap(this.level.world.player)) {
-						Event.dispatch('shift-left');
-						eventTriggered = true;
-						break;
+					for (const mapBtn of path.mapButtons) {
+						mapBtn.update();
 					}
+
+					// if (path.openMap(this.level.world.player)) {
+					// 	Event.dispatch('shift-left');
+					// 	eventTriggered = true;
+					// 	break;
+					// }
 				}
 				if (isCancelPlayer || eventTriggered) break;
 			}

@@ -1,18 +1,13 @@
-import { ctx } from '@/global';
+import { ctx, TILE_SIZE } from '@/global';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 import { Player } from '@/script/object/entity/Player';
 import { Level } from '@/script/world/Level';
 import { MazeObjectType } from '@/script/world/Maze';
 import { _QuadImage } from '@/utils';
+import { MapButton } from '@/script/object/world/MapButton';
+import { AABB } from '@/script/interface/game/AABB';
 
 const _window = window as any;
-
-interface AABB {
-	x: number; // x position (top-left corner)
-	y: number; // y position (top-left corner)
-	width: number;
-	height: number;
-}
 
 enum BlockType {
 	NONE = 0,
@@ -28,6 +23,7 @@ export class Path implements CanvasRendering {
 	renderPosY: number;
 	renderPosX: number;
 	level: Level;
+	mapButtons: MapButton[];
 
 	constructor(level: Level, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
 		this.level = level;
@@ -37,6 +33,7 @@ export class Path implements CanvasRendering {
 		this.renderPosY = renderPosY;
 		this.structure = null;
 		this.spriteId = null;
+		this.mapButtons = [];
 	}
 
 	generate() {
@@ -49,9 +46,10 @@ export class Path implements CanvasRendering {
 				structure.push([]);
 				for (let x = 0; x <= 4; x++) {
 					// The corner of the block don't need to check, make more efficient performance
-					if (x >= 1 && x <= 3 && y >= 1 && y <= 3) {
-						structure[y].push(BlockType.NONE);
-					} else structure[y].push(BlockType.RED);
+					// if (x >= 1 && x <= 3 && y >= 1 && y <= 3) {
+					// 	structure[y].push(BlockType.NONE);
+					// } else structure[y].push(BlockType.RED);
+					structure[y].push(BlockType.NONE);
 				}
 			}
 
@@ -111,6 +109,8 @@ export class Path implements CanvasRendering {
 					structure[1][0] = BlockType.WAY;
 					structure[2][0] = BlockType.WAY;
 					structure[3][0] = BlockType.WAY;
+
+					this.mapButtons.push(new MapButton('left', this.xPos, this.yPos, this.level));
 				}
 				break;
 
@@ -136,6 +136,10 @@ export class Path implements CanvasRendering {
 					structure[1][4] = BlockType.WAY;
 					structure[2][4] = BlockType.WAY;
 					structure[3][4] = BlockType.WAY;
+
+					const x = 14 * 80 + TILE_SIZE * 4;
+					const y = this.yPos * 80 + TILE_SIZE;
+					this.mapButtons.push(new MapButton('right', this.xPos, this.yPos, this.level));
 				}
 				break;
 
@@ -161,6 +165,10 @@ export class Path implements CanvasRendering {
 					structure[0][1] = BlockType.WAY;
 					structure[0][2] = BlockType.WAY;
 					structure[0][3] = BlockType.WAY;
+
+					const x = this.xPos * 80 + TILE_SIZE;
+					const y = 0;
+					this.mapButtons.push(new MapButton('top', this.xPos, this.yPos, this.level));
 				}
 				break;
 
@@ -181,11 +189,15 @@ export class Path implements CanvasRendering {
 				structure[4][3] = BlockType.NONE;
 				sprite.bottom = true;
 
-				const edgeY = this.yPos - this.level.currentMapPartX! * 8;
+				const edgeY = this.yPos - this.level.currentMapPartY! * 8;
 				if (edgeY === 7) {
 					structure[4][1] = BlockType.WAY;
 					structure[4][2] = BlockType.WAY;
 					structure[4][3] = BlockType.WAY;
+
+					const x = this.xPos * 80 + TILE_SIZE;
+					const y = 7 * 80 + TILE_SIZE * 4;
+					this.mapButtons.push(new MapButton('bottom', this.xPos, this.yPos, this.level));
 				}
 				break;
 
@@ -220,8 +232,6 @@ export class Path implements CanvasRendering {
 		this.spriteId = spriteId;
 	}
 
-	update() {}
-
 	evaluate(player: Player): boolean {
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
@@ -255,7 +265,7 @@ export class Path implements CanvasRendering {
 
 		/**
 		 * TODO:
-		 * Refactor code, player reference looks weird
+		 * - Refactor code, Player reference looks weird
 		 */
 	}
 
@@ -292,12 +302,12 @@ export class Path implements CanvasRendering {
 
 		/**
 		 * TODO:
-		 * Refactor code, player reference looks weird
+		 * - The Code for openMap looks the same, should be refactor
 		 */
 	}
 
 	// Function to check AABB collision
-	checkCollision(box1: AABB, box2: AABB): boolean {
+	private checkCollision(box1: AABB, box2: AABB): boolean {
 		return (
 			box1.x < box2.x + box2.width &&
 			box1.x + box1.width > box2.x &&
@@ -305,6 +315,11 @@ export class Path implements CanvasRendering {
 			box1.y + box1.height > box2.y
 		);
 	}
+
+	update() {
+		// this.evaluate(this.level.player);
+	}
+
 	render() {
 		const sprites = _window.gFrames.get('level1') as _QuadImage[];
 		if (!this.spriteId === null) throw new Error('[Path] spriteId found null');

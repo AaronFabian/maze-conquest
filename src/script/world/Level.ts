@@ -4,6 +4,7 @@ import { GameState } from '@/script/state/game/GameState';
 import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
 import { Event } from '@/utils';
+import { Player } from '@/script/object/entity/Player';
 
 export class Level implements CanvasRendering {
 	maze: MazeGame;
@@ -11,6 +12,7 @@ export class Level implements CanvasRendering {
 	paths: Path[][];
 	currentMapPartX: number | null;
 	currentMapPartY: number | null;
+	nextPaths: Path[][] | null;
 	constructor(state: GameState) {
 		this.world = state;
 
@@ -23,12 +25,22 @@ export class Level implements CanvasRendering {
 		// 03 start digging for path, 1,1 mean start from left right at position 1,1 2D Array
 		this.maze.dig(1, 1);
 
+		this.paths = [];
+		this.nextPaths = null;
 		this.currentMapPartX = null;
 		this.currentMapPartY = null;
-		this.paths = [];
 
 		Event.on('shift-left', () => {
 			console.log('begin shifting left');
+		});
+		Event.on('shift-right', () => {
+			console.log('begin shifting right');
+		});
+		Event.on('shift-top', () => {
+			console.log('begin shifting top');
+		});
+		Event.on('shift-bottom', () => {
+			console.log('begin shifting bottom');
 		});
 	}
 
@@ -119,6 +131,9 @@ export class Level implements CanvasRendering {
 			for (let x = 0; x < this.paths[y].length; x++) {
 				const path = this.paths[y][x];
 				path.render();
+				for (const mapBtn of path.mapButtons) {
+					mapBtn.render();
+				}
 			}
 		}
 
