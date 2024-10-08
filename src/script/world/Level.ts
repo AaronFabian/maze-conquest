@@ -5,7 +5,7 @@ import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
 import { Event } from '@/utils';
 import { Player } from '@/script/object/entity/Player';
-import { ctx, Tween } from '@/global';
+import { canvas, ctx, Tween } from '@/global';
 
 export class Level implements CanvasRendering {
 	maze: MazeGame;
@@ -15,14 +15,23 @@ export class Level implements CanvasRendering {
 	currentMapPartY: number | null;
 	nextPaths: Path[][] | null;
 	shifting: boolean;
+
+	nextMapOpacity: number;
 	nextMapPartX: number | null;
 	nextMapPartY: number | null;
 	adjacentOffsetX: number;
 	adjacentOffsetY: number;
+	currentMapOffsetY: number;
+	currentMapOffsetX: number;
+	currentMapOpacity: number;
+	cameraOffsetX: number;
+	cameraOffsetY: number;
 	constructor(state: GameState) {
 		this.world = state;
 
 		// 01
+		this.cameraOffsetX = 0;
+		this.cameraOffsetY = 0;
 		this.maze = new MazeGame(21, 21, this);
 
 		// 02 Fill the maze dimension and fill with ex: WALL
@@ -36,8 +45,13 @@ export class Level implements CanvasRendering {
 		this.shifting = false;
 		this.currentMapPartX = null;
 		this.currentMapPartY = null;
+		this.currentMapOffsetX = 0;
+		this.currentMapOffsetY = 0;
 		this.adjacentOffsetX = 0;
 		this.adjacentOffsetY = 0;
+
+		this.currentMapOpacity = 1;
+		this.nextMapOpacity = 0;
 
 		// 05
 		this.nextPaths = null;
@@ -124,6 +138,10 @@ export class Level implements CanvasRendering {
 		// Set the player position in this current map with player and the middle
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
+
+		// Setup camera offset so the map will be on the center
+		this.cameraOffsetX = canvas.width / 2 - (this.paths[0].length * 80) / 2;
+		this.cameraOffsetY = canvas.height / 2 - (this.paths.length * 80) / 2;
 	}
 
 	private beginShifting(direction: string) {
@@ -152,37 +170,50 @@ export class Level implements CanvasRendering {
 
 		this.nextPaths = paths;
 
-		// This will render the next paths at the other side
+		// 03 This will render the next paths at the other side
+		const xLength = this.nextPaths[0].length;
+		const yLength = this.nextPaths.length;
 		const currentXLength = this.paths[0].length;
 		const currentYLength = this.paths.length;
+
 		let adjacentOffsetX = 0;
 		let adjacentOffsetY = 0;
 		let playerAdjacentX = 0;
 		let playerAdjacentY = 0;
+		let cameraOffsetX = 0;
+		let cameraOffsetY = 0;
 		switch (direction) {
 			case 'left':
-				adjacentOffsetX = -(80 * currentXLength);
+				adjacentOffsetX = -(80 * xLength);
 				adjacentOffsetY = 0;
 				playerAdjacentX = this.world.player.x - adjacentOffsetX - 60;
 				playerAdjacentY = this.world.player.y - adjacentOffsetY;
+				cameraOffsetX = canvas.width / 2 - (this.nextPaths[0].length * 80) / 2;
+				cameraOffsetY = canvas.height / 2 - (this.nextPaths.length * 80) / 2;
 				break;
 			case 'right':
 				adjacentOffsetX = 80 * currentXLength;
 				adjacentOffsetY = 0;
 				playerAdjacentX = this.world.player.x - adjacentOffsetX + 60;
 				playerAdjacentY = this.world.player.y - adjacentOffsetY;
+				cameraOffsetX = canvas.width / 2 - (this.nextPaths[0].length * 80) / 2;
+				cameraOffsetY = canvas.height / 2 - (this.nextPaths.length * 80) / 2;
 				break;
 			case 'top':
 				adjacentOffsetX = 0;
-				adjacentOffsetY = -(80 * currentYLength);
+				adjacentOffsetY = -(80 * yLength);
 				playerAdjacentX = this.world.player.x - adjacentOffsetX;
 				playerAdjacentY = this.world.player.y - adjacentOffsetY - 60;
+				cameraOffsetX = canvas.width / 2 - (this.nextPaths[0].length * 80) / 2;
+				cameraOffsetY = canvas.height / 2 - (this.nextPaths.length * 80) / 2;
 				break;
 			case 'bottom':
 				adjacentOffsetX = 0;
 				adjacentOffsetY = 80 * currentYLength;
 				playerAdjacentX = this.world.player.x - adjacentOffsetX;
 				playerAdjacentY = this.world.player.y - adjacentOffsetY + 60;
+				cameraOffsetX = canvas.width / 2 - (this.nextPaths[0].length * 80) / 2;
+				cameraOffsetY = canvas.height / 2 - (this.nextPaths.length * 80) / 2;
 				break;
 			default:
 				throw new SystemError('Unexpected behaviour when beginShifting() at determining the shifting direction');
@@ -191,17 +222,71 @@ export class Level implements CanvasRendering {
 		// Begin shifting animation for new Path[] and the old path[];
 		this.adjacentOffsetX = adjacentOffsetX;
 		this.adjacentOffsetY = adjacentOffsetY;
+
+		// 04 - [1]
 		new Tween(this)
-			.to({ adjacentOffsetX: 0, adjacentOffsetY: 0 }, 2500)
+			.to({ nextMapOpacity: 1 }, 1000)
 			.onComplete(() => {
-				console.log('shifting ok');
+				// 04 - [2]
+				new Tween(this)
+					.to({ adjacentOffsetX: 0, adjacentOffsetY: 0 }, 2500)
+					.onComplete(() => {})
+					.start();
+
+				new Tween(this)
+					.to({ currentMapOffsetX: -adjacentOffsetX, currentMapOffsetY: -adjacentOffsetY }, 2500)
+					.onComplete(() => {})
+					.start();
+
+				new Tween(this)
+					.to(
+						{
+							cameraOffsetX: cameraOffsetX,
+							cameraOffsetY: cameraOffsetY,
+						},
+						2500
+					)
+					.onComplete(() => {})
+					.start();
+
+				new Tween(this.world.player)
+					.to({ x: playerAdjacentX, y: playerAdjacentY }, 2500)
+					.onComplete(() => {
+						// 04 - [3]
+						// Make Player stop walking while fading out the old map
+						this.world.player.changeState('idle');
+
+						new Tween(this)
+							.to({ currentMapOpacity: 0 }, 1000)
+							.onComplete(() => this.finishShifting())
+							.start();
+					})
+					.start();
 			})
 			.start();
+	}
+	private finishShifting() {
+		// Begin switching the next Paths to current Paths
+		this.paths = this.nextPaths!;
+		this.currentMapPartX = this.nextMapPartX!;
+		this.currentMapPartY = this.nextMapPartY!;
+		this.nextPaths = null;
 
-		new Tween(this.world.player)
-			.to({ x: playerAdjacentX, y: playerAdjacentY }, 2500)
-			.onComplete(() => {})
-			.start();
+		// Reset the offset configuration
+		this.currentMapOffsetX = 0;
+		this.currentMapOffsetY = 0;
+		this.adjacentOffsetX = 0;
+		this.adjacentOffsetY = 0;
+		this.nextMapOpacity = 0;
+		this.currentMapOpacity = 1;
+
+		// Make Player moveable again
+		this.shifting = false;
+
+		// this.cameraOffsetX = canvas.width / 2 - (this.paths[0].length * 80) / 2;
+		// this.cameraOffsetY = canvas.height / 2 - (this.paths.length * 80) / 2;
+
+		console.log(`[System] Player using mapPartX ${this.currentMapPartX}, mapPartY ${this.currentMapPartY}`);
 	}
 
 	update() {
@@ -220,10 +305,15 @@ export class Level implements CanvasRendering {
 	}
 
 	render() {
-		// const test = new Path(2, 1);
-		// test.generate(this.maze.data);
-		// test.render();
+		// Camera offset, always save the current canvas configuration so later we will fine
+		ctx.save();
+		ctx.translate(this.cameraOffsetX, this.cameraOffsetY);
+
+		// Current map
 		if (this.paths.length === 0) throw new SystemError('Unexpected paths properties');
+		ctx.save();
+		ctx.globalAlpha = this.currentMapOpacity;
+		ctx.translate(this.currentMapOffsetX, this.currentMapOffsetY);
 		for (let y = 0; y < this.paths.length; y++) {
 			for (let x = 0; x < this.paths[y].length; x++) {
 				const path = this.paths[y][x];
@@ -233,24 +323,30 @@ export class Level implements CanvasRendering {
 				}
 			}
 		}
+		ctx.globalAlpha = 1;
+		ctx.restore();
 
+		// Next map
 		if (this.nextPaths !== null) {
 			ctx.save();
+			ctx.globalAlpha = this.nextMapOpacity;
 			ctx.translate(this.adjacentOffsetX, this.adjacentOffsetY);
 			for (let y = 0; y < this.nextPaths.length; y++) {
 				for (let x = 0; x < this.nextPaths[y].length; x++) {
 					const path = this.nextPaths[y][x];
 					path.render();
 					for (const mapBtn of path.mapButtons) {
-						console.log('mapbtn render');
 						mapBtn.render();
 					}
 				}
 			}
+			ctx.globalAlpha = 1;
 			ctx.restore();
 		}
 
 		this.world.player.render();
-		console.log(this.world.player.x, this.world.player.y);
+
+		// Make sure we don't mess the canvas
+		ctx.restore();
 	}
 }
