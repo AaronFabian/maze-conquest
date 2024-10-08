@@ -52,7 +52,7 @@ export class Room implements CanvasRendering {
 				const xPos = mapPartX * 15 + x;
 				const yPos = mapPartY * 8 + y;
 				const path = new Path(this.level, xPos, yPos, renderPosX, renderPosY);
-				path.generate();
+				path.generate(this.mapPartX, this.mapPartY);
 				paths[y].push(path);
 			}
 		}

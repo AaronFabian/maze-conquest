@@ -24,6 +24,7 @@ export class Path implements CanvasRendering {
 	renderPosX: number;
 	level: Level;
 	mapButtons: MapButton[];
+	isDangerPath: boolean;
 
 	constructor(level: Level, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
 		this.level = level;
@@ -34,9 +35,10 @@ export class Path implements CanvasRendering {
 		this.structure = null;
 		this.spriteId = null;
 		this.mapButtons = [];
+		this.isDangerPath = false;
 	}
 
-	generate() {
+	generate(currentMapPartX: number, currentMapPartY: number) {
 		const map = this.level.maze.data;
 
 		// If this path itself is WALL (1) or EDGE WALL (7) then just generate outer wall
@@ -104,7 +106,8 @@ export class Path implements CanvasRendering {
 				structure[3][0] = BlockType.NONE;
 				sprite.left = true;
 
-				const edgeX = this.xPos - this.level.currentMapPartX! * 15;
+				// const edgeX = this.xPos - this.level.currentMapPartX! * 15;
+				const edgeX = this.xPos - currentMapPartX! * 15;
 				if (edgeX === 0) {
 					structure[1][0] = BlockType.WAY;
 					structure[2][0] = BlockType.WAY;
@@ -131,7 +134,7 @@ export class Path implements CanvasRendering {
 				structure[3][4] = BlockType.NONE;
 				sprite.right = true;
 
-				const edgeX = this.xPos - this.level.currentMapPartX! * 15;
+				const edgeX = this.xPos - currentMapPartX! * 15;
 				if (edgeX === 14) {
 					structure[1][4] = BlockType.WAY;
 					structure[2][4] = BlockType.WAY;
@@ -158,7 +161,7 @@ export class Path implements CanvasRendering {
 				structure[0][3] = BlockType.NONE;
 				sprite.top = true;
 
-				const edgeY = this.yPos - this.level.currentMapPartY! * 8;
+				const edgeY = this.yPos - currentMapPartY! * 8;
 				if (edgeY === 0) {
 					structure[0][1] = BlockType.WAY;
 					structure[0][2] = BlockType.WAY;
@@ -185,14 +188,12 @@ export class Path implements CanvasRendering {
 				structure[4][3] = BlockType.NONE;
 				sprite.bottom = true;
 
-				const edgeY = this.yPos - this.level.currentMapPartY! * 8;
+				const edgeY = this.yPos - currentMapPartY! * 8;
 				if (edgeY === 7) {
 					structure[4][1] = BlockType.WAY;
 					structure[4][2] = BlockType.WAY;
 					structure[4][3] = BlockType.WAY;
 
-					const x = this.xPos * 80 + TILE_SIZE;
-					const y = 7 * 80 + TILE_SIZE * 4;
 					this.mapButtons.push(new MapButton('bottom', this.xPos, this.yPos, this.level));
 				}
 				break;
@@ -331,9 +332,12 @@ export class Path implements CanvasRendering {
 					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
 
 				ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
-				if (block === BlockType.WAY)
+				if (block === BlockType.WAY) {
 					// For debugging purpose
 					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
+
+					// console.log(this.renderPosX, this.renderPosY);
+				}
 			}
 		}
 	}
