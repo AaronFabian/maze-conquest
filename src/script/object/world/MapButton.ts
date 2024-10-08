@@ -72,6 +72,23 @@ export class MapButton implements CanvasRendering {
 		};
 		// If the Player hit the button then shift based on this MapButton
 		if (this.checkCollision(box1, box2)) {
+			let nextMapPartX = this.level.currentMapPartX!;
+			let nextMapPartY = this.level.currentMapPartY!;
+			if (this.direction === 'left') {
+				nextMapPartX -= 1;
+			} else if (this.direction === 'right') {
+				nextMapPartX += 1;
+			} else if (this.direction === 'top') {
+				nextMapPartY -= 1;
+			} else if (this.direction === 'bottom') {
+				nextMapPartY += 1;
+			}
+
+			// Save the map part coordinate for later shifting
+			this.level.nextMapPartX = nextMapPartX;
+			this.level.nextMapPartY = nextMapPartY;
+
+			// Begin event for shifting camera
 			Event.dispatch('shift-' + this.direction);
 		}
 	}

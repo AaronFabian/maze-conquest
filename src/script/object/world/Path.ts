@@ -137,8 +137,6 @@ export class Path implements CanvasRendering {
 					structure[2][4] = BlockType.WAY;
 					structure[3][4] = BlockType.WAY;
 
-					const x = 14 * 80 + TILE_SIZE * 4;
-					const y = this.yPos * 80 + TILE_SIZE;
 					this.mapButtons.push(new MapButton('right', this.xPos, this.yPos, this.level));
 				}
 				break;
@@ -166,8 +164,6 @@ export class Path implements CanvasRendering {
 					structure[0][2] = BlockType.WAY;
 					structure[0][3] = BlockType.WAY;
 
-					const x = this.xPos * 80 + TILE_SIZE;
-					const y = 0;
 					this.mapButtons.push(new MapButton('top', this.xPos, this.yPos, this.level));
 				}
 				break;
@@ -335,9 +331,9 @@ export class Path implements CanvasRendering {
 					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
 
 				ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
-				if (block === BlockType.WAY) {
+				if (block === BlockType.WAY)
+					// For debugging purpose
 					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
-				}
 			}
 		}
 	}

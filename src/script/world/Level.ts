@@ -5,6 +5,7 @@ import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
 import { Event } from '@/utils';
 import { Player } from '@/script/object/entity/Player';
+import { ctx, Tween } from '@/global';
 
 export class Level implements CanvasRendering {
 	maze: MazeGame;
@@ -13,34 +14,47 @@ export class Level implements CanvasRendering {
 	currentMapPartX: number | null;
 	currentMapPartY: number | null;
 	nextPaths: Path[][] | null;
+	shifting: boolean;
+	nextMapPartX: number | null;
+	nextMapPartY: number | null;
+	adjacentOffsetX: number;
+	adjacentOffsetY: number;
 	constructor(state: GameState) {
 		this.world = state;
 
 		// 01
 		this.maze = new MazeGame(21, 21, this);
 
-		// 02 fill the maze dimension and fill with WALL
+		// 02 Fill the maze dimension and fill with ex: WALL
 		this.maze.create();
 
-		// 03 start digging for path, 1,1 mean start from left right at position 1,1 2D Array
+		// 03 Start digging for path, 1,1 mean start from left right at position 1,1 2D Array
 		this.maze.dig(1, 1);
 
+		// 04 Later will be assigned / late init
 		this.paths = [];
-		this.nextPaths = null;
+		this.shifting = false;
 		this.currentMapPartX = null;
 		this.currentMapPartY = null;
+		this.adjacentOffsetX = 0;
+		this.adjacentOffsetY = 0;
+
+		// 05
+		this.nextPaths = null;
+		this.nextMapPartX = null;
+		this.nextMapPartY = null;
 
 		Event.on('shift-left', () => {
-			console.log('begin shifting left');
+			this.beginShifting('left');
 		});
 		Event.on('shift-right', () => {
-			console.log('begin shifting right');
+			this.beginShifting('right');
 		});
 		Event.on('shift-top', () => {
-			console.log('begin shifting top');
+			this.beginShifting('top');
 		});
 		Event.on('shift-bottom', () => {
-			console.log('begin shifting bottom');
+			this.beginShifting('bottom');
 		});
 	}
 
@@ -56,7 +70,7 @@ export class Level implements CanvasRendering {
 		// 06 Take sliced map and then render that map only
 		// const renderWidth = 15;
 		// const renderHeight = 8;
-		const [playerXCoord, playerYCoord] = [this.world.player.x, this.world.player.y];
+		const [playerXCoord, playerYCoord] = [this.world.player.xCoord, this.world.player.yCoord];
 		const [mapPartX, mapPartY] = [Math.floor(playerXCoord / 15), Math.floor(playerYCoord / 8)];
 		const currentMap = this.maze.slicedMap[mapPartY][mapPartX];
 
@@ -112,6 +126,84 @@ export class Level implements CanvasRendering {
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
 	}
 
+	private beginShifting(direction: string) {
+		if (this.nextMapPartX === null || this.nextMapPartY === null)
+			throw new SystemError('[Level] Unexpected configuration for next map');
+		// console.log(this.currentMapPartX, this.currentMapPartY);
+
+		// 01 Tell Level that we are shifting the camera
+		this.shifting = true;
+
+		// 02 Generate next Path[][]
+		const nextMap = this.maze.slicedMap[this.nextMapPartY][this.nextMapPartX];
+		const paths: Array<Array<Path>> = [];
+		for (let y = 0; y < nextMap.length; y++) {
+			paths.push([]);
+			for (let x = 0; x < nextMap[y].length; x++) {
+				const renderPosX = x;
+				const renderPosY = y;
+				const xPos = this.nextMapPartX * 15 + x;
+				const yPos = this.nextMapPartY * 8 + y;
+				const path = new Path(this, xPos, yPos, renderPosX, renderPosY);
+				path.generate();
+				paths[y].push(path);
+			}
+		}
+
+		this.nextPaths = paths;
+
+		// This will render the next paths at the other side
+		const currentXLength = this.paths[0].length;
+		const currentYLength = this.paths.length;
+		let adjacentOffsetX = 0;
+		let adjacentOffsetY = 0;
+		let playerAdjacentX = 0;
+		let playerAdjacentY = 0;
+		switch (direction) {
+			case 'left':
+				adjacentOffsetX = -(80 * currentXLength);
+				adjacentOffsetY = 0;
+				playerAdjacentX = this.world.player.x - adjacentOffsetX - 60;
+				playerAdjacentY = this.world.player.y - adjacentOffsetY;
+				break;
+			case 'right':
+				adjacentOffsetX = 80 * currentXLength;
+				adjacentOffsetY = 0;
+				playerAdjacentX = this.world.player.x - adjacentOffsetX + 60;
+				playerAdjacentY = this.world.player.y - adjacentOffsetY;
+				break;
+			case 'top':
+				adjacentOffsetX = 0;
+				adjacentOffsetY = -(80 * currentYLength);
+				playerAdjacentX = this.world.player.x - adjacentOffsetX;
+				playerAdjacentY = this.world.player.y - adjacentOffsetY - 60;
+				break;
+			case 'bottom':
+				adjacentOffsetX = 0;
+				adjacentOffsetY = 80 * currentYLength;
+				playerAdjacentX = this.world.player.x - adjacentOffsetX;
+				playerAdjacentY = this.world.player.y - adjacentOffsetY + 60;
+				break;
+			default:
+				throw new SystemError('Unexpected behaviour when beginShifting() at determining the shifting direction');
+		}
+
+		// Begin shifting animation for new Path[] and the old path[];
+		this.adjacentOffsetX = adjacentOffsetX;
+		this.adjacentOffsetY = adjacentOffsetY;
+		new Tween(this)
+			.to({ adjacentOffsetX: 0, adjacentOffsetY: 0 }, 2500)
+			.onComplete(() => {
+				console.log('shifting ok');
+			})
+			.start();
+
+		new Tween(this.world.player)
+			.to({ x: playerAdjacentX, y: playerAdjacentY }, 2500)
+			.onComplete(() => {})
+			.start();
+	}
+
 	update() {
 		// for (const yRow of this.paths) {
 		// 	for (const path of yRow) {
@@ -119,7 +211,12 @@ export class Level implements CanvasRendering {
 		// 	}
 		// }
 
-		this.world.player.update();
+		// Only updating the Player Animation
+		if (this.shifting) {
+			this.world.player.currentAnimation!.update();
+		} else {
+			this.world.player.update();
+		}
 	}
 
 	render() {
@@ -137,6 +234,23 @@ export class Level implements CanvasRendering {
 			}
 		}
 
+		if (this.nextPaths !== null) {
+			ctx.save();
+			ctx.translate(this.adjacentOffsetX, this.adjacentOffsetY);
+			for (let y = 0; y < this.nextPaths.length; y++) {
+				for (let x = 0; x < this.nextPaths[y].length; x++) {
+					const path = this.nextPaths[y][x];
+					path.render();
+					for (const mapBtn of path.mapButtons) {
+						console.log('mapbtn render');
+						mapBtn.render();
+					}
+				}
+			}
+			ctx.restore();
+		}
+
 		this.world.player.render();
+		console.log(this.world.player.x, this.world.player.y);
 	}
 }

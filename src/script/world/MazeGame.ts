@@ -25,11 +25,10 @@ export class MazeGame extends Maze {
 				const initialX = random(1, this.height - 1);
 				const initialY = random(1, this.width - 1);
 
-				if (
-					this.data[initialY][initialX] !== MazeObjectType.WALL &&
-					this.data[initialY][initialX] !== MazeObjectType.SPACE
-				) {
-					[this.level.world.player.x, this.level.world.player.y] = [initialX, initialY];
+				const notWALL = this.data[initialY][initialX] !== MazeObjectType.WALL;
+				const notSPACE = this.data[initialY][initialX] !== MazeObjectType.SPACE;
+				if (notWALL && notSPACE) {
+					[this.level.world.player.xCoord, this.level.world.player.yCoord] = [initialX, initialY];
 					console.log(`[Maze] player set at x = ${this.level.world.player.x}, y = ${this.level.world.player.y}`);
 
 					return; // Exit loop if a valid position is found
