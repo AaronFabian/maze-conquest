@@ -78,6 +78,17 @@ export class _QuadImage {
 	}
 }
 
+export class Event {
+	static on(eventName: string, cb: () => void) {
+		document.addEventListener(eventName, cb);
+	}
+
+	static dispatch(eventName: string) {
+		const event = new window.Event(eventName);
+		document.dispatchEvent(event);
+	}
+}
+
 export function pixelToWorld(inPx: number): number {
 	return inPx / PTM;
 }

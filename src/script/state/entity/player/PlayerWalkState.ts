@@ -2,12 +2,11 @@ import { input } from '@/global';
 import { Entity } from '@/script/object/entity/Entity';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
 import { Level } from '@/script/world/Level';
+import { Event } from '@/utils';
 
 export class PlayerWalkState extends PlayerBaseState {
 	constructor(entity: Entity, public level: Level) {
 		super(entity);
-
-		this.level = level;
 		this.entity.setAnimation = 'walk-' + this.entity.direction;
 	}
 
@@ -42,14 +41,25 @@ export class PlayerWalkState extends PlayerBaseState {
 		if (moving) {
 			// Check for collisions before moving
 			let isCancelPlayer = false;
+			let eventTriggered = false;
 			for (const yRow of this.level.paths) {
 				for (const path of yRow) {
 					if (path.evaluate(this.level.world.player)) {
 						isCancelPlayer = true;
 						break;
 					}
+
+					for (const mapBtn of path.mapButtons) {
+						mapBtn.update();
+					}
+
+					// if (path.openMap(this.level.world.player)) {
+					// 	Event.dispatch('shift-left');
+					// 	eventTriggered = true;
+					// 	break;
+					// }
 				}
-				if (isCancelPlayer) break;
+				if (isCancelPlayer || eventTriggered) break;
 			}
 
 			// Cancel Player movement if Player hit the collision box

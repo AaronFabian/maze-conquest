@@ -14,9 +14,11 @@ const _window = window as any;
 export class GameState extends BaseState {
 	level: Level;
 	player: Player;
+	disableKey: boolean;
 
 	constructor() {
 		super();
+		this.disableKey = false;
 
 		// 01 Generate world level
 		this.level = new Level(this);
@@ -44,7 +46,9 @@ export class GameState extends BaseState {
 	}
 
 	override update() {
-		this.level.update();
+		if (!this.disableKey) {
+			this.level.update();
+		}
 	}
 
 	override render() {

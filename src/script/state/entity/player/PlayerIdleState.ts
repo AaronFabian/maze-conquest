@@ -1,4 +1,3 @@
-import { input } from '@/global';
 import { keyWasPressed } from '@/index';
 import { Entity } from '@/script/object/entity/Entity';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
