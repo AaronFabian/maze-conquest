@@ -3,9 +3,10 @@ import { Path } from '@/script/object/world/Path';
 import { GameState } from '@/script/state/game/GameState';
 import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
-import { Event } from '@/utils';
+import { Event, random } from '@/utils';
 import { Player } from '@/script/object/entity/Player';
 import { canvas, ctx, Tween } from '@/global';
+import { MazeObjectType } from '@/script/world/Maze';
 
 export class Level implements CanvasRendering {
 	maze: MazeGame;
@@ -101,7 +102,7 @@ export class Level implements CanvasRendering {
 			}
 		}
 
-		this.paths = paths;
+		this.paths = this.generateEnemies(paths);
 
 		// Set the player position in this current map with player and the middle
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
@@ -110,6 +111,28 @@ export class Level implements CanvasRendering {
 		// Setup camera offset so the map will be on the center
 		this.cameraOffsetX = canvas.width / 2 - (this.paths[0].length * 80) / 2;
 		this.cameraOffsetY = canvas.height / 2 - (this.paths.length * 80) / 2;
+	}
+
+	private generateEnemies(paths: Path[][]): Path[][] {
+		// At least one 1 guaranteed
+		const totalEnemies = random(1, Math.floor(paths[0].length + paths.length));
+		// const totalEnemies = random(1, Math.floor((paths[0].length + paths.length) / 2));
+
+		// A list that algorithm should be avoid
+		const objectShouldAvoid = [MazeObjectType.WALL, MazeObjectType.SPACE, MazeObjectType.ITEM];
+
+		for (let i = 1; i <= totalEnemies; i++) {
+			while (true) {
+				const [x, y] = [random(1, paths[0].length - 1), random(1, paths.length - 1)];
+				if (!objectShouldAvoid.find(o => o === paths[y][x].mazeObjectType)) {
+					paths[y][x].mazeObjectType = MazeObjectType.ENEMY;
+					console.log(`[System] enemy set at ${x} ${y}`);
+					break;
+				}
+			}
+		}
+
+		return paths;
 	}
 
 	private beginShifting(direction: string) {
@@ -135,7 +158,7 @@ export class Level implements CanvasRendering {
 			}
 		}
 
-		this.nextPaths = paths;
+		this.nextPaths = this.generateEnemies(paths);
 
 		// 03 This will render the next paths at the other side
 		const xLength = this.nextPaths[0].length;
@@ -187,7 +210,7 @@ export class Level implements CanvasRendering {
 
 		// 04 - [1]
 		new Tween(this)
-			.to({ nextMapOpacity: 1 }, 1000)
+			.to({ nextMapOpacity: 1 }, 500)
 			.onComplete(() => {
 				// 04 - [2]
 				// After new map generate, set again Player into walk while Transition, so the Player looks like walking through next map
@@ -216,7 +239,7 @@ export class Level implements CanvasRendering {
 						this.world.player.changeState('idle');
 
 						new Tween(this)
-							.to({ currentMapOpacity: 0 }, 1000)
+							.to({ currentMapOpacity: 0 }, 500)
 							.onComplete(() => this.finishShifting())
 							.start();
 					})
@@ -297,6 +320,11 @@ export class Level implements CanvasRendering {
 
 		// Make sure we don't mess the canvas
 		ctx.restore();
+
+		// ! Game Log
+		ctx.font = '8px zig';
+		ctx.fillStyle = `white`;
+		ctx.fillText(`[Log] map part x:${this.currentMapPartX} y:${this.currentMapPartY}`, 16, canvas.height - 16);
 	}
 }
 

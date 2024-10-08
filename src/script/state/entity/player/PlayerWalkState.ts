@@ -15,7 +15,7 @@ export class PlayerWalkState extends PlayerBaseState {
 		let direction = this.entity.direction;
 		const move = { x: 0, y: 0 };
 
-		// Check keyboard input for movement
+		// Check keyboard input for movement, only 1 key allowed
 		if (input.keyboard.isDown.w) {
 			move.y = -2;
 			direction = 'up';
@@ -41,25 +41,23 @@ export class PlayerWalkState extends PlayerBaseState {
 		if (moving) {
 			// Check for collisions before moving
 			let isCancelPlayer = false;
-			let eventTriggered = false;
 			for (const yRow of this.level.paths) {
 				for (const path of yRow) {
+					// Evaluate Player movement first
 					if (path.evaluate(this.level.world.player)) {
 						isCancelPlayer = true;
 						break;
 					}
 
+					// The map button will be trigger the shift and go to next map if collide
 					for (const mapBtn of path.mapButtons) {
 						mapBtn.update();
 					}
 
-					// if (path.openMap(this.level.world.player)) {
-					// 	Event.dispatch('shift-left');
-					// 	eventTriggered = true;
-					// 	break;
-					// }
+					// The Path will check whether should go to battle field or not
+					path.checkBattle(this.level.world.player);
 				}
-				if (isCancelPlayer || eventTriggered) break;
+				if (isCancelPlayer) break;
 			}
 
 			// Cancel Player movement if Player hit the collision box

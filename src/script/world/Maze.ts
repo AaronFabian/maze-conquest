@@ -1,6 +1,6 @@
-import { _QuadImage, random } from '@/utils';
+import { ctx } from '@/global';
 import { SystemError } from '@/script/world/Error/SystemError';
-import { ctx, TILE_SIZE } from '@/global';
+import { _QuadImage, random } from '@/utils';
 
 const _window = window as any;
 
