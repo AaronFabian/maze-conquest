@@ -1,5 +1,5 @@
 import { EntityDef } from '@/script/interface/entity/EntityDef';
-import { AnimationDefInterface } from '@/script/interface/game/AnimationDefInterface';
+import { AnimationDef } from '@/script/interface/game/AnimationDef';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 import { StateMachine } from '@/script/state/StateMachine';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
@@ -68,7 +68,7 @@ export class Entity implements CanvasRendering {
 		const animationsReturned = new Map<string, Animation>();
 
 		for (const key of Object.keys(animations)) {
-			const animationDef: AnimationDefInterface = {
+			const animationDef: AnimationDef = {
 				texture: animations[key].texture || 'entities',
 				frames: animations[key].frames,
 				interval: animations[key].interval,

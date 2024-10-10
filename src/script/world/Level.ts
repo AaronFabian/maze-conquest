@@ -324,7 +324,12 @@ export class Level implements CanvasRendering {
 		// ! Game Log
 		ctx.font = '8px zig';
 		ctx.fillStyle = `white`;
-		ctx.fillText(`[Log] map part x:${this.currentMapPartX} y:${this.currentMapPartY}`, 16, canvas.height - 16);
+		ctx.fillText(`[Log] map part x:${this.currentMapPartX} y:${this.currentMapPartY}`, 16, canvas.height - 32);
+
+		const player = this.world.player;
+		ctx.font = '8px zig';
+		ctx.fillStyle = `white`;
+		ctx.fillText(`[Log] player coordinate x:${player.xCoord} y:${player.yCoord}`, 16, canvas.height - 16);
 	}
 }
 

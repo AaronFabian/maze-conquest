@@ -51,7 +51,7 @@ export class StartState extends BaseState {
 
 							_window.gStateStack.push(new GameState());
 
-							_window.gStateStack.push(new CurtainOpenState(0, 2000, () => {}));
+							_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
 						})
 					);
 				}

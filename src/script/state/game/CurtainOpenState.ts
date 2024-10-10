@@ -11,9 +11,17 @@ export class CurtainOpenState extends BaseState {
 	private topCurtainY: number;
 	private bottomCurtainY: number;
 
-	constructor(delay: number = 250, animateTime: number = 750, onFinished: Function = () => {}) {
+	private color: { r: number; g: number; b: number };
+
+	constructor(
+		color: { r: number; g: number; b: number },
+		delay: number = 250,
+		animateTime: number = 750,
+		onFinished: Function = () => {}
+	) {
 		super();
 
+		this.color = color;
 		this.topCurtainY = 0;
 		this.bottomCurtainY = canvas.height / 2;
 
@@ -33,7 +41,8 @@ export class CurtainOpenState extends BaseState {
 	}
 
 	render() {
-		ctx.fillStyle = `rgba(255,255,255, ${this.curtainOpacity})`;
+		const { r, g, b } = this.color;
+		ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.curtainOpacity})`;
 		ctx.fillRect(0, this.bottomCurtainY, canvas.width, canvas.height / 2);
 		ctx.fillRect(0, this.topCurtainY, canvas.width, canvas.height / 2);
 	}

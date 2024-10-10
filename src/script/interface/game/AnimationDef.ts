@@ -1,4 +1,4 @@
-export interface AnimationDefInterface {
+export interface AnimationDef {
 	frames: number[];
 	interval: number;
 	texture: string;

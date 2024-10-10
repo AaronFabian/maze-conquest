@@ -1,8 +1,11 @@
 import { ctx } from '@/global';
 import { AABB } from '@/script/interface/game/AABB';
-import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 import { Player } from '@/script/object/entity/Player';
 import { MapButton } from '@/script/object/world/MapButton';
+import { BattleState } from '@/script/state/game/BattleState';
+import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
+import { FadeInState } from '@/script/state/game/FadeInState';
+import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { Level } from '@/script/world/Level';
 import { MazeObjectType } from '@/script/world/Maze';
 import { _QuadImage } from '@/utils';
@@ -15,7 +18,7 @@ enum BlockType {
 	WAY = 2,
 }
 
-export class Path implements CanvasRendering {
+export class Path {
 	structure: number[][] | null;
 	spriteId: number | null;
 	xPos: number;
@@ -286,11 +289,29 @@ export class Path implements CanvasRendering {
 		};
 
 		if (this.checkCollision(box1, box2)) {
-			this.onCollide();
+			this.beginBattle();
 		}
 	}
 
-	onCollide() {}
+	beginBattle() {
+		// 01 We are going to Fade in and Fade out twice
+		_window.gStateStack.push(
+			new FadeInState({ r: 0, g: 0, b: 0 }, 500, () => {
+				_window.gStateStack.push(
+					new FadeOutState({ r: 0, g: 0, b: 0 }, 500, () => {
+						_window.gStateStack.push(
+							new FadeInState({ r: 0, g: 0, b: 0 }, 250, () => {
+								// 02 In this FadeInState we Load the BattleState
+								_window.gStateStack.push(new BattleState());
+
+								_window.gStateStack.push(new CurtainOpenState({ r: 0, g: 0, b: 0 }, 500, 1500, () => {}));
+							})
+						);
+					})
+				);
+			})
+		);
+	}
 
 	private checkCollision(box1: AABB, box2: AABB): boolean {
 		return (
@@ -302,7 +323,34 @@ export class Path implements CanvasRendering {
 	}
 
 	update() {
-		// this.evaluate(this.level.player);
+		const player = this.level.world.player;
+
+		// Using AABB
+		const box1: AABB = {
+			// Path
+			x: this.renderPosX * 80,
+			y: this.renderPosY * 80,
+			width: 80,
+			height: 80,
+		};
+		const box2: AABB = {
+			// Player
+			x: player.x,
+			y: player.y,
+			width: player.width,
+			height: player.x,
+		};
+
+		// If this some Path collided then update the Player coordinate
+		if (this.checkCollision(box1, box2)) {
+			player.xCoord = this.xPos;
+			player.yCoord = this.yPos;
+
+			// If this Path actually an Enemy then begin battle
+			if (this.mazeObjectType === MazeObjectType.ENEMY) {
+				this.beginBattle();
+			}
+		}
 	}
 
 	render() {

@@ -2,7 +2,6 @@ import { input } from '@/global';
 import { Entity } from '@/script/object/entity/Entity';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
 import { Level } from '@/script/world/Level';
-import { Event } from '@/utils';
 
 export class PlayerWalkState extends PlayerBaseState {
 	constructor(entity: Entity, public level: Level) {
@@ -72,7 +71,7 @@ export class PlayerWalkState extends PlayerBaseState {
 				this.entity.setAnimation = 'walk-' + this.entity.direction;
 			}
 		} else {
-			// Set to idle state if no movement
+			// Set to idle state if no movement / no key pressed
 			this.entity.changeState('idle');
 		}
 	}
