@@ -12,6 +12,7 @@ export class CurtainOpenState extends BaseState {
 	private bottomCurtainY: number;
 
 	private color: { r: number; g: number; b: number };
+	time: NodeJS.Timeout;
 
 	constructor(
 		color: { r: number; g: number; b: number },
@@ -26,7 +27,7 @@ export class CurtainOpenState extends BaseState {
 		this.bottomCurtainY = canvas.height / 2;
 
 		// setTimeout to avoid the lag
-		setTimeout(() => {
+		this.time = setTimeout(() => {
 			new Tween(this)
 				.to({ bottomCurtainY: canvas.height, topCurtainY: -canvas.height / 2 }, animateTime)
 				.onComplete(() => {
@@ -45,5 +46,9 @@ export class CurtainOpenState extends BaseState {
 		ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.curtainOpacity})`;
 		ctx.fillRect(0, this.bottomCurtainY, canvas.width, canvas.height / 2);
 		ctx.fillRect(0, this.topCurtainY, canvas.width, canvas.height / 2);
+	}
+
+	exit() {
+		clearTimeout(this.time);
 	}
 }

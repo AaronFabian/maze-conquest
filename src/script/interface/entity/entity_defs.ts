@@ -69,6 +69,12 @@ export const ENTITY_DEFS = {
 				interval: 4,
 				looping: true,
 			},
+			['run-left']: {
+				frames: [54, 55, 56, 57, 58, 59, 60, 61],
+				texture: 'soldier',
+				interval: 4,
+				looping: true,
+			},
 			['attack-left-1']: {
 				frames: [9, 10, 11, 12, 13, 14],
 				texture: 'soldier',

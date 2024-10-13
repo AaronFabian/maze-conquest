@@ -1,22 +1,21 @@
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { Path } from '@/script/object/world/Path';
 import { GameState } from '@/script/state/game/GameState';
 import { MazeGame } from '@/script/world/MazeGame';
 import { SystemError } from './Error/SystemError';
 import { Event, random } from '@/utils';
-import { Player } from '@/script/object/entity/Player';
 import { canvas, ctx, Tween } from '@/global';
 import { MazeObjectType } from '@/script/world/Maze';
+import { MapPart } from '@/script/world/MapPart';
 
 export class Level implements CanvasRendering {
-	maze: MazeGame;
 	world: GameState;
-	paths: Path[][];
+	maze: MazeGame;
+	currentMapPart: MapPart | null;
+	nextMapPart: MapPart | null;
 	currentMapPartX: number | null;
 	currentMapPartY: number | null;
-	nextPaths: Path[][] | null;
-	shifting: boolean;
 
+	shifting: boolean;
 	nextMapOpacity: number;
 	nextMapPartX: number | null;
 	nextMapPartY: number | null;
@@ -27,8 +26,9 @@ export class Level implements CanvasRendering {
 	currentMapOpacity: number;
 	cameraOffsetX: number;
 	cameraOffsetY: number;
-	constructor(state: GameState) {
-		this.world = state;
+
+	constructor(world: GameState) {
+		this.world = world;
 
 		// 01
 		this.cameraOffsetX = 0;
@@ -42,20 +42,21 @@ export class Level implements CanvasRendering {
 		this.maze.dig(1, 1);
 
 		// 04 Later will be assigned / late init
-		this.paths = [];
 		this.shifting = false;
-		this.currentMapPartX = null;
-		this.currentMapPartY = null;
 		this.currentMapOffsetX = 0;
 		this.currentMapOffsetY = 0;
 		this.adjacentOffsetX = 0;
 		this.adjacentOffsetY = 0;
 
+		this.currentMapPart = null;
+		this.currentMapPartX = null;
+		this.currentMapPartY = null;
+
 		this.currentMapOpacity = 1;
 		this.nextMapOpacity = 0;
 
 		// 05
-		this.nextPaths = null;
+		this.nextMapPart = null;
 		this.nextMapPartX = null;
 		this.nextMapPartY = null;
 
@@ -88,32 +89,23 @@ export class Level implements CanvasRendering {
 		console.log(`[System] Player using mapPartX ${mapPartX}, mapPartY ${mapPartY}`);
 
 		// 07 create Path instances from sliced Map
-		const paths: Array<Array<Path>> = [];
-		for (let y = 0; y < currentMap.length; y++) {
-			paths.push([]);
-			for (let x = 0; x < currentMap[y].length; x++) {
-				const renderPosX = x;
-				const renderPosY = y;
-				const xPos = mapPartX * 15 + x;
-				const yPos = mapPartY * 8 + y;
-				const path = new Path(this, xPos, yPos, renderPosX, renderPosY);
-				path.generate(this.currentMapPartX, this.currentMapPartY);
-				paths[y].push(path);
-			}
-		}
+		this.currentMapPart = new MapPart(currentMap, this.currentMapPartX, this.currentMapPartY, this);
 
-		this.paths = this.generateEnemies(paths);
+		// Tell this Level to generate Enemy
+		this.generateEnemies(this.currentMapPart);
 
 		// Set the player position in this current map with player and the middle
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
 
 		// Setup camera offset so the map will be on the center
-		this.cameraOffsetX = canvas.width / 2 - (this.paths[0].length * 80) / 2;
-		this.cameraOffsetY = canvas.height / 2 - (this.paths.length * 80) / 2;
+		this.cameraOffsetX = canvas.width / 2 - (this.currentMapPart.paths[0].length * 80) / 2;
+		this.cameraOffsetY = canvas.height / 2 - (this.currentMapPart.paths.length * 80) / 2;
 	}
 
-	private generateEnemies(paths: Path[][]): Path[][] {
+	private generateEnemies(mapPart: MapPart) {
+		const paths = mapPart.paths;
+
 		// At least one 1 guaranteed
 		const totalEnemies = random(1, Math.floor(paths[0].length + paths.length));
 		// const totalEnemies = random(1, Math.floor((paths[0].length + paths.length) / 2));
@@ -126,13 +118,12 @@ export class Level implements CanvasRendering {
 				const [x, y] = [random(1, paths[0].length - 1), random(1, paths.length - 1)];
 				if (!objectShouldAvoid.find(o => o === paths[y][x].mazeObjectType)) {
 					paths[y][x].mazeObjectType = MazeObjectType.ENEMY;
-					console.log(`[System] enemy set at ${x} ${y}`);
+					// ! This not final, When generating enemy they can have the same spot
+					// console.log(`[System] enemy set at ${x} ${y}`);
 					break;
 				}
 			}
 		}
-
-		return paths;
 	}
 
 	private beginShifting(direction: string) {
@@ -142,29 +133,20 @@ export class Level implements CanvasRendering {
 		// 01 Tell Level that we are shifting the camera
 		this.shifting = true;
 
-		// 02 Generate next Path[][]
+		// 02 Generate next MapPart
 		const nextMap = this.maze.slicedMap[this.nextMapPartY][this.nextMapPartX];
-		const paths: Array<Array<Path>> = [];
-		for (let y = 0; y < nextMap.length; y++) {
-			paths.push([]);
-			for (let x = 0; x < nextMap[y].length; x++) {
-				const renderPosX = x;
-				const renderPosY = y;
-				const xPos = this.nextMapPartX * 15 + x;
-				const yPos = this.nextMapPartY * 8 + y;
-				const path = new Path(this, xPos, yPos, renderPosX, renderPosY);
-				path.generate(this.nextMapPartX, this.nextMapPartY);
-				paths[y].push(path);
-			}
-		}
+		this.nextMapPart = new MapPart(nextMap, this.nextMapPartX, this.nextMapPartY, this);
 
-		this.nextPaths = this.generateEnemies(paths);
+		// Tell this Level to generate Enemy
+		this.generateEnemies(this.nextMapPart);
+
+		// this.nextPaths = this.generateEnemies(paths);
 
 		// 03 This will render the next paths at the other side
-		const xLength = this.nextPaths[0].length;
-		const yLength = this.nextPaths.length;
-		const currentXLength = this.paths[0].length;
-		const currentYLength = this.paths.length;
+		const xLength = this.nextMapPart!.paths[0].length;
+		const yLength = this.nextMapPart!.paths.length;
+		const currentXLength = this.currentMapPart!.paths[0].length;
+		const currentYLength = this.currentMapPart!.paths.length;
 
 		let adjacentOffsetX = 0;
 		let adjacentOffsetY = 0;
@@ -202,8 +184,8 @@ export class Level implements CanvasRendering {
 		// Begin shifting animation for new Path[] and the old path[];
 		this.adjacentOffsetX = adjacentOffsetX;
 		this.adjacentOffsetY = adjacentOffsetY;
-		const cameraOffsetX = canvas.width / 2 - (this.nextPaths[0].length * 80) / 2;
-		const cameraOffsetY = canvas.height / 2 - (this.nextPaths.length * 80) / 2;
+		const cameraOffsetX = canvas.width / 2 - (this.nextMapPart!.paths[0].length * 80) / 2;
+		const cameraOffsetY = canvas.height / 2 - (this.nextMapPart!.paths.length * 80) / 2;
 
 		// Set Player to idle while next map fade in
 		this.world.player.changeState('idle');
@@ -247,12 +229,14 @@ export class Level implements CanvasRendering {
 			})
 			.start();
 	}
+
 	private finishShifting() {
-		// Assign the next Paths to become current Paths[][]
-		this.paths = this.nextPaths!;
-		this.currentMapPartX = this.nextMapPartX!;
-		this.currentMapPartY = this.nextMapPartY!;
-		this.nextPaths = null;
+		// Assign the next MapPath to become current MapPart
+		if (this.nextMapPart === null) throw new SystemError('Null was given from finishShifting()');
+		this.currentMapPart = this.nextMapPart;
+		this.currentMapPartX = this.nextMapPartX;
+		this.currentMapPartY = this.nextMapPartY;
+		this.nextMapPart = null;
 
 		// Reset the offset and opacity configuration
 		this.currentMapOffsetX = 0;
@@ -274,6 +258,7 @@ export class Level implements CanvasRendering {
 			this.world.player.currentAnimation!.update();
 		} else {
 			this.world.player.update();
+			this.currentMapPart!.update();
 		}
 	}
 
@@ -286,32 +271,16 @@ export class Level implements CanvasRendering {
 		ctx.save();
 		ctx.globalAlpha = this.currentMapOpacity;
 		ctx.translate(this.currentMapOffsetX, this.currentMapOffsetY);
-		for (let y = 0; y < this.paths.length; y++) {
-			for (let x = 0; x < this.paths[y].length; x++) {
-				const path = this.paths[y][x];
-				path.render();
-				for (const mapBtn of path.mapButtons) {
-					mapBtn.render();
-				}
-			}
-		}
+		this.currentMapPart!.render();
 		ctx.globalAlpha = 1;
 		ctx.restore();
 
 		// Next map
-		if (this.nextPaths !== null) {
+		if (this.nextMapPart !== null) {
 			ctx.save();
 			ctx.globalAlpha = this.nextMapOpacity;
 			ctx.translate(this.adjacentOffsetX, this.adjacentOffsetY);
-			for (let y = 0; y < this.nextPaths.length; y++) {
-				for (let x = 0; x < this.nextPaths[y].length; x++) {
-					const path = this.nextPaths[y][x];
-					path.render();
-					for (const mapBtn of path.mapButtons) {
-						mapBtn.render();
-					}
-				}
-			}
+			this.nextMapPart.render();
 			ctx.globalAlpha = 1;
 			ctx.restore();
 		}
@@ -321,15 +290,15 @@ export class Level implements CanvasRendering {
 		// Make sure we don't mess the canvas
 		ctx.restore();
 
-		// ! Game Log
-		ctx.font = '8px zig';
-		ctx.fillStyle = `white`;
-		ctx.fillText(`[Log] map part x:${this.currentMapPartX} y:${this.currentMapPartY}`, 16, canvas.height - 32);
+		// // ! Game Log
+		// ctx.font = '8px zig';
+		// ctx.fillStyle = `white`;
+		// ctx.fillText(`[Log] map part x:${this.currentMapPartX} y:${this.currentMapPartY}`, 16, canvas.height - 16);
 
-		const player = this.world.player;
-		ctx.font = '8px zig';
-		ctx.fillStyle = `white`;
-		ctx.fillText(`[Log] player coordinate x:${player.xCoord} y:${player.yCoord}`, 16, canvas.height - 16);
+		// const player = this.world.player;
+		// ctx.font = '8px zig';
+		// ctx.fillStyle = `white`;
+		// ctx.fillText(`[Log] player coordinate x:${player.xCoord} y:${player.yCoord}`, 16, canvas.height - 16);
 	}
 }
 

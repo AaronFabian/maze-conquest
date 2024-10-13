@@ -1,9 +1,11 @@
 import { input } from '@/global';
 import { Entity } from '@/script/object/entity/Entity';
+import { Player } from '@/script/object/entity/Player.js';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
 import { Level } from '@/script/world/Level';
 
 export class PlayerWalkState extends PlayerBaseState {
+	override entity!: Player;
 	constructor(entity: Entity, public level: Level) {
 		super(entity);
 		this.entity.setAnimation = 'walk-' + this.entity.direction;
@@ -38,33 +40,6 @@ export class PlayerWalkState extends PlayerBaseState {
 		}
 
 		if (moving) {
-			// Check for collisions before moving
-			let isCancelPlayer = false;
-			for (const yRow of this.level.paths) {
-				for (const path of yRow) {
-					// Evaluate Player movement first
-					if (path.evaluate(this.level.world.player)) {
-						isCancelPlayer = true;
-						break;
-					}
-
-					// The map button will be trigger the shift and go to next map if collide
-					for (const mapBtn of path.mapButtons) {
-						mapBtn.update();
-					}
-
-					// The Path will check whether should go to battle field or not
-					path.checkBattle(this.level.world.player);
-				}
-				if (isCancelPlayer) break;
-			}
-
-			// Cancel Player movement if Player hit the collision box
-			if (isCancelPlayer) {
-				this.entity.x += -move.x;
-				this.entity.y += -move.y;
-			}
-
 			// Update direction and animation if the direction changed
 			if (this.entity.direction !== direction) {
 				this.entity.direction = direction;

@@ -25,7 +25,6 @@ export class Entity implements CanvasRendering {
 		this.direction = 'down';
 		this.animations = this.createAnimations(def.animations);
 
-		// x, y only for initializer because we calculate our pixel by Box2D
 		this.x = def.x;
 		this.y = def.y;
 

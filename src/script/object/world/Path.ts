@@ -29,6 +29,7 @@ export class Path {
 	mapButtons: MapButton[];
 	isDangerPath: boolean;
 	mazeObjectType: MazeObjectType;
+	isPlayerCollided: boolean;
 
 	constructor(level: Level, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
 		this.level = level;
@@ -40,6 +41,7 @@ export class Path {
 		this.spriteId = null;
 		this.mapButtons = [];
 		this.isDangerPath = false;
+		this.isPlayerCollided = false;
 
 		this.mazeObjectType = this.level.maze.data[this.yPos][this.xPos];
 	}
@@ -232,7 +234,7 @@ export class Path {
 		this.spriteId = spriteId;
 	}
 
-	evaluate(player: Player): boolean {
+	private evaluate(player: Player): boolean {
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
 				const block = this.structure![y][x];
@@ -269,7 +271,7 @@ export class Path {
 		 */
 	}
 
-	checkBattle(player: Player) {
+	private checkBattle(player: Player) {
 		if (this.mazeObjectType !== MazeObjectType.ENEMY) return;
 
 		// Using AABB
@@ -300,11 +302,11 @@ export class Path {
 				_window.gStateStack.push(
 					new FadeOutState({ r: 0, g: 0, b: 0 }, 500, () => {
 						_window.gStateStack.push(
-							new FadeInState({ r: 0, g: 0, b: 0 }, 250, () => {
+							new FadeInState({ r: 0, g: 0, b: 0 }, 500, () => {
 								// 02 In this FadeInState we Load the BattleState
-								_window.gStateStack.push(new BattleState());
+								_window.gStateStack.push(new BattleState(this.level));
 
-								_window.gStateStack.push(new CurtainOpenState({ r: 0, g: 0, b: 0 }, 500, 1500, () => {}));
+								_window.gStateStack.push(new CurtainOpenState({ r: 0, g: 0, b: 0 }, 500, 500, () => {}));
 							})
 						);
 					})
@@ -323,34 +325,22 @@ export class Path {
 	}
 
 	update() {
-		const player = this.level.world.player;
+		// Check for collisions before moving
+		this.isPlayerCollided = false;
 
-		// Using AABB
-		const box1: AABB = {
-			// Path
-			x: this.renderPosX * 80,
-			y: this.renderPosY * 80,
-			width: 80,
-			height: 80,
-		};
-		const box2: AABB = {
-			// Player
-			x: player.x,
-			y: player.y,
-			width: player.width,
-			height: player.x,
-		};
-
-		// If this some Path collided then update the Player coordinate
-		if (this.checkCollision(box1, box2)) {
-			player.xCoord = this.xPos;
-			player.yCoord = this.yPos;
-
-			// If this Path actually an Enemy then begin battle
-			if (this.mazeObjectType === MazeObjectType.ENEMY) {
-				this.beginBattle();
-			}
+		// Evaluate Player movement first
+		if (this.evaluate(this.level.world.player)) {
+			this.isPlayerCollided = true;
+			return;
 		}
+
+		// The map button will be trigger the shift and go to next map if collide
+		for (const mapBtn of this.mapButtons) {
+			mapBtn.update();
+		}
+
+		// The Path will check whether should go to battle field or not
+		this.checkBattle(this.level.world.player);
 	}
 
 	render() {

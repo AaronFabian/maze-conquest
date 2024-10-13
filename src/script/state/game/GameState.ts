@@ -1,4 +1,4 @@
-import { TWEEN } from '@/global';
+import { canvas, ctx, TWEEN } from '@/global';
 import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 import { Player } from '@/script/object/entity/Player';
@@ -27,7 +27,7 @@ export class GameState extends BaseState {
 		const playerDef: EntityDef = ENTITY_DEFS.player;
 		this.player = new Player(playerDef, this.level);
 
-		// defining ship state
+		// Defining Player state
 		const playerState = new Map<string, () => EntityBaseState>();
 		playerState.set('idle', () => new PlayerIdleState(this.player));
 		playerState.set('walk', () => new PlayerWalkState(this.player, this.level));
@@ -52,7 +52,14 @@ export class GameState extends BaseState {
 	}
 
 	override render() {
-		this.level.render();
+		const level = this.level;
+
+		level.render();
+
+		// ! Game Log
+		ctx.font = '8px zig';
+		ctx.fillStyle = `white`;
+		ctx.fillText(`[Log] map part x:${level.currentMapPartX} y:${level.currentMapPartY}`, 16, canvas.height - 16);
 	}
 
 	override exit = () => TWEEN.removeAll();
