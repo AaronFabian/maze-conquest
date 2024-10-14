@@ -3,14 +3,18 @@ import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 import { Entity } from '@/script/object/entity/Entity';
 import { Party } from '@/script/object/party/Party';
-import { Soldier } from '@/script/object/party/Soldier';
+import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
-import { SoldierBaseState } from '@/script/state/entity/party/soldier/SoldierBaseState';
-import { SoldierIdleState } from '@/script/state/entity/party/soldier/SoldierIdleState';
+import { HeroBaseState } from '@/script/state/entity/party/HeroBaseState';
+import { HeroIdleState } from '@/script/state/entity/party/HeroIdleState';
 import { StateMachine } from '@/script/state/StateMachine';
 import { Level } from '@/script/world/Level';
 import { BattleNatatorState } from '@/script/state/game/BattleNatatorState';
+import { HeroDef } from '@/script/interface/entity/HeroDef';
+import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
+import { EnemyDef } from '@/script/interface/entity/EnemyDef';
+import { ENEMY_DEFS } from '@/script/interface/entity/enemy_defs';
 
 const _window = window as any;
 
@@ -27,53 +31,102 @@ export class BattleState extends BaseState {
 		this.finishOpening = false;
 
 		// Hero party
+		this.heroParty = this.generateHeroParty();
+
+		// Opponent Party
+		this.enemyParty = this.generateEnemyParty();
+
+		// Here where the hero begin to transition in
+		this.slideIn();
+	}
+	generateEnemyParty(): Party {
+		const enemies: Entity[] = [];
+		const orcDef: EnemyDef = ENEMY_DEFS.orc;
+		const orc = new Hero(orcDef, 1);
+
+		const orcState = new Map<string, () => EntityBaseState>();
+		orcState.set('idle', () => new HeroIdleState(orc));
+		orcState.set('run', () => new HeroBaseState(orc));
+
+		orc.setStateMachine = new StateMachine(orcState);
+		orc.setDirection = 'right';
+		orc.changeState('run');
+
+		// Make our party at the outside of the battle field
+		orc.x = canvas.width / 2 - 320;
+		orc.y = canvas.height / 2 - 240 / 2 + 64;
+		enemies.push(orc);
+
+		return new Party(this.level, enemies);
+	}
+
+	private generateHeroParty(): Party {
 		const heroes: Entity[] = [];
-		const soldierDef: EntityDef = ENTITY_DEFS.soldier;
-		const soldier = new Soldier(soldierDef);
+		const soldierDef: HeroDef = HERO_DEFS.soldier;
+		const soldier = new Hero(soldierDef, 1);
 
 		const soldierState = new Map<string, () => EntityBaseState>();
-		soldierState.set('idle', () => new SoldierIdleState(soldier));
-		soldierState.set('run', () => new SoldierBaseState(soldier));
+		soldierState.set('idle', () => new HeroIdleState(soldier));
+		soldierState.set('run', () => new HeroBaseState(soldier));
 
 		soldier.setStateMachine = new StateMachine(soldierState);
+		soldier.setDirection = 'left';
 		soldier.changeState('run');
 
 		// Make our party at the outside of the battle field
 		soldier.x = canvas.width / 2 + 320;
-		soldier.y = canvas.height / 2 - 240 / 2 + 32;
+		soldier.y = canvas.height / 2 - 240 / 2 + 64;
 		heroes.push(soldier);
 
-		this.heroParty = new Party(this.level, heroes);
-
-		// Opponent Party
-		const enemies: Entity[] = [];
-		this.enemyParty = new Party(this.level, enemies);
-
-		// Here where the hero begin to transition in
-		this.heroSlideIn();
+		return new Party(this.level, heroes);
 	}
 
-	heroSlideIn() {
+	private slideIn() {
+		for (let i = 0; i < this.heroParty.party.length; i++) {
+			const enemy = this.enemyParty.party[i];
+			const startAnimate = () => {
+				new Tween(enemy)
+					.to({ x: canvas.width / 2 - 96 })
+					.onComplete(() => {
+						enemy.changeState('idle');
+					})
+					.start();
+			};
+
+			setTimeout(startAnimate, 500 + 100 * i);
+		}
+
 		for (let i = 0; i < this.heroParty.party.length; i++) {
 			const member = this.heroParty.party[i];
 			const startAnimate = () => {
 				new Tween(member)
-					.to({ x: canvas.width / 2 + 64 })
+					.to({ x: canvas.width / 2 + 96 })
 					.onComplete(() => {
-						// Immediate stop the CurtainOpenState
-						// _window.gStateStack.pop();
 						member.changeState('idle');
+
+						if (i === this.heroParty.party.length - 1) {
+							// Immediate stop the CurtainOpenState
+							// _window.gStateStack.pop();
+
+							let text = 'You are encountering \n';
+							for (const enemy of this.enemyParty.party) {
+								text += (enemy as Hero).name;
+							}
+
+							_window.gStateStack.push(new BattleNatatorState(this, text, () => console.log('ok')));
+						}
 					})
 					.start();
 			};
 
 			// Wait the CurtainOpen animation finished for 500ms
-			setTimeout(startAnimate, 600 + 100 * i);
+			setTimeout(startAnimate, 500 + 100 * i);
 		}
 	}
 
 	override update() {
 		this.heroParty.update();
+		this.enemyParty.update();
 	}
 
 	override render() {

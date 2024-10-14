@@ -136,7 +136,6 @@ export function newHowler(src: string, loop: boolean = false): Promise<unknown> 
 	});
 }
 
-// under experiment
 export function newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
 	const imgElement = new Image();
 	imgElement.src = src;
@@ -154,4 +153,29 @@ export function newImage(src: string, alt: string, state: LoadingAssetScreen): P
 
 export function random(from: number = 0, to: number = 1) {
 	return Math.floor(Math.random() * (to - from + 1)) + from;
+}
+
+export function getWrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+	const words = text.split(' ');
+	let lines: string[] = [];
+	let currentLine = '';
+
+	words.forEach(word => {
+		const testLine: string = currentLine + word + ' ';
+		const metrics: TextMetrics = ctx.measureText(testLine);
+		const testWidth: number = metrics.width;
+
+		if (testWidth > maxWidth && currentLine !== '') {
+			lines.push(currentLine);
+			currentLine = word + ' ';
+		} else {
+			currentLine = testLine;
+		}
+	});
+
+	if (currentLine) {
+		lines.push(currentLine.trim());
+	}
+
+	return lines;
 }

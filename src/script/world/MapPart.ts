@@ -14,6 +14,7 @@ export class MapPart extends Room {
 	opacity: number;
 	constructor(map: MazeObjectType[][], mapPartX: number, mapPartY: number, level: Level) {
 		super();
+
 		this.map = map;
 		this.mapPartX = mapPartX;
 		this.mapPartY = mapPartY;

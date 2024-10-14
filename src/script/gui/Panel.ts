@@ -8,6 +8,7 @@ export class Panel implements CanvasRendering {
 	y: number;
 	width: number;
 	height: number;
+	isAnimating: boolean;
 	constructor(x: number, y: number, width: number, height: number) {
 		this.x = x;
 		this.y = y;
@@ -16,11 +17,27 @@ export class Panel implements CanvasRendering {
 
 		this.visible = true;
 		this.textVisible = false;
-
+		this.isAnimating = true;
 		new Tween(this)
 			.to({ height: height }, 250)
 			.onComplete(() => {
+				this.isAnimating = false;
 				this.textVisible = true;
+			})
+			.start();
+	}
+
+	toggle() {
+		this.visible = !this.visible;
+	}
+
+	switch() {
+		this.isAnimating = true;
+		new Tween(this)
+			.to({ height: this.visible ? 0 : this.height }, 250)
+			.onComplete(() => {
+				this.isAnimating = false;
+				this.toggle();
 			})
 			.start();
 	}

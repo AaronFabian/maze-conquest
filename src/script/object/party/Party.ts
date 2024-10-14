@@ -1,10 +1,8 @@
-import { canvas } from '@/global';
+import { canvas, ctx } from '@/global';
 import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
-import { Soldier } from '@/script/object/party/Soldier';
+import { Hero } from '@/script/object/party/Hero';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
-import { SoldierBaseState } from '@/script/state/entity/party/soldier/SoldierBaseState';
-import { SoldierIdleState } from '@/script/state/entity/party/soldier/SoldierIdleState';
 import { StateMachine } from '@/script/state/StateMachine';
 import { Level } from '@/script/world/Level';
 import { Entity } from '@/script/object/entity/Entity';
@@ -23,14 +21,18 @@ export class Party {
 	}
 
 	update() {
-		// Only get the current turn
-		const member = this.party[this.order];
-		member.update();
+		for (const member of this.party) {
+			member.currentAnimation!.update();
+		}
 	}
 
 	render() {
 		for (const member of this.party) {
 			member.render();
+
+			// debugging-purpose
+			// ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+			// ctx.fillRect(member.x, member.y, member.width, member.height);
 		}
 	}
 }
