@@ -25,6 +25,7 @@ async function init() {
 	imageToAwait.push(newImage('component/character/player.png', 'player', loadingScreen));
 	imageToAwait.push(newImage('component/character/soldier.png', 'soldier', loadingScreen));
 	imageToAwait.push(newImage('component/character/orc.png', 'orc', loadingScreen));
+	imageToAwait.push(newImage('component/cursor.png', 'cursor', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));

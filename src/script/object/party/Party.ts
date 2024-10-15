@@ -20,6 +20,10 @@ export class Party {
 		this.order = 0;
 	}
 
+	get length(): number {
+		return this.party.length;
+	}
+
 	update() {
 		for (const member of this.party) {
 			member.currentAnimation!.update();

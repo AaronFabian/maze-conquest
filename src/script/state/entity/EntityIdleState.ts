@@ -12,6 +12,8 @@ export class EntityIdleState extends EntityBaseState {
 	constructor(entity: Entity) {
 		super(entity);
 
+		this.entity.setAnimation = 'idle-' + this.entity.direction;
+
 		// used for AI waiting
 		this.waitDuration = 0;
 		this.waitTimer = 0;
