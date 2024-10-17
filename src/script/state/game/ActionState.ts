@@ -1,16 +1,26 @@
 import { BaseState } from '@/script/state/BaseState';
 import { BattleState } from '@/script/state/game/BattleState';
 
+const _window = window as any;
+
 export class ActionState extends BaseState {
-	constructor(public battleState: BattleState) {
+	isPerformingAction: boolean;
+	constructor(public battleState: BattleState, public actionStack: Array<(s: ActionState) => void>) {
 		super();
+		this.isPerformingAction = false;
 	}
 
 	override update() {
 		this.battleState.update();
-	}
 
-	override render() {
-		console.log('this is action state');
+		if (!this.isPerformingAction) {
+			if (this.actionStack.length === 0) {
+				// Pop out this stack
+				_window.gStateStack.pop();
+			} else {
+				const onAction = this.actionStack.shift()!;
+				onAction(this);
+			}
+		}
 	}
 }

@@ -49,20 +49,22 @@ export class HeroMoveMenu implements CanvasRendering {
 		}
 
 		if (keyWasPressed('Enter')) {
-			this.menu[this.cursor].onSelect();
+			// Here Player should choose which enemy should be attack
 
-			// Do not proceed to next queue if there is no Hero left in the turn stack
-			if (this.selectionState.turnStack.length === 1) {
-				console.log('should go to enemy party turn');
-				// Remove the SelectionState
-				_window.gStateStack.pop();
+			this.menu[this.cursor].onSelect(this.hero);
 
-				_window.gStateStack.push(new ActionState(this.selectionState.battleState));
+			// // Do not proceed to next queue if there is no Hero left in the turn stack
+			// if (this.selectionState.turnStack.length === 1) {
+			// 	console.log('should go to enemy party turn');
+			// 	// Remove the SelectionState
+			// 	_window.gStateStack.pop();
 
-				this.selectionState.battleInformationState.highLight = null;
-			} else {
-				this.selectionState.nextQueue();
-			}
+			// 	_window.gStateStack.push(new ActionState(this.selectionState.battleState, this.selectionState.moveStack));
+
+			// 	this.selectionState.battleInformationState.highLight = null;
+			// } else {
+			// 	this.selectionState.nextQueue();
+			// }
 		}
 	}
 

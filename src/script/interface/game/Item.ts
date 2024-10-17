@@ -1,4 +1,6 @@
+import { Hero } from '@/script/object/party/Hero';
+
 export interface Item {
 	text: string;
-	onSelect: () => void;
+	onSelect: (hero: Hero) => void;
 }

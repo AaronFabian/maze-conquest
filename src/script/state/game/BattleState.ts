@@ -11,6 +11,7 @@ import { BaseState } from '@/script/state/BaseState';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
 import { EntityRunState } from '@/script/state/entity/EntityRunState';
+import { HeroAttackState } from '@/script/state/entity/party/HeroAttackState';
 import { HeroBaseState } from '@/script/state/entity/party/HeroBaseState';
 import { HeroIdleState } from '@/script/state/entity/party/HeroIdleState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
@@ -73,10 +74,11 @@ export class BattleState extends BaseState {
 		const soldierState = new Map<string, () => EntityBaseState>();
 		soldierState.set('idle', () => new HeroIdleState(soldier));
 		soldierState.set('run', () => new HeroBaseState(soldier));
+		soldierState.set('attack', () => new HeroAttackState(soldier));
 
 		soldier.setStateMachine = new StateMachine(soldierState);
 		soldier.setDirection = 'left';
-		soldier.changeState('run');
+		soldier.changeState('idle');
 
 		// Make our party at the outside of the battle field
 		soldier.x = canvas.width / 2 + 320;
@@ -96,7 +98,6 @@ export class BattleState extends BaseState {
 					.to({ x: canvas.width / 2 - 96 })
 					.onComplete(() => {
 						enemy.changeState('idle');
-						enemy;
 					})
 					.start();
 			};

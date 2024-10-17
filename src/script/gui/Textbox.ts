@@ -7,7 +7,6 @@ import { getWrap } from '@/utils';
 
 export class Textbox implements CanvasRendering {
 	panel: Panel;
-	level: Level;
 	x: number;
 	y: number;
 	width: number;
@@ -18,14 +17,13 @@ export class Textbox implements CanvasRendering {
 	chunkCounter: number;
 	displayingChunks: string[];
 	font: string;
-	constructor(level: Level, x: number, y: number, width: number, height: number, text: string) {
-		this.level = level;
+	constructor(x: number, y: number, width: number, height: number, text: string, font: string = '16px zig') {
 		this.panel = new Panel(x, y, width, height);
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.font = '16px zig';
+		this.font = font;
 
 		ctx.font = this.font;
 		this.textChucks = getWrap(ctx, text, this.width - 12);
@@ -72,6 +70,16 @@ export class Textbox implements CanvasRendering {
 
 	get isClosed() {
 		return this.closed;
+	}
+
+	set setX(x: number) {
+		this.x = x;
+		this.panel.x = x;
+	}
+
+	set setY(y: number) {
+		this.y = y;
+		this.panel.y = y;
 	}
 
 	update() {

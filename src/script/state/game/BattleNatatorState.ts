@@ -17,14 +17,7 @@ export class BattleNatatorState extends BaseState {
 		this.onClose = onClose;
 
 		// gui
-		this.textbox = new Textbox(
-			this.battleState.level,
-			canvas.width / 2 - 360 / 2,
-			canvas.height / 2 - 240 / 2 + 260,
-			360,
-			84,
-			text
-		);
+		this.textbox = new Textbox(canvas.width / 2 - 360 / 2, canvas.height / 2 - 240 / 2 + 260, 360, 84, text);
 	}
 
 	override update() {
