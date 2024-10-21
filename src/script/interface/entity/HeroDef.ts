@@ -1,4 +1,8 @@
 import { EntityDef } from '@/script/interface/entity/EntityDef';
+import { Enemy } from '@/script/object/party/Enemy';
+import { Hero } from '@/script/object/party/Hero';
+import { ActionState } from '@/script/state/game/ActionState';
+import { HeroCommand } from '@/script/interface/game/HeroCommand';
 
 /*
 local def = {
@@ -26,4 +30,7 @@ export interface HeroDef extends EntityDef {
 	attackIV: number;
 	defenseIV: number;
 	speedIV: number;
+	moveSet: { [key: string]: (hero: Hero, enemy: Enemy) => (actionState: ActionState) => void }; // !
+	attackStatsTable: Map<string, number>;
+	heroCommand: HeroCommand;
 }

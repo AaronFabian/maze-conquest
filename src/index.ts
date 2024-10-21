@@ -24,7 +24,9 @@ async function init() {
 	imageToAwait.push(newImage('component/level1-battlefield.png', 'level1-battlefield', loadingScreen));
 	imageToAwait.push(newImage('component/character/player.png', 'player', loadingScreen));
 	imageToAwait.push(newImage('component/character/soldier.png', 'soldier', loadingScreen));
+	imageToAwait.push(newImage('component/character/wizard.png', 'wizard', loadingScreen));
 	imageToAwait.push(newImage('component/character/orc.png', 'orc', loadingScreen));
+	imageToAwait.push(newImage('component/character/skeleton.png', 'skeleton', loadingScreen));
 	imageToAwait.push(newImage('component/cursor.png', 'cursor', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
@@ -35,6 +37,8 @@ async function init() {
 	_window.gFrames.set('player', generateQuads(_window.gImages.get('player'), 32, 32));
 	_window.gFrames.set('soldier', generateQuads(_window.gImages.get('soldier'), 100, 100));
 	_window.gFrames.set('orc', generateQuads(_window.gImages.get('orc'), 100, 100));
+	_window.gFrames.set('wizard', generateQuads(_window.gImages.get('wizard'), 100, 100));
+	_window.gFrames.set('skeleton', generateQuads(_window.gImages.get('skeleton'), 100, 100));
 
 	// _window.gStateStack.push(new StartState());
 	_window.gStateStack.push(new GameState());

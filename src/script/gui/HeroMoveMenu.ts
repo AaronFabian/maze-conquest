@@ -3,7 +3,7 @@ import { Panel } from '@/script/gui/Panel';
 import { Hero } from '@/script/object/party/Hero';
 import { ctx } from '@/global';
 import { keyWasPressed } from '@/index';
-import { Item } from '@/script/interface/game/Item';
+import { HeroCommand } from '@/script/interface/game/HeroCommand';
 import { SelectionState } from '@/script/state/game/SelectionState';
 import { BattleState } from '@/script/state/game/BattleState';
 import { ActionState } from '@/script/state/game/ActionState';
@@ -18,18 +18,12 @@ export class HeroMoveMenu implements CanvasRendering {
 	panel: Panel;
 	hero: Hero;
 	cursor: number;
-	menu: Item[];
+	menu: HeroCommand[];
 	selectionState: SelectionState;
-	constructor(
-		selectionState: SelectionState,
-		hero: Hero,
-		x: number,
-		y: number,
-		width: number,
-		height: number,
-		menu: Item[]
-	) {
-		this.selectionState = selectionState;
+	battleState: BattleState;
+	constructor(s: SelectionState, hero: Hero, x: number, y: number, width: number, height: number, menu: HeroCommand[]) {
+		this.selectionState = s;
+		this.battleState = this.selectionState.battleState;
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -49,22 +43,7 @@ export class HeroMoveMenu implements CanvasRendering {
 		}
 
 		if (keyWasPressed('Enter')) {
-			// Here Player should choose which enemy should be attack
-
-			this.menu[this.cursor].onSelect(this.hero);
-
-			// // Do not proceed to next queue if there is no Hero left in the turn stack
-			// if (this.selectionState.turnStack.length === 1) {
-			// 	console.log('should go to enemy party turn');
-			// 	// Remove the SelectionState
-			// 	_window.gStateStack.pop();
-
-			// 	_window.gStateStack.push(new ActionState(this.selectionState.battleState, this.selectionState.moveStack));
-
-			// 	this.selectionState.battleInformationState.highLight = null;
-			// } else {
-			// 	this.selectionState.nextQueue();
-			// }
+			this.menu[this.cursor].onSelect(this.hero, this.battleState, this.selectionState);
 		}
 	}
 

@@ -1,5 +1,9 @@
+import { ENEMY_DEFS } from '@/script/interface/entity/enemy_defs';
 import { EnemyDef } from '@/script/interface/entity/EnemyDef';
 import { Entity } from '@/script/object/entity/Entity';
+import { Hero } from '@/script/object/party/Hero';
+import { EnemyActionState } from '@/script/state/game/EnemyActionState';
+import { SystemError } from '@/script/world/Error/SystemError';
 
 export class Enemy extends Entity {
 	name: string;
@@ -19,6 +23,10 @@ export class Enemy extends Entity {
 	expToLevel: number;
 	currentHP: number;
 	override HP: number;
+	moveSet: {
+		[key: string]: (enemy: Enemy, hero: Hero) => (enemyActionState: EnemyActionState) => void;
+	};
+	exp: number;
 	constructor(def: EnemyDef, level: number) {
 		super(def);
 
@@ -47,7 +55,26 @@ export class Enemy extends Entity {
 		// this.calculateStats();
 
 		this.currentHP = this.HP;
+		this.moveSet = def.moveSet;
+		this.exp = def.exp;
+	}
+
+	override damage(value: number): void {
+		this.currentHP -= value;
 	}
 
 	calculateStats() {}
+
+	calculateAttack(moveName: string, hero: Hero) {
+		const baseDmg: number | undefined = ENEMY_DEFS[this.name].attackStatsTable.get(moveName);
+		if (baseDmg === undefined)
+			throw new SystemError('Unexpected error while calculateAttack(). The return value get undefined');
+
+		const dmg = Math.max(1, baseDmg * this.attack - hero.defense);
+		hero.damage(dmg);
+		console.log(`[Battle Log] ${hero.name} damaged by ${dmg}`);
+		if (hero.currentHP <= 0) {
+			hero.isAlive = false;
+		}
+	}
 }

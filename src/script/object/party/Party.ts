@@ -24,6 +24,10 @@ export class Party {
 		return this.party.length;
 	}
 
+	findHeroIndex(reference: Entity): number {
+		return this.party.indexOf(reference);
+	}
+
 	update() {
 		for (const member of this.party) {
 			member.currentAnimation!.update();

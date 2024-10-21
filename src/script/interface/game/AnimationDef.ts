@@ -3,4 +3,5 @@ export interface AnimationDef {
 	interval: number;
 	texture: string;
 	looping: boolean;
+	stopAtFinish: boolean;
 }

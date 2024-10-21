@@ -8,6 +8,7 @@ import { Enemy } from '@/script/object/party/Enemy';
 import { Hero } from '@/script/object/party/Hero';
 import { Party } from '@/script/object/party/Party';
 import { BaseState } from '@/script/state/BaseState';
+import { EntityAttackState } from '@/script/state/entity/EntityAttackState';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
 import { EntityRunState } from '@/script/state/entity/EntityRunState';
@@ -47,12 +48,15 @@ export class BattleState extends BaseState {
 	}
 	private generateEnemyParty(): Party {
 		const enemies: Entity[] = [];
+
+		// orc
 		const orcDef: EnemyDef = ENEMY_DEFS.orc;
 		const orc = new Enemy(orcDef, 1);
 
 		const orcState = new Map<string, () => EntityBaseState>();
 		orcState.set('idle', () => new EntityIdleState(orc));
 		orcState.set('run', () => new EntityRunState(orc));
+		orcState.set('attack', () => new EntityAttackState(orc));
 
 		orc.setStateMachine = new StateMachine(orcState);
 		orc.setDirection = 'right';
@@ -63,11 +67,31 @@ export class BattleState extends BaseState {
 		orc.y = canvas.height / 2 - 240 / 2 + 64;
 		enemies.push(orc);
 
+		// skeleton
+		const skeletonDef: EnemyDef = ENEMY_DEFS.skeleton;
+		const skeleton = new Enemy(skeletonDef, 1);
+
+		const skeletonState = new Map<string, () => EntityBaseState>();
+		skeletonState.set('idle', () => new EntityIdleState(skeleton));
+		skeletonState.set('run', () => new EntityRunState(skeleton));
+		skeletonState.set('attack', () => new EntityAttackState(skeleton));
+
+		skeleton.setStateMachine = new StateMachine(skeletonState);
+		skeleton.setDirection = 'right';
+		skeleton.changeState('run');
+
+		// Make our party at the outside of the battle field
+		skeleton.x = canvas.width / 2 - 320;
+		skeleton.y = canvas.height / 2 - 240 / 2 + 112;
+		enemies.push(skeleton);
+
 		return new Party(this.level, enemies);
 	}
 
 	private generateHeroParty(): Party {
 		const heroes: Entity[] = [];
+
+		// soldier
 		const soldierDef: HeroDef = HERO_DEFS.soldier;
 		const soldier = new Hero(soldierDef, 1);
 
@@ -84,6 +108,23 @@ export class BattleState extends BaseState {
 		soldier.x = canvas.width / 2 + 320;
 		soldier.y = canvas.height / 2 - 240 / 2 + 64;
 		heroes.push(soldier);
+
+		// wizard
+		const wizardDef: HeroDef = HERO_DEFS.wizard;
+		const wizard = new Hero(wizardDef, 1);
+
+		const wizardState = new Map<string, () => EntityBaseState>();
+		wizardState.set('idle', () => new HeroIdleState(wizard));
+		wizardState.set('run', () => new HeroBaseState(wizard));
+		wizardState.set('attack', () => new HeroAttackState(wizard));
+
+		wizard.setStateMachine = new StateMachine(wizardState);
+		wizard.setDirection = 'left';
+		wizard.changeState('idle');
+
+		wizard.x = canvas.width / 2 + 320;
+		wizard.y = canvas.height / 2 - 240 / 2 + 112;
+		heroes.push(wizard);
 
 		return new Party(this.level, heroes);
 	}
@@ -114,13 +155,11 @@ export class BattleState extends BaseState {
 						member.changeState('idle');
 
 						if (i === this.heroParty.party.length - 1) {
-							// Immediate stop the CurtainOpenState
-							// _window.gStateStack.pop();
-
-							let text = 'You are encountering \n';
-							for (let i = 0; i < this.enemyParty.party.length; i++) {
-								const enemy = this.enemyParty.party[0] as Enemy;
-								text += enemy.name + (i === this.enemyParty.party.length - 1 ? '' : ', ');
+							// Creating text for battle opening
+							let text = 'You are encountering ';
+							for (let j = 0; j < this.enemyParty.party.length; j++) {
+								const enemy = this.enemyParty.party[j] as Enemy;
+								text += enemy.name + (j === this.enemyParty.party.length - 1 ? '' : ', ');
 							}
 
 							// here will be trigger BattleNatatorState
@@ -130,6 +169,7 @@ export class BattleState extends BaseState {
 									// For the first time we need to determine which one is going first
 									this.determineTurn();
 
+									// The information about Player Party will always shown
 									_window.gStateStack.push(new BattleInformationState(this));
 								})
 							);
@@ -143,16 +183,18 @@ export class BattleState extends BaseState {
 		}
 	}
 
-	private determineTurn() {
+	determineTurn() {
 		let heroesSpeed = 0;
 		for (let i = 0; i < this.heroParty.length; i++) {
 			const hero = this.heroParty.party[i] as Hero;
+			if (!hero.isAlive) continue;
 			heroesSpeed += hero.speed;
 		}
 
 		let enemiesSpeed = 0;
 		for (let i = 0; i < this.enemyParty.length; i++) {
 			const enemy = this.enemyParty.party[i] as Enemy;
+			if (!enemy.isAlive) continue;
 			enemiesSpeed += enemy.speed;
 		}
 

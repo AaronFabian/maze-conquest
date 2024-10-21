@@ -1,6 +1,6 @@
 // utility function and class
 
-import { PTM, Howl, canvas } from '@/global';
+import { PTM, Howl } from '@/global';
 import { LoadingAssetScreen } from '@/script/world/LoadingAssetScreen.js';
 
 export class Animation {
@@ -34,6 +34,11 @@ export class Animation {
 	}
 
 	update() {
+		if (this.stopAtFinish && this.timesPlayed >= 1) {
+			this.currentFrame = this.frames.length;
+			return;
+		}
+
 		// if not looping animation and we've played at least once, exit !
 		if (!this.looping && this.timesPlayed > 0) return;
 

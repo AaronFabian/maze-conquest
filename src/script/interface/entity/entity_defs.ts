@@ -1,8 +1,8 @@
 import { canvas } from '@/global';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 
-export const ENTITY_DEFS = {
-	player: <EntityDef>{
+export const ENTITY_DEFS: { [key: string]: EntityDef } = {
+	player: {
 		animations: {
 			['walk-left']: {
 				frames: [6, 7, 8, 9, 10, 11],
@@ -61,7 +61,7 @@ export const ENTITY_DEFS = {
 		renderOffSetX: -8,
 		renderOffSetY: -8,
 	},
-	soldier: <EntityDef>{
+	soldier: {
 		animations: {
 			['idle-left']: {
 				frames: [0, 1, 2, 3, 4, 5],

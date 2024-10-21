@@ -24,9 +24,14 @@ export class BattleInformationState extends BaseState {
 	override update() {
 		this.battleState.update();
 
-		if (!this.panel.isAnimating && !this.finish) {
-			this.finish = true;
-			_window.gStateStack.push(new SelectionState(this.battleState, this));
+		if (this.battleState.firstTurn !== null && this.battleState.secondTurn !== null) {
+			if (!this.panel.isAnimating && !this.finish) {
+				this.finish = true;
+				_window.gStateStack.push(new SelectionState(this));
+			}
+		} else {
+			this.battleState.determineTurn();
+			_window.gStateStack.push(new SelectionState(this));
 		}
 	}
 

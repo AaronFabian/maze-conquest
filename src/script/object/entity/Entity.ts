@@ -7,6 +7,7 @@ import { Animation } from '@/utils';
 
 export class Entity implements CanvasRendering {
 	HP: number;
+	isAlive: boolean;
 	direction: string;
 	animations: Map<string, Animation>;
 	x: number;
@@ -22,6 +23,7 @@ export class Entity implements CanvasRendering {
 
 	constructor(def: EntityDef) {
 		this.HP = def.HP;
+		this.isAlive = true;
 		this.direction = 'down';
 		this.animations = this.createAnimations(def.animations);
 
@@ -72,6 +74,7 @@ export class Entity implements CanvasRendering {
 				frames: animations[key].frames,
 				interval: animations[key].interval,
 				looping: animations[key].looping || false,
+				stopAtFinish: animations[key].stopAtFinish || false,
 			};
 
 			animationsReturned.set(key, new Animation(animationDef));
