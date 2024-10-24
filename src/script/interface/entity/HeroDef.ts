@@ -26,10 +26,12 @@ export interface HeroDef extends EntityDef {
 	baseAttack: number;
 	baseDefense: number;
 	baseSpeed: number;
+	baseIntelligent: number;
 	HPIV: number;
 	attackIV: number;
 	defenseIV: number;
 	speedIV: number;
+	intelligentIV: number;
 	moveSet: { [key: string]: (hero: Hero, enemy: Enemy) => (actionState: ActionState) => void }; // !
 	attackStatsTable: Map<string, number>;
 	heroCommand: HeroCommand;

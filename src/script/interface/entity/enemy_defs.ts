@@ -234,6 +234,6 @@ export const ENEMY_DEFS: { [key: string]: EnemyDef } = {
 				},
 		},
 		attackStatsTable: new Map([['attack', 1]]),
-		exp: 5,
+		exp: 7,
 	},
 };

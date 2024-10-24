@@ -1,5 +1,6 @@
 import { canvas, ctx } from '@/global';
 import { Panel } from '@/script/gui/Panel';
+import { ProgressBar } from '@/script/gui/ProgressBar';
 import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
 import { BattleState } from '@/script/state/game/BattleState';

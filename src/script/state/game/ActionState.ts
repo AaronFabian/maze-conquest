@@ -8,15 +8,17 @@ const _window = window as any;
 
 export class ActionState extends BaseState {
 	isPerformingAction: boolean;
+	isPlayerWin: boolean;
 	constructor(public battleState: BattleState, public selectEnemyState: SelectionState) {
 		super();
 		this.isPerformingAction = false;
+		this.isPlayerWin = false;
 
 		// While performing the action, do not highlight any Hero
 		this.selectEnemyState.battleInformationState.highLight = null;
 	}
 
-	private isPlayerWin() {
+	private checkWin() {
 		// Before performing action for enemy check is the enemy still alive
 		let stopAction = true;
 		for (const enemy of this.selectEnemyState.battleState.enemyParty.party)
@@ -25,7 +27,8 @@ export class ActionState extends BaseState {
 				break;
 			}
 
-		if (stopAction) {
+		// Some animation may left behind so the best is to wait Tween tell this state finished or not
+		if (stopAction && this.isPerformingAction === false) {
 			// Filter and retain only GameState and BattleState in the stack
 			_window.gStateStack.states = _window.gStateStack.states.filter((s: BaseState) => {
 				if (s instanceof GameState || s instanceof BattleState) {
@@ -38,16 +41,21 @@ export class ActionState extends BaseState {
 			_window.gStateStack.push(
 				new ExpCalculateState(this.battleState, this.battleState.enemyParty, this.battleState.heroParty)
 			);
+
+			// Tell the state that Player Heroes already won so the state will not pop the ExpCalculatedState
+			this.isPlayerWin = true;
 		}
 	}
 
 	override update() {
 		this.battleState.update();
 
-		this.isPlayerWin();
+		this.checkWin();
 
-		if (!this.isPerformingAction) {
-			if (this.selectEnemyState.moveStack.length === 0) {
+		if (!this.isPerformingAction && !this.isPlayerWin) {
+			// If stack empty that means there is no other movement
+			const isStackEmpty = this.selectEnemyState.moveStack.length === 0;
+			if (isStackEmpty) {
 				// Pop out this stack and update the enemy attack state
 				_window.gStateStack.pop();
 			} else {
