@@ -53,7 +53,7 @@ export class Hero extends Entity {
 		this.speed = this.baseSpeed;
 
 		this.level = level;
-		this.currentExp = 4000;
+		this.currentExp = 0;
 		this.expToLevel = this.level * this.level * 5 * 0.75;
 
 		this.calculateStats();
@@ -70,16 +70,25 @@ export class Hero extends Entity {
 	calculateStats() {
 		// Small improvement, if the this Hero at level 1 then no need to calculate use the base stats;
 		for (let i = 2; i <= this.level; i++) {
-			this.levelUP();
+			this.statsLevelUp();
 		}
 	}
 
-	levelUP() {
+	statsLevelUp() {
 		this.HP += this.baseHP + this.HPIV * 2;
 		this.attack += this.baseAttack + this.attackIV * 1.5;
 		this.defense += this.baseDefense + this.defenseIV * 0.5;
 		this.speed += this.baseSpeed + this.speedIV * 1.5;
 		this.intelligent += this.baseIntelligent + this.intelligentIV * 2;
+	}
+
+	levelUP() {
+		this.level += 1;
+		this.expToLevel = this.level * this.level * 5 * 0.75;
+
+		this.statsLevelUp();
+
+		this.currentExp = 0;
 	}
 
 	calculateAttack(moveName: string, enemy: Enemy) {

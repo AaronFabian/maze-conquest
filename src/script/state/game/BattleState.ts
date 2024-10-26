@@ -93,7 +93,7 @@ export class BattleState extends BaseState {
 
 		// soldier
 		const soldierDef: HeroDef = HERO_DEFS.soldier;
-		const soldier = new Hero(soldierDef, 99);
+		const soldier = new Hero(soldierDef, 1);
 
 		const soldierState = new Map<string, () => EntityBaseState>();
 		soldierState.set('idle', () => new HeroIdleState(soldier));
@@ -111,7 +111,7 @@ export class BattleState extends BaseState {
 
 		// wizard
 		const wizardDef: HeroDef = HERO_DEFS.wizard;
-		const wizard = new Hero(wizardDef, 99);
+		const wizard = new Hero(wizardDef, 2);
 
 		const wizardState = new Map<string, () => EntityBaseState>();
 		wizardState.set('idle', () => new HeroIdleState(wizard));
