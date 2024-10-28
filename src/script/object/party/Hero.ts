@@ -1,8 +1,8 @@
+import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
 import { Entity } from '@/script/object/entity/Entity';
-import { ActionState } from '@/script/state/game/ActionState';
 import { Enemy } from '@/script/object/party/Enemy';
-import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
+import { ActionState } from '@/script/state/game/ActionState';
 import { SystemError } from '@/script/world/Error/SystemError';
 
 export class Hero extends Entity {

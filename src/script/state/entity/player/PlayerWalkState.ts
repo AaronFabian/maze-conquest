@@ -2,11 +2,11 @@ import { input } from '@/global';
 import { Entity } from '@/script/object/entity/Entity';
 import { Player } from '@/script/object/entity/Player.js';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
-import { Level } from '@/script/world/Level';
+import { World } from '@/script/world/World.js';
 
 export class PlayerWalkState extends PlayerBaseState {
 	override entity!: Player;
-	constructor(entity: Entity, public level: Level) {
+	constructor(entity: Entity, public level: World) {
 		super(entity);
 		this.entity.setAnimation = 'walk-' + this.entity.direction;
 	}

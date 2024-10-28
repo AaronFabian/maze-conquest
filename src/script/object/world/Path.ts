@@ -8,6 +8,7 @@ import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { Level } from '@/script/world/Level';
 import { MazeObjectType } from '@/script/world/Maze';
+import { World } from '@/script/world/World.js';
 import { _QuadImage } from '@/utils';
 
 const _window = window as any;
@@ -31,8 +32,8 @@ export class Path {
 	mazeObjectType: MazeObjectType;
 	isPlayerCollided: boolean;
 
-	constructor(level: Level, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
-		this.level = level;
+	constructor(level: World, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
+		this.level = level as Level;
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.renderPosX = renderPosX;
@@ -235,6 +236,8 @@ export class Path {
 	}
 
 	private evaluate(player: Player): boolean {
+		const level = player.level as Level;
+
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
 				const block = this.structure![y][x];
@@ -243,8 +246,8 @@ export class Path {
 				// Using AABB
 				const box1: AABB = {
 					// Path
-					x: (this.xPos - 15 * player.level.currentMapPartX!) * 80 + x * 16,
-					y: (this.yPos - 8 * player.level.currentMapPartY!) * 80 + y * 16,
+					x: (this.xPos - 15 * level.currentMapPartX!) * 80 + x * 16,
+					y: (this.yPos - 8 * level.currentMapPartY!) * 80 + y * 16,
 					width: 16,
 					height: 16,
 				};
@@ -307,6 +310,9 @@ export class Path {
 								_window.gStateStack.push(new BattleState(this.level));
 
 								_window.gStateStack.push(new CurtainOpenState({ r: 0, g: 0, b: 0 }, 500, 500, () => {}));
+
+								// Whatever the Player choose to run or win then change this Path MazeObjectType to normal
+								this.mazeObjectType = MazeObjectType.PATH;
 							})
 						);
 					})

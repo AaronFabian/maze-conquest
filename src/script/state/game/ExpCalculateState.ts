@@ -1,4 +1,4 @@
-import { canvas, ctx, Tween } from '@/global';
+import { canvas, ctx, TWEEN, Tween } from '@/global';
 import { keyWasPressed } from '@/index';
 import { Panel } from '@/script/gui/Panel';
 import { ProgressBar } from '@/script/gui/ProgressBar';
@@ -7,6 +7,10 @@ import { Hero } from '@/script/object/party/Hero';
 import { Party } from '@/script/object/party/Party';
 import { BaseState } from '@/script/state/BaseState';
 import { BattleState } from '@/script/state/game/BattleState';
+import { FadeInState } from '@/script/state/game/FadeInState';
+import { FadeOutState } from '@/script/state/game/FadeOutState';
+
+const _window = window as any;
 
 export class ExpCalculateState extends BaseState {
 	panel: Panel;
@@ -15,6 +19,7 @@ export class ExpCalculateState extends BaseState {
 	progressBars: ProgressBar[];
 	totalGetExp: number;
 	heroLevel: number[];
+	counter: number;
 	constructor(public battleState: BattleState, public enemies: Party, public heroes: Party) {
 		super();
 
@@ -39,22 +44,26 @@ export class ExpCalculateState extends BaseState {
 
 		// 03 Floating black panel will render each Hero to the next level;
 		this.progressBars = [];
-		this.heroLevel = []; // This is fake Hero level reference;
+		this.heroLevel = []; // This is fake Hero level reference; for visually purpose
 		for (let i = 0; i < this.heroes.party.length; i++) {
 			const hero = this.heroes.party[i] as Hero;
 			this.progressBars.push(
 				new ProgressBar({
-					x: canvas.width / 2 - 84 + 3,
+					x: canvas.width / 2 - 94 + 3,
 					y: canvas.height / 2 - 84 + 32 * (i + 1),
 					color: { r: 189, g: 32, b: 32 },
-					width: 160,
+					width: 170,
 					height: 6,
 					value: hero.currentExp,
 					max: hero.expToLevel,
 				})
 			);
+
+			// Here get the current hero fake reference at this index for visually effect
 			this.heroLevel.push(hero.level);
 		}
+
+		this.counter = 0;
 	}
 
 	override enter(_: any) {
@@ -63,36 +72,40 @@ export class ExpCalculateState extends BaseState {
 	}
 
 	private tweenHeroExpProgressBar() {
-		// Start to Tween the exp ProgressBar
+		// Start to Tween / Tweening chaining animation for exp ProgressBar
+		// Iterate through each hero's progress bar to animate experience gain
 		for (let i = 0; i < this.progressBars.length; i++) {
 			const progressBar = this.progressBars[i];
 			const hero = this.heroes.party[i] as Hero;
 
 			// Cut the total exp, so If ProgressBar exceed / Hero level Up the left exp
-			let expGetTotal = this.totalGetExp;
+			let remainingExp = this.totalGetExp;
 			let tweenFirstRef = null;
 			let tweenRef = null;
 
-			while (expGetTotal > 0) {
+			// Loop until all experience is allocated
+			while (remainingExp > 0) {
 				// 01 Get the difference
 				const expForNextLevel = hero.expToLevel - hero.currentExp;
-				if (expForNextLevel - expGetTotal > 0) {
+
+				if (expForNextLevel - remainingExp > 0) {
 					// 02 Tween the current state
-					const ref = new Tween(progressBar).to({ value: progressBar.value + expGetTotal }, 750).onComplete(() => {});
-					hero.currentExp += expGetTotal;
+					// This block add experience without level up
+					const ref = new Tween(progressBar).to({ value: progressBar.value + remainingExp }, 750);
+					hero.currentExp += remainingExp;
 
 					// 03 Check for reference
 					if (tweenFirstRef === null) tweenFirstRef = ref;
 					else tweenRef!.chain(ref);
 
 					// break;
-					expGetTotal -= expForNextLevel;
+					remainingExp -= expForNextLevel;
 				} else {
 					// 02 Create tween reference before player go to next level
 					const ref = new Tween(progressBar).to({ value: hero.expToLevel }, 750);
 
 					// 03 Subtract the reward exp
-					expGetTotal -= expForNextLevel;
+					remainingExp -= expForNextLevel;
 
 					// 04 If everything is setup then level up the Hero
 					hero.levelUP();
@@ -103,11 +116,11 @@ export class ExpCalculateState extends BaseState {
 						progressBar.setValue = 0;
 						progressBar.setMax = newExpToLevel;
 
-						// Get this progress bar fake level and lvl up!, so it feels like the Hero Lvl Up
+						// Get this progress bar fake level and lvl up!, so it feels like the Hero Lvl Up visually
 						this.heroLevel[i]++;
 					});
 
-					// 06 Check for reference
+					// 06 Check for reference, chain if needed
 					if (tweenFirstRef === null) {
 						tweenFirstRef = ref;
 						tweenRef = ref;
@@ -125,11 +138,40 @@ export class ExpCalculateState extends BaseState {
 
 	override update() {
 		this.battleState.update();
-		this.panel.render();
+		// this.panel.update();
 
-		if (keyWasPressed('Enter') && !this.secondPress) {
-			this.secondPress = true;
-			this.tweenHeroExpProgressBar();
+		if (keyWasPressed('Enter')) {
+			this.counter++;
+		}
+
+		switch (this.counter) {
+			case 1:
+				this.secondPress = true;
+				this.tweenHeroExpProgressBar();
+				this.counter++;
+				break;
+
+			case 3:
+				_window.gStateStack.push(
+					new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+						// Will pop this state
+						_window.gStateStack.pop();
+
+						// Will pop the battle state
+						_window.gStateStack.pop();
+
+						_window.gStateStack.push(new FadeOutState({ r: 255, g: 255, b: 255 }, 1000, () => {}));
+
+						// Just for reminder that, the logic where why BattleState trigger gone is because
+						// the logic at Path.ts that change that Path MazeObjectType into normal Path
+					})
+				);
+				this.counter++;
+				break;
+
+			default:
+				// ---
+				break;
 		}
 	}
 
@@ -137,12 +179,14 @@ export class ExpCalculateState extends BaseState {
 		this.panel.render();
 
 		if (this.secondPress) {
+			// Related to panel
 			ctx.font = '14px zig';
 			ctx.fillStyle = 'rgba(255, 255, 255, 1)';
 			ctx.fillText(`Total exp ${this.totalGetExp}`, canvas.width / 2 - 180 + 3, canvas.height / 2 - 240 / 2 + 278);
 
+			// Floating modal
 			ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-			ctx.fillRect(canvas.width / 2 - 84, canvas.height / 2 - 86, 167, 32 * this.heroes.length + 32);
+			ctx.fillRect(canvas.width / 2 - 94, canvas.height / 2 - 86, 177, 32 * this.heroes.length + 32);
 			for (let i = 0; i < this.heroes.length; i++) {
 				const hero = this.heroes.party[i] as Hero;
 				const progressBar = this.progressBars[i];
@@ -159,15 +203,18 @@ export class ExpCalculateState extends BaseState {
 		}
 
 		if (!this.secondPress) {
+			// Related to panel
 			ctx.font = '14px zig';
 			ctx.fillStyle = 'rgba(255, 255, 255, 1)';
 			ctx.fillText('You win !', canvas.width / 2 - 180 + 3, canvas.height / 2 - 240 / 2 + 278);
 			let counter = 1;
 			for (const [key, [totalDefeated, individualExp, totalExp]] of this.totalEnemyDefeated.entries()) {
 				const text = `${key}: ${totalDefeated} x ${individualExp} : ${totalExp} EXP`;
-				ctx.fillText(text, canvas.width / 2 - 180 + 3, canvas.height / 2 - 240 / 2 + 278 + 16 * counter);
+				ctx.fillText(text, canvas.width / 2 - 180 + 3, canvas.height / 2 - 398 + 16 * counter);
 				counter++;
 			}
 		}
 	}
+
+	override exit = () => TWEEN.removeAll();
 }

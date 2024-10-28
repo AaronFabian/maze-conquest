@@ -6,8 +6,9 @@ import { Event, random } from '@/utils';
 import { canvas, ctx, Tween } from '@/global';
 import { MazeObjectType } from '@/script/world/Maze';
 import { MapPart } from '@/script/world/MapPart';
+import { World } from '@/script/world/World';
 
-export class Level implements CanvasRendering {
+export class Level extends World {
 	world: GameState;
 	maze: MazeGame;
 	currentMapPart: MapPart | null;
@@ -28,6 +29,8 @@ export class Level implements CanvasRendering {
 	cameraOffsetY: number;
 
 	constructor(world: GameState) {
+		super();
+
 		this.world = world;
 
 		// 01
