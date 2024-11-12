@@ -1,11 +1,5 @@
-import { canvas, ctx } from '@/global';
-import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
-import { EntityDef } from '@/script/interface/entity/EntityDef';
-import { Hero } from '@/script/object/party/Hero';
-import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
-import { StateMachine } from '@/script/state/StateMachine';
-import { Level } from '@/script/world/Level';
 import { Entity } from '@/script/object/entity/Entity';
+import { Level } from '@/script/world/Level';
 
 export class Party {
 	level: Level;

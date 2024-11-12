@@ -1,3 +1,10 @@
+/**
+ * Author: Aaron Fabian Saputra
+ * Title: Maze Conquest
+ * A single game where player will explore the maze, every level will
+ * recorded and post online to see someone explored the highest maze game.
+ */
+
 // *** Application Entry Point ***
 import { canvas, ctx, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';

@@ -1,8 +1,7 @@
-import { canvas, ctx, Tween } from '@/global';
+import { ctx } from '@/global';
 import { keyWasPressed } from '@/index';
 import { Panel } from '@/script/gui/Panel';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { Level } from '@/script/world/Level';
 import { getWrap } from '@/utils';
 
 export class Textbox implements CanvasRendering {

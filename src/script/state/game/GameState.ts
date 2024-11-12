@@ -1,6 +1,5 @@
-import { canvas, TWEEN } from '@/global';
+import { TWEEN } from '@/global';
 import { keyWasPressed } from '@/index';
-import { Prompt } from '@/script/gui/Prompt';
 import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 import { Player } from '@/script/object/entity/Player';

@@ -1,15 +1,13 @@
-import { canvas, Tween } from '@/global';
+import { canvas } from '@/global';
 import { HeroMoveMenu } from '@/script/gui/HeroMoveMenu';
+import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
+import { ActionState } from '@/script/state/game/ActionState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
 import { BattleState } from '@/script/state/game/BattleState';
 import { SystemError } from '@/script/world/Error/SystemError';
-import { ActionState } from '@/script/state/game/ActionState';
-import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { SelectEnemyPartyState } from './SelectEnemyPartyState';
-
-const _window = window as any;
 
 export class SelectionState extends BaseState {
 	battleState: BattleState;

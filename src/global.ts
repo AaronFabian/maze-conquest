@@ -1,12 +1,3 @@
-/**
- * Author: Aaron Fabian Saputra
- * Title: Maze Conquest
- * A single game where player will explore the maze, every level will
- * recorded and post online to see someone explored the highest maze game.
- *
- * Game World hierarchy: World (state) -> Level -> MazeGame
- */
-
 // style for webpack to apply css and minified the html css
 import '@/style.css';
 

@@ -1,9 +1,6 @@
 import { Tween } from '@/global';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
-import { Enemy } from '@/script/object/party/Enemy';
 import { Hero } from '@/script/object/party/Hero';
-import { ActionState } from '@/script/state/game/ActionState';
-import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState';
 
 export const HERO_DEFS: { [key: string]: HeroDef } = {
 	soldier: {

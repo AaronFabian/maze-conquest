@@ -1,12 +1,11 @@
-import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { Panel } from '@/script/gui/Panel';
-import { Hero } from '@/script/object/party/Hero';
 import { ctx } from '@/global';
 import { keyWasPressed } from '@/index';
+import { Panel } from '@/script/gui/Panel';
 import { HeroCommand } from '@/script/interface/game/HeroCommand';
-import { SelectionState } from '@/script/state/game/SelectionState';
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
+import { Hero } from '@/script/object/party/Hero';
 import { BattleState } from '@/script/state/game/BattleState';
-import { ActionState } from '@/script/state/game/ActionState';
+import { SelectionState } from '@/script/state/game/SelectionState';
 
 const _window = window as any;
 

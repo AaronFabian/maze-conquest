@@ -119,17 +119,6 @@ export function newQuad(image: HTMLImageElement, sx: number, sy: number, width: 
 	return new _QuadImage(image, sx, sy, width, height);
 }
 
-// export function newImage(src: string, alt: string): Promise<HTMLImageElement> {
-// 	const imgElement = new Image();
-// 	imgElement.src = src;
-// 	imgElement.alt = alt;
-
-// 	return new Promise((resolve, reject) => {
-// 		imgElement.onload = () => resolve(imgElement);
-// 		imgElement.onerror = e => reject(e);
-// 	});
-// }
-
 export function newHowler(src: string, loop: boolean = false): Promise<unknown> {
 	return new Promise((resolve, reject) => {
 		const howl = new Howl({

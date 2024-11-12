@@ -1,8 +1,5 @@
 import { ctx } from '@/global';
-import { _QuadImage } from '@/utils';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
-
-const _window = window as any;
 
 export class PlayerBaseState extends EntityBaseState {
 	override render() {

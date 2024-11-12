@@ -3,8 +3,6 @@ import { Textbox } from '@/script/gui/Textbox';
 import { BaseState } from '@/script/state/BaseState';
 import { World } from '@/script/world/World.js';
 
-const _window = window as any;
-
 /**
  * This is basically almost the same with the BattleNatatorState, but the place where this will render different
  */
