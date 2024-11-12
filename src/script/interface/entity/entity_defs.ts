@@ -114,4 +114,21 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 		renderOffSetX: 0,
 		renderOffSetY: 0,
 	},
+	beginningNPC: {
+		animations: {
+			['idle-down']: {
+				frames: [9, 10, 11],
+				texture: 'npcs',
+				interval: 10,
+				looping: true,
+			},
+		},
+		HP: 10,
+		x: 32,
+		y: 112,
+		width: 16,
+		height: 16,
+		renderOffSetX: -8,
+		renderOffSetY: -13,
+	},
 };

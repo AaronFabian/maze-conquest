@@ -244,6 +244,7 @@ export class Path {
 				if (block === BlockType.NONE || block === BlockType.WAY) continue;
 
 				// Using AABB
+				// level.currentMapPartX!;
 				const box1: AABB = {
 					// Path
 					x: (this.xPos - 15 * level.currentMapPartX!) * 80 + x * 16,

@@ -1,12 +1,13 @@
-import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { GameState } from '@/script/state/game/GameState';
-import { MazeGame } from '@/script/world/MazeGame';
-import { SystemError } from './Error/SystemError';
-import { Event, random } from '@/utils';
 import { canvas, ctx, Tween } from '@/global';
-import { MazeObjectType } from '@/script/world/Maze';
+import { GAME_OBJECT_DEFS } from '@/script/interface/object/game_object_defs';
+import { GameObject } from '@/script/object/GameObject';
+import { GameState } from '@/script/state/game/GameState';
+import { SystemError } from '@/script/world/Error/SystemError';
 import { MapPart } from '@/script/world/MapPart';
+import { MazeObjectType } from '@/script/world/Maze';
+import { MazeGame } from '@/script/world/MazeGame';
 import { World } from '@/script/world/World';
+import { Event, random } from '@/utils';
 
 export class Level extends World {
 	world: GameState;
@@ -27,6 +28,9 @@ export class Level extends World {
 	currentMapOpacity: number;
 	cameraOffsetX: number;
 	cameraOffsetY: number;
+	wrapEffect: boolean;
+	objects: GameObject[];
+	private tweenRef: any;
 
 	constructor(world: GameState) {
 		super();
@@ -45,7 +49,10 @@ export class Level extends World {
 		this.maze.dig(1, 1);
 
 		// 04 Later will be assigned / late init
+		this.objects = [];
 		this.shifting = false;
+		this.wrapEffect = true;
+
 		this.currentMapOffsetX = 0;
 		this.currentMapOffsetY = 0;
 		this.adjacentOffsetX = 0;
@@ -71,15 +78,15 @@ export class Level extends World {
 	}
 
 	setup() {
-		// 04 Tell the maze level to place the player
+		// 01 Once map generate tell the maze level to place the player
 		this.maze.initPlayerPosition();
 
-		// 05
+		// 02
 		// Slice the maze so the game efficiently performance,
 		// the player required for make player spawn randomly
 		this.maze.mapSlicer();
 
-		// 06 Take sliced map and then render that map only
+		// 03 Take sliced map and then render that map only
 		// const renderWidth = 15;
 		// const renderHeight = 8;
 		const [playerXCoord, playerYCoord] = [this.world.player.xCoord, this.world.player.yCoord];
@@ -91,19 +98,32 @@ export class Level extends World {
 		console.log('[System] Player position ', playerXCoord, playerYCoord);
 		console.log(`[System] Player using mapPartX ${mapPartX}, mapPartY ${mapPartY}`);
 
-		// 07 create Path instances from sliced Map
+		// 04 create Path instances from sliced Map
 		this.currentMapPart = new MapPart(currentMap, this.currentMapPartX, this.currentMapPartY, this);
 
-		// Tell this Level to generate Enemy
+		// 05 Tell this Level to generate Enemy
 		this.generateEnemies(this.currentMapPart);
 
-		// Set the player position in this current map with player and the middle
+		// 06 Set the player position in this current map with player
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
 
-		// Setup camera offset so the map will be on the center
+		// 07 Setup camera offset so the map will be on the center
 		this.cameraOffsetX = canvas.width / 2 - (this.currentMapPart.paths[0].length * 80) / 2;
 		this.cameraOffsetY = canvas.height / 2 - (this.currentMapPart.paths.length * 80) / 2;
+
+		// 08 Make wrap effect when the first time Player arrive
+		const wrapEffect = new GameObject(GAME_OBJECT_DEFS.wrapEffect);
+		wrapEffect.x = this.world.player.x - 8;
+		wrapEffect.y = this.world.player.y - 8;
+		this.objects.push(wrapEffect);
+
+		// 09 Make the player looks like it respawn
+		this.tweenRef = new Tween().to({}, 500).onComplete(() => {
+			const index = this.objects.indexOf(wrapEffect);
+			this.objects.splice(index, 1);
+			this.wrapEffect = false;
+		});
 	}
 
 	private generateEnemies(mapPart: MapPart) {
@@ -256,12 +276,18 @@ export class Level extends World {
 	}
 
 	update() {
+		if (this.wrapEffect) {
+			this.wrapEffect = false;
+			this.tweenRef.start();
+		}
+
 		// Only updating the Player Animation
 		if (this.shifting) {
 			this.world.player.currentAnimation!.update();
 		} else {
 			this.world.player.update();
 			this.currentMapPart!.update();
+			this.objects.forEach(obj => obj.update());
 		}
 	}
 
@@ -289,6 +315,7 @@ export class Level extends World {
 		}
 
 		this.world.player.render();
+		this.objects.forEach(obj => obj.render());
 
 		// Make sure we don't mess the canvas
 		ctx.restore();

@@ -1,5 +1,6 @@
-import { TWEEN } from '@/global';
+import { canvas, TWEEN } from '@/global';
 import { keyWasPressed } from '@/index';
+import { Prompt } from '@/script/gui/Prompt';
 import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
 import { Player } from '@/script/object/entity/Player';
@@ -25,11 +26,12 @@ export class GameState extends BaseState {
 		super();
 		this.disableKey = false;
 
-		// 01 Generate world level
+		// 00 Put all worlds but don't load any World yet
 		this.worlds = new Map<WorldType, () => World>();
 		this.worlds.set(WorldType.Level, () => new Level(this));
 		this.worlds.set(WorldType.Town, () => new Town(this));
 
+		// 01 Generate world level
 		this.level = this.worlds.get(WorldType.Town)!();
 
 		// 02 Create player data
@@ -50,7 +52,15 @@ export class GameState extends BaseState {
 		// 03 Setup maze level
 		this.level.setup();
 
+		// this.prompt = new Prompt(canvas.width / 2 - 180, canvas.height / 2 - 134 + 240, 120, 32);
 		console.log('%c -game state-', 'color: #30AEBF;');
+	}
+
+	set setWorld(worldType: WorldType) {
+		if (!this.worlds.has(worldType))
+			throw new Error('Fatal error while set world where world type not found at GameState !');
+
+		this.level = this.worlds.get(worldType)!();
 	}
 
 	override update() {
@@ -64,14 +74,7 @@ export class GameState extends BaseState {
 	}
 
 	override render() {
-		const level = this.level;
-
-		level.render();
-
-		// // ! Game Log
-		// ctx.font = '8px zig';
-		// ctx.fillStyle = `white`;
-		// ctx.fillText(`[Log] map part x:${level.currentMapPartX} y:${level.currentMapPartY}`, 16, canvas.height - 16);
+		this.level.render();
 	}
 
 	override exit = () => TWEEN.removeAll();
