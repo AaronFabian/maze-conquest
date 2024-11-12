@@ -1,7 +1,7 @@
-import { SystemError } from '@/script/world/Error/SystemError';
-import { Maze, MazeObjectType } from '@/script/world/Maze';
-import { _QuadImage, random } from '@/utils';
+import { SystemError } from '@/script/system/error/SystemError';
 import { Level } from '@/script/world/Level';
+import { Maze, MazeObjectType } from '@/script/world/internal/Maze';
+import { random } from '@/utils';
 
 export class MazeGame extends Maze {
 	slicedMap!: Array<Array<Array<Array<MazeObjectType>>>>;

@@ -3,7 +3,7 @@ import { EnemyDef } from '@/script/interface/entity/EnemyDef';
 import { Entity } from '@/script/object/entity/Entity';
 import { Hero } from '@/script/object/party/Hero';
 import { EnemyActionState } from '@/script/state/game/EnemyActionState';
-import { SystemError } from '@/script/world/Error/SystemError';
+import { SystemError } from '@/script/system/error/SystemError';
 
 export class Enemy extends Entity {
 	name: string;

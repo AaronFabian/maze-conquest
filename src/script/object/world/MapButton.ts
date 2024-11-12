@@ -1,7 +1,7 @@
 import { TILE_SIZE } from '@/global';
 import { AABB } from '@/script/interface/game/AABB';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { SystemError } from '@/script/world/Error/SystemError';
+import { SystemError } from '@/script/system/error/SystemError';
 import { Level } from '@/script/world/Level';
 import { Event } from '@/utils';
 

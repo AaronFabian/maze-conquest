@@ -5,7 +5,7 @@ import { BattleState } from '@/script/state/game/BattleState';
 import { GameOverState } from '@/script/state/game/GameOverState';
 import { GameState } from '@/script/state/game/GameState';
 import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState';
-import { SystemError } from '@/script/world/Error/SystemError';
+import { SystemError } from '@/script/system/error/SystemError';
 
 const _window = window as any;
 

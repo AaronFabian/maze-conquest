@@ -9,10 +9,10 @@
 import { canvas, ctx, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';
 import { GameState } from '@/script/state/game/GameState';
-import { LoadingAssetScreen } from '@/script/world/LoadingAssetScreen';
+import { LoadingAssetScreen } from '@/script/system/error/LoadingAssetScreen';
 import { newImage, generateQuads } from '@/utils';
-import { SystemError } from '@/script/world/Error/SystemError';
-import { FatalErrorScreen } from './script/world/FatalErrorScreen';
+import { SystemError } from '@/script/system/error/SystemError';
+import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();

@@ -1,5 +1,5 @@
 import { ctx } from '@/global';
-import { SystemError } from '@/script/world/Error/SystemError';
+import { SystemError } from '@/script/system/error/SystemError';
 import { _QuadImage, random } from '@/utils';
 
 const _window = window as any;

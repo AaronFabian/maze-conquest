@@ -6,8 +6,8 @@ import { BaseState } from '@/script/state/BaseState';
 import { ActionState } from '@/script/state/game/ActionState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
 import { BattleState } from '@/script/state/game/BattleState';
-import { SystemError } from '@/script/world/Error/SystemError';
-import { SelectEnemyPartyState } from './SelectEnemyPartyState';
+import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState';
+import { SystemError } from '@/script/system/error/SystemError';
 
 export class SelectionState extends BaseState {
 	battleState: BattleState;

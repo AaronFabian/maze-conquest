@@ -1,11 +1,11 @@
+import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 import { Path } from '@/script/object/world/Path';
-import { SystemError } from '@/script/world/Error/SystemError';
-import { Level } from '@/script/world/Level';
-import { MazeObjectType } from '@/script/world/Maze';
-import { Room } from '@/script/world/Room';
 import { PlayerWalkState } from '@/script/state/entity/player/PlayerWalkState';
+import { SystemError } from '@/script/system/error/SystemError';
+import { Level } from '@/script/world/Level';
+import { MazeObjectType } from '@/script/world/internal/Maze';
 
-export class MapPart extends Room {
+export class MapPart implements CanvasRendering {
 	map: MazeObjectType[][];
 	mapPartX: number;
 	mapPartY: number;
@@ -13,8 +13,6 @@ export class MapPart extends Room {
 	paths: Path[][];
 	opacity: number;
 	constructor(map: MazeObjectType[][], mapPartX: number, mapPartY: number, level: Level) {
-		super();
-
 		this.map = map;
 		this.mapPartX = mapPartX;
 		this.mapPartY = mapPartY;
@@ -38,7 +36,7 @@ export class MapPart extends Room {
 		this.paths = paths;
 	}
 
-	override update() {
+	update() {
 		let isCancelPlayer = false;
 
 		// Do not check collision if Player at idle state
@@ -68,7 +66,7 @@ export class MapPart extends Room {
 			}
 	}
 
-	override render() {
+	render() {
 		if (this.paths.length === 0) throw new SystemError('Unexpected paths properties');
 
 		for (let y = 0; y < this.paths.length; y++) {

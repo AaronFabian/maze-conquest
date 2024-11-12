@@ -2,10 +2,10 @@ import { canvas, ctx, Tween } from '@/global';
 import { GAME_OBJECT_DEFS } from '@/script/interface/object/game_object_defs';
 import { GameObject } from '@/script/object/GameObject';
 import { GameState } from '@/script/state/game/GameState';
-import { SystemError } from '@/script/world/Error/SystemError';
-import { MapPart } from '@/script/world/MapPart';
-import { MazeObjectType } from '@/script/world/Maze';
-import { MazeGame } from '@/script/world/MazeGame';
+import { SystemError } from '@/script/system/error/SystemError';
+import { MapPart } from '@/script/world/map/MapPart';
+import { MazeObjectType } from '@/script/world/internal/Maze';
+import { MazeGame } from '@/script/world/internal/MazeGame';
 import { World } from '@/script/world/World';
 import { Event, random } from '@/utils';
 

@@ -7,7 +7,7 @@ import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { Level } from '@/script/world/Level';
-import { MazeObjectType } from '@/script/world/Maze';
+import { MazeObjectType } from '@/script/world/internal/Maze';
 import { World } from '@/script/world/World';
 import { _QuadImage } from '@/utils';
 
