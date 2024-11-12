@@ -1,5 +1,5 @@
 {
-	"name": "tryout-traveloka",
+	"name": "maze-conquest",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
@@ -10,7 +10,7 @@
 		"docker-run": "docker run --name maze-conquest --publish 8080:8080 maze-conquest"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Aaron Fabian",
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.23.9",
