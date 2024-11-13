@@ -6,7 +6,10 @@
  */
 
 // *** Application Entry Point ***
-import { canvas, ctx, input, TWEEN } from '@/global';
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+
+import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';
 import { GameState } from '@/script/state/game/GameState';
 import { LoadingAssetScreen } from '@/script/system/error/LoadingAssetScreen';
@@ -20,6 +23,10 @@ let _fps = 60;
 let _fpsInterval = 1000 / _fps;
 
 async function init() {
+	// Initialize Firebase
+	const app = initializeApp(firebaseConfig);
+	const analytics = getAnalytics(app);
+
 	// declare local screen only for displaying loading screen
 	// in general "screen" still inherit from BaseState but they not relate to game update nor render
 	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
@@ -56,8 +63,8 @@ async function init() {
 	_window.gFrames.set('campfire', generateQuads(_window.gImages.get('campfire'), 16, 16));
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
 
-	// _window.gStateStack.push(new StartState());
-	_window.gStateStack.push(new GameState());
+	_window.gStateStack.push(new StartState());
+	// _window.gStateStack.push(new GameState());
 
 	animation();
 }

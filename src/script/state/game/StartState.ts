@@ -1,4 +1,4 @@
-import { Tween, canvas, ctx } from '@/global';
+import { TWEEN, Tween, canvas, ctx } from '@/global';
 import { keyWasPressed } from '@/index';
 import { BaseState } from '@/script/state/BaseState';
 import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
@@ -8,14 +8,25 @@ import { GameState } from '@/script/state/game/GameState';
 const _window = window as any;
 
 enum LocalScreen {
-	START_SCREEN = 1,
-	MENU_SCREEN = 2,
+	START_SCREEN,
+	MENU_SCREEN,
+	ASYNC_OPERATION,
 }
 
+export const DUMMY_PLAYER_DATA = {
+	allHeroes: {
+		['soldier']: {
+			level: 1,
+		},
+		['wizard']: {
+			level: 1,
+		},
+	},
+	party: ['soldier', 'wizard'],
+};
+
 export class StartState extends BaseState {
-	private blink: boolean = false;
 	private blinkOpacity: number = 1;
-	private blinkIntervalId: NodeJS.Timeout;
 	private localScreen: LocalScreen;
 	private cursor: number;
 
@@ -26,60 +37,62 @@ export class StartState extends BaseState {
 		this.localScreen = LocalScreen.MENU_SCREEN;
 		this.cursor = 1;
 
-		this.blinkIntervalId = setInterval(() => {
-			new Tween(this)
-				.to({ blinkOpacity: this.blink ? 1 : 0 }, 1000)
-				.onComplete(() => (this.blink = !this.blink))
-				.start();
-		}, 1000);
+		const tween1 = new Tween(this).to({ blinkOpacity: 0 }, 1000);
+		const tween2 = new Tween(this).to({ blinkOpacity: 1 }, 1000);
+
+		tween1.chain(tween2);
+		tween2.chain(tween1);
+
+		tween1.start();
 	}
 
 	override update() {
 		if (keyWasPressed('Enter')) {
-			if (this.localScreen === LocalScreen.START_SCREEN) {
-				this.localScreen = LocalScreen.MENU_SCREEN;
-				this.cursor = 1;
-			} else if (this.localScreen === LocalScreen.MENU_SCREEN) {
-				if (this.cursor === 1) {
-					_window.gStateStack.push(
-						new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
-							// pop it self
-							// ...
+			switch (this.localScreen) {
+				case LocalScreen.START_SCREEN:
+					this.localScreen = LocalScreen.MENU_SCREEN;
+					this.cursor = 1;
+					break;
 
-							// pop StartState (this)
-							_window.gStateStack.pop();
+				case LocalScreen.MENU_SCREEN:
+					if (this.cursor === 1) {
+						_window.gStateStack.push(
+							new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+								// pop it self
+								// ...
 
-							_window.gStateStack.push(new GameState());
+								// pop StartState (this)
+								_window.gStateStack.pop();
 
-							_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
-						})
-					);
-				}
+								_window.gStateStack.push(new GameState());
 
-				if (this.cursor === 2) {
-					console.log('Go to BFS and DFS');
-				}
+								_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
+							})
+						);
+					}
 
-				if (this.cursor === 3) {
-					this.localScreen = LocalScreen.START_SCREEN;
-				}
+					if (this.cursor === 2) {
+						console.log('Go to BFS and DFS');
+					}
+
+					if (this.cursor === 3) {
+						this.localScreen = LocalScreen.START_SCREEN;
+					}
+					break;
+
+				default:
+					throw new Error('Unknown behavior from changing StartState local screen');
 			}
 		}
 
+		// Cursor up
 		if (keyWasPressed('w')) {
-			if (this.cursor - 1 < 1) {
-				this.cursor = 3;
-			} else {
-				this.cursor -= 1;
-			}
+			this.cursor = this.cursor - 1 < 1 ? 3 : this.cursor - 1;
 		}
 
+		// Cursor down
 		if (keyWasPressed('s')) {
-			if (this.cursor + 1 > 3) {
-				this.cursor = 1;
-			} else {
-				this.cursor += 1;
-			}
+			this.cursor = this.cursor + 1 > 3 ? 1 : this.cursor + 1;
 		}
 	}
 
@@ -115,5 +128,5 @@ export class StartState extends BaseState {
 		ctx.fillText('© AARON FABIAN', canvas.width / 2, canvas.height - 24);
 	}
 
-	override exit = () => clearInterval(this.blinkIntervalId);
+	override exit = () => TWEEN.removeAll();
 }
