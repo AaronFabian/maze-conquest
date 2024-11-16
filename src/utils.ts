@@ -1,7 +1,7 @@
 // utility function and class
 
 import { PTM, Howl } from '@/global';
-import { LoadingAssetScreen } from '@/script/system/error/LoadingAssetScreen.js';
+import { LoadingAssetScreen } from '@/script/system/screen/LoadingAssetScreen.js';
 
 export class Animation {
 	frames: number[];
