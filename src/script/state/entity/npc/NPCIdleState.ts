@@ -13,4 +13,6 @@ export class NPCIdleState extends EntityIdleState {
 	}
 
 	override update() {}
+
+	override render(): void {}
 }

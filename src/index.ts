@@ -9,6 +9,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';
@@ -30,6 +31,9 @@ async function init() {
 	const analytics = getAnalytics(app);
 	getAuth(app);
 
+	// Initialize Cloud Firestore and get a reference to the service
+	const db = getFirestore(app);
+
 	// declare local screen only for displaying loading screen
 	// in general "screen" still inherit from BaseState but they not relate to game update nor render
 	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
@@ -39,6 +43,7 @@ async function init() {
 	imageToAwait.push(newImage('component/level1-tileset.png', 'level1-tileset', loadingScreen));
 	imageToAwait.push(newImage('component/level1.png', 'level1', loadingScreen));
 	imageToAwait.push(newImage('component/town-prototype.png', 'town-prototype', loadingScreen));
+	imageToAwait.push(newImage('component/forest-prototype.png', 'forest-prototype', loadingScreen));
 	imageToAwait.push(newImage('component/wrap-effect.png', 'wrap-effect', loadingScreen));
 	imageToAwait.push(newImage('component/level1-battlefield.png', 'level1-battlefield', loadingScreen));
 	imageToAwait.push(newImage('component/character/player.png', 'player', loadingScreen));
@@ -66,8 +71,8 @@ async function init() {
 	_window.gFrames.set('campfire', generateQuads(_window.gImages.get('campfire'), 16, 16));
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
 
-	_window.gStateStack.push(new TutorialState());
-	// _window.gStateStack.push(new StartState());
+	// _window.gStateStack.push(new TutorialState());
+	_window.gStateStack.push(new StartState());
 	// _window.gStateStack.push(new GameState());
 
 	animation();

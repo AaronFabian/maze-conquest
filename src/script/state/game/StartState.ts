@@ -1,4 +1,3 @@
-import { getAuth, GoogleAuthProvider, OAuthCredential, signInWithPopup, signOut, User } from 'firebase/auth';
 import { canvas, ctx, TWEEN, Tween } from '@/global';
 import { keyWasPressed } from '@/index';
 import { BaseState } from '@/script/state/BaseState';
@@ -8,6 +7,19 @@ import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
 import { StoryOpeningState } from '@/script/state/game/StoryOpeningState';
 import { TutorialState } from '@/script/state/game/TutorialState';
+import { sleep } from '@/utils';
+import {
+	createUserWithEmailAndPassword,
+	deleteUser,
+	getAuth,
+	GoogleAuthProvider,
+	OAuthCredential,
+	signInWithPopup,
+	signOut,
+	updateProfile,
+	User,
+} from 'firebase/auth';
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
 
 const _window = window as any;
 
@@ -17,6 +29,7 @@ enum LocalScreen {
 	NewGameScreen,
 	AsyncOperation,
 	NewGameWithSignInOrNotScreen,
+	FreshStartConfirmationScreen,
 	LogoutConfirmationScreen,
 }
 
@@ -25,11 +38,10 @@ export const DUMMY_PLAYER_DATA = {
 		['soldier']: {
 			level: 1,
 		},
-		['wizard']: {
-			level: 1,
-		},
 	},
-	party: ['soldier', 'wizard'],
+	party: ['soldier'],
+	active: true,
+	createdAt: Date.now(),
 };
 
 export class StartState extends BaseState {
@@ -65,7 +77,7 @@ export class StartState extends BaseState {
 			}
 
 			const auth = getAuth();
-			await new Promise<void>((res, _) => setTimeout(res, 500));
+			await sleep(500);
 
 			if (auth.currentUser === null) {
 				this.localScreen = LocalScreen.NewGameScreen;
@@ -153,6 +165,26 @@ export class StartState extends BaseState {
 			// IdP data available using getAdditionalUserInfo(result)
 			// ...
 
+			// User may use old account and somehow create new account
+			// We need to confirm User does he want to start fresh or continue the old save data
+			// if () {}
+
+			// Fresh start User
+			const db = getFirestore();
+			const docRef = doc(db, 'users', user.uid);
+			const docSnap = await getDoc(docRef);
+			if (docSnap.exists()) {
+				// this.userPhotoUrl
+				this.user = user;
+				this.cursor = 2; // Default for No options
+				this.localScreen = LocalScreen.FreshStartConfirmationScreen;
+				console.log('[System] Old saved data exist');
+				return;
+			}
+
+			const usersRef = collection(db, 'users');
+			await setDoc(doc(usersRef, user.uid), DUMMY_PLAYER_DATA);
+			console.log('[System] Fresh user created');
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 					// pop it self
@@ -167,14 +199,16 @@ export class StartState extends BaseState {
 				})
 			);
 		} catch (error: any) {
+			console.error(error);
 			// Handle Errors here.
 			const errorCode = error.code;
 			const errorMessage = error.message;
-			// console.error(errorCode, errorMessage);
-			alert('Warning: popup closed by user');
+			console.error(errorCode, errorMessage);
+			console.warn('[System] Popup closed by user, failed to register user');
+			alert('Warning: Popup closed by user');
 
 			// The email of the user's account used.
-			const email = error.customData.email;
+			// const email = error.customData.email;
 
 			// The AuthCredential type that was used.
 			const credential = GoogleAuthProvider.credentialFromError(error);
@@ -196,6 +230,46 @@ export class StartState extends BaseState {
 			alert('Warning: Error while signing out user');
 			this.localScreen = LocalScreen.StartScreen;
 		}
+	}
+
+	private async handleFreshStart() {
+		this.localScreen = LocalScreen.AsyncOperation;
+
+		const db = getFirestore();
+
+		// 01 Set the current data property active into false
+		const updateDocRef = doc(db, 'users', this.user!.uid);
+		await updateDoc(updateDocRef, { active: false });
+
+		// 02 Delete from Authentication database at firebase
+		const cacheUserEmail = this.user!.email!;
+		const cacheUserPhotoURL = this.user!.photoURL!;
+		const cacheUserDisplayName = this.user!.displayName!;
+		await deleteUser(this.user!);
+		this.user = null;
+
+		// 03 Create new user with the same email and the same data
+		const userCred = await createUserWithEmailAndPassword(getAuth(), cacheUserEmail, crypto.randomUUID());
+		const user = userCred.user;
+		await updateProfile(user, { displayName: cacheUserDisplayName, photoURL: cacheUserPhotoURL });
+
+		// 04 Create new game save data
+		const usersRef = collection(db, 'users');
+		await setDoc(doc(usersRef, user!.uid), DUMMY_PLAYER_DATA);
+		console.log('[System] User start fresh start');
+		_window.gStateStack.push(
+			new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+				// pop it self
+				// ...
+
+				// pop StartState (this)
+				_window.gStateStack.pop();
+
+				_window.gStateStack.push(new TutorialState());
+
+				_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
+			})
+		);
 	}
 
 	override update() {
@@ -305,6 +379,18 @@ export class StartState extends BaseState {
 					}
 					break;
 
+				case LocalScreen.FreshStartConfirmationScreen:
+					// Yes
+					if (this.cursor === 1) {
+						this.handleFreshStart();
+					}
+
+					// No
+					if (this.cursor === 2) {
+						this.localScreen = LocalScreen.StartScreen;
+					}
+					break;
+
 				case LocalScreen.AsyncOperation:
 					break;
 
@@ -325,6 +411,9 @@ export class StartState extends BaseState {
 			maxOptions = 4;
 		}
 		if (this.localScreen === LocalScreen.LogoutConfirmationScreen) {
+			maxOptions = 2;
+		}
+		if (this.localScreen === LocalScreen.FreshStartConfirmationScreen) {
 			maxOptions = 2;
 		}
 
@@ -413,6 +502,30 @@ export class StartState extends BaseState {
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 3 ? 1 : 0.4})`;
 			ctx.fillText('back', canvas.width / 2, canvas.height / 2 + 156);
+		}
+
+		if (this.localScreen === LocalScreen.FreshStartConfirmationScreen) {
+			ctx.font = '36px zig';
+			ctx.textAlign = 'center';
+			ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+			ctx.fillText('⚠️ Warning ⚠️', canvas.width / 2, canvas.height / 2 - 36);
+
+			ctx.font = '20px zig';
+			ctx.textAlign = 'center';
+			ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+			ctx.fillText('Old saved data found !!', canvas.width / 2, canvas.height / 2 + 8);
+			ctx.fillText(
+				'Start a new game will reset all the data and cannot be undone',
+				canvas.width / 2,
+				canvas.height / 2 + 38
+			);
+
+			ctx.font = '24px zig';
+			ctx.fillStyle = `rgba(237, 67, 55, ${this.cursor === 1 ? 1 : 0.4})`;
+			ctx.fillText('Yes, fresh start my account', canvas.width / 2, canvas.height / 2 + 102);
+
+			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 2 ? 1 : 0.4})`;
+			ctx.fillText('No, cancel and continue last saved data', canvas.width / 2, canvas.height / 2 + 134);
 		}
 
 		if (this.localScreen === LocalScreen.LogoutConfirmationScreen) {

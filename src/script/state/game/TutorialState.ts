@@ -1,10 +1,12 @@
-import { ctx, input } from '@/global';
+import { ctx, input, Tween } from '@/global';
 import { ProgressBar } from '@/script/gui/ProgressBar';
 import { ProgressBarDef } from '@/script/interface/game/ProgressBarDef';
 import { BaseState } from '@/script/state/BaseState';
+import { Forest } from '@/script/world/Forest';
 
 export class TutorialState extends BaseState {
 	skipProgressBar: ProgressBar;
+	world: Forest;
 	constructor() {
 		super();
 
@@ -17,11 +19,16 @@ export class TutorialState extends BaseState {
 			color: { r: 255, g: 0, b: 0 },
 			value: 0,
 		});
+
+		// const action1 = new Tween(this).to();
+		this.world = new Forest(this);
 	}
 
 	override update() {
+		this.world.update();
+
 		// By default Player could skip tutorial
-		if (input.keyboard.isDown['x']) {
+		if (input.keyboard.isDown.x) {
 			this.skipProgressBar.value = this.skipProgressBar.value + 2;
 		} else {
 			this.skipProgressBar.value = 0;
@@ -34,6 +41,8 @@ export class TutorialState extends BaseState {
 	}
 
 	override render() {
+		this.world.render();
+
 		if (this.skipProgressBar.value > 0) {
 			this.skipProgressBar.render();
 		} else {
