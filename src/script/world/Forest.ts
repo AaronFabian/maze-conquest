@@ -10,6 +10,7 @@ import { PlayerIdleState } from '@/script/state/entity/player/PlayerIdleState';
 import { PlayerWalkState } from '@/script/state/entity/player/PlayerWalkState';
 import { TutorialState } from '@/script/state/game/TutorialState';
 import { World } from '@/script/world/World';
+import { FOREST_MAP } from '@/script/world/map/forest_map';
 
 const _window = window as any;
 
@@ -18,11 +19,14 @@ export class Forest extends World {
 	npc: Entity;
 	player: Player;
 	hold: boolean;
+	layerWaterEdge: AABB[];
+	layerTree: AABB[];
 	constructor(state: TutorialState) {
 		super();
 
-		// this.maps =
-		this.hold = true;
+		this.layerWaterEdge = FOREST_MAP.waterCollision;
+		this.layerTree = FOREST_MAP.treeCollision;
+		this.hold = false;
 		this.state = state;
 
 		// 02 Create player data
@@ -60,11 +64,67 @@ export class Forest extends World {
 
 	override update() {
 		if (this.hold) {
-			this.npc.currentAnimation?.update();
-			this.player.currentAnimation?.update();
+			this.npc.currentAnimation!.update();
+			this.player.currentAnimation!.update();
 		} else {
-			this.npc.update();
 			this.player.update();
+			this.npc.update();
+
+			// Only check collision while Player walking
+			if (this.player.stateMachine!.getCurrent() instanceof PlayerWalkState) {
+				const playerAABB: AABB = {
+					x: this.player.x,
+					y: this.player.y,
+					width: this.player.width,
+					height: this.player.height,
+				};
+
+				// Water Collision
+				for (const waterCol of this.layerWaterEdge) {
+					if (this.checkCollision(waterCol, playerAABB)) {
+						switch (this.player.direction) {
+							case 'left':
+								this.player.x += 2;
+								break;
+							case 'right':
+								this.player.x -= 2;
+								break;
+							case 'up':
+								this.player.y += 2;
+								break;
+							case 'down':
+								this.player.y -= 2;
+								break;
+
+							default:
+								throw new Error('Unexpected error while checking collision at Forest update()');
+						}
+					}
+				}
+
+				// Tree Collision
+				for (const treeCol of this.layerTree) {
+					if (this.checkCollision(treeCol, playerAABB)) {
+						switch (this.player.direction) {
+							case 'left':
+								this.player.x += 2;
+								break;
+							case 'right':
+								this.player.x -= 2;
+								break;
+							case 'up':
+								this.player.y += 2;
+								break;
+							case 'down':
+								this.player.y -= 2;
+								break;
+
+							default:
+								throw new Error('Unexpected error while checking collision at Forest update()');
+						}
+					}
+				}
+			}
 		}
 	}
 
