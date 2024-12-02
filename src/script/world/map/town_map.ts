@@ -1,4 +1,4 @@
-import { AABB } from '@/script/interface/game/AABB.js';
+import { AABB } from '@/script/interface/game/AABB';
 
 export const TOWN_MAP = {
 	rectangleCollision: <AABB[]>[

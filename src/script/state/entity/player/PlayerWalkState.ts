@@ -1,8 +1,8 @@
 import { input } from '@/global';
 import { Entity } from '@/script/object/entity/Entity';
-import { Player } from '@/script/object/entity/Player.js';
+import { Player } from '@/script/object/entity/Player';
 import { PlayerBaseState } from '@/script/state/entity/player/PlayerBaseState';
-import { World } from '@/script/world/World.js';
+import { World } from '@/script/world/World';
 
 export class PlayerWalkState extends PlayerBaseState {
 	override entity!: Player;

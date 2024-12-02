@@ -1,7 +1,7 @@
 // utility function and class
 
 import { PTM, Howl } from '@/global';
-import { LoadingAssetScreen } from '@/script/system/error/LoadingAssetScreen.js';
+import { LoadingAssetScreen } from '@/script/system/screen/LoadingAssetScreen';
 
 export class Animation {
 	frames: number[];
@@ -145,7 +145,7 @@ export function newImage(src: string, alt: string, state: LoadingAssetScreen): P
 	});
 }
 
-export function random(from: number = 0, to: number = 1) {
+export function random(from: number = 0, to: number = 1): number {
 	return Math.floor(Math.random() * (to - from + 1)) + from;
 }
 
@@ -172,4 +172,8 @@ export function getWrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: n
 	}
 
 	return lines;
+}
+
+export function sleep(sleepTimeInMs: number): Promise<void> {
+	return new Promise<void>((res, _) => setTimeout(res, sleepTimeInMs));
 }

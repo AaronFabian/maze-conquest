@@ -27,15 +27,16 @@ export class Town extends World {
 		this.maps = TOWN_MAP.rectangleCollision;
 		this.gameState = gameState;
 
-		// 01 In general NPC interaction almost the same so better just save it to array of Entity
-		this.npcs = this.generateNPCs();
-
+		this.npcs = [];
 		this.allowInteract = true;
 	}
 
 	override setup() {
 		// Because this os the beginning then place Player inside the collision block
 		this.placePlayer(2 * 16, 9 * 16);
+
+		// In general NPC interaction almost the same so better just save it to array of Entity
+		this.npcs = this.generateNPCs();
 
 		// This is the portal where the Player will go to Maze aka Level at code
 		this.portal = new Portal(this.gameState.player);
