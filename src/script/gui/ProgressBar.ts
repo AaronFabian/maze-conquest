@@ -39,7 +39,7 @@ export class ProgressBar implements CanvasRendering {
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 
 		// Multiplier on width based on progress
-		const renderWidth = Math.min(this.max, (this.value / this.max) * this.width);
+		const renderWidth = Math.min(this.width, (this.value / this.max) * this.width);
 
 		// Draw main bar, with calculated width based on value / max
 		ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 1)`;

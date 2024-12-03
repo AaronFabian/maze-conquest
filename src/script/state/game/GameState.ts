@@ -9,6 +9,7 @@ import { PlayerIdleState } from '@/script/state/entity/player/PlayerIdleState';
 import { PlayerWalkState } from '@/script/state/entity/player/PlayerWalkState';
 import { PauseMenuState } from '@/script/state/game/PauseMenuState';
 import { StateMachine } from '@/script/state/StateMachine';
+import { User } from '@/script/system/model/User';
 import { Level } from '@/script/world/Level';
 import { Town } from '@/script/world/Town';
 import { World, WorldType } from '@/script/world/World';
@@ -20,6 +21,7 @@ export class GameState extends BaseState {
 	player: Player;
 	disableKey: boolean;
 	worlds: Map<WorldType, () => World>;
+	user: User;
 
 	constructor() {
 		super();
@@ -51,7 +53,26 @@ export class GameState extends BaseState {
 		// 03 Setup maze level
 		this.level.setup();
 
-		// this.prompt = new Prompt(canvas.width / 2 - 180, canvas.height / 2 - 134 + 240, 120, 32);
+		const DUMMY_PLAYER_DATA = {
+			_uid: 9999,
+			items: new Map<string, number>([
+				['phoenix-feather', 99],
+				['potion', 99],
+			]),
+			allHeroes: {
+				['soldier']: {
+					level: 2,
+				},
+			},
+			party: ['soldier'],
+			active: true,
+			username: 'Aaron Fabian',
+			createdAt: Date.now(),
+		};
+
+		this.user = new User(DUMMY_PLAYER_DATA);
+
+		console.log(this.user);
 		console.log('%c -game state-', 'color: #30AEBF;');
 	}
 
@@ -67,7 +88,7 @@ export class GameState extends BaseState {
 			this.level.update();
 
 			if (keyWasPressed(' ') || keyWasPressed('o')) {
-				_window.gStateStack.push(new PauseMenuState());
+				_window.gStateStack.push(new PauseMenuState(this.user));
 			}
 		}
 	}

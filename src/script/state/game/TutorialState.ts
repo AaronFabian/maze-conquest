@@ -15,13 +15,15 @@ export class TutorialState extends BaseState {
 			y: 10,
 			width: 250,
 			height: 12,
-			max: 250,
+			max: 10,
 			color: { r: 255, g: 0, b: 0 },
 			value: 0,
 		});
 
 		// const action1 = new Tween(this).to();
 		this.world = new Forest(this);
+
+		this.world.setup();
 	}
 
 	override update() {
@@ -29,12 +31,12 @@ export class TutorialState extends BaseState {
 
 		// By default Player could skip tutorial
 		if (input.keyboard.isDown.x) {
-			this.skipProgressBar.value = this.skipProgressBar.value + 2;
+			this.skipProgressBar.value = this.skipProgressBar.value + 0.1;
 		} else {
 			this.skipProgressBar.value = 0;
 		}
 
-		const enterTriggerHandiCap = 250;
+		const enterTriggerHandiCap = 10;
 		if (this.skipProgressBar.value >= enterTriggerHandiCap) {
 			console.log('Skip tutorial state');
 		}

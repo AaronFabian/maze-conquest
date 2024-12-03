@@ -19,7 +19,18 @@ import {
 	updateProfile,
 	User,
 } from 'firebase/auth';
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import {
+	collection,
+	doc,
+	DocumentData,
+	DocumentReference,
+	DocumentSnapshot,
+	getDoc,
+	getFirestore,
+	onSnapshot,
+	setDoc,
+	updateDoc,
+} from 'firebase/firestore';
 
 const _window = window as any;
 
@@ -85,6 +96,16 @@ export class StartState extends BaseState {
 			}
 
 			this.user = auth.currentUser;
+
+			const db = getFirestore();
+			const docRef = doc(db, 'users', this.user.uid);
+			const docSnap = await getDoc(docRef);
+			onSnapshot(docRef, {
+				next: (snp: DocumentSnapshot<DocumentData, DocumentData>) => {
+					console.log(snp.data());
+				},
+			});
+
 			const photoUrl = new Image();
 			if (this.user.photoURL !== null) {
 				photoUrl.src = this.user.photoURL;
@@ -348,7 +369,8 @@ export class StartState extends BaseState {
 								// pop StartState (this)
 								_window.gStateStack.pop();
 
-								_window.gStateStack.push(new StoryOpeningState());
+								// TODO:
+								// _window.gStateStack.push(new StoryOpeningState());
 
 								_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 							})

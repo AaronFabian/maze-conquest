@@ -18,6 +18,7 @@ import { HeroIdleState } from '@/script/state/entity/party/HeroIdleState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
 import { BattleNatatorState } from '@/script/state/game/BattleNatatorState';
 import { StateMachine } from '@/script/state/StateMachine';
+import { User } from '@/script/system/model/User';
 import { Level } from '@/script/world/Level';
 
 const _window = window as any;
@@ -30,11 +31,13 @@ export class BattleState extends BaseState {
 	battleStarted: boolean;
 	firstTurn: Party | null;
 	secondTurn: Party | null;
+	user: User;
 
 	constructor(level: Level) {
 		super();
 
 		this.level = level;
+		this.user = this.level.world.user;
 		this.finishOpening = false;
 		this.battleStarted = false;
 		this.firstTurn = null;
@@ -91,6 +94,7 @@ export class BattleState extends BaseState {
 	private generateHeroParty(): Party {
 		const heroes: Entity[] = [];
 
+		/*
 		// soldier
 		const soldierDef: HeroDef = HERO_DEFS.soldier;
 		const soldier = new Hero(soldierDef, 1);
@@ -125,6 +129,20 @@ export class BattleState extends BaseState {
 		wizard.x = canvas.width / 2 + 320;
 		wizard.y = canvas.height / 2 - 240 / 2 + 112;
 		heroes.push(wizard);
+		*/
+
+		const userAllHeroes = this.user.getAllHeroes;
+		const userParty = this.user.getParty;
+		for (let i = 0; i < userParty.length; i++) {
+			const heroName = userParty[i];
+			const hero = userAllHeroes.get(heroName)!;
+			if (hero === undefined) throw new Error('Unexpected behavior while starting battle at BattleState');
+
+			hero.x = canvas.width / 2 + 320;
+			hero.y = canvas.height / 2 - 240 / 2 + 64 * (i + 1);
+
+			heroes.push(hero);
+		}
 
 		return new Party(this.level, heroes);
 	}
