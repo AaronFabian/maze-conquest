@@ -28,4 +28,8 @@ export class StateStack {
 	get length() {
 		return this.states.length;
 	}
+
+	get tailRef() {
+		return this.states[this.states.length - 1];
+	}
 }

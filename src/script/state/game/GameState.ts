@@ -61,10 +61,13 @@ export class GameState extends BaseState {
 			]),
 			allHeroes: {
 				['soldier']: {
-					level: 2,
+					level: 1,
 				},
+				['wizard']: {
+					level: 1
+				}
 			},
-			party: ['soldier'],
+			party: ['soldier', 'wizard'],
 			active: true,
 			username: 'Aaron Fabian',
 			createdAt: Date.now(),
@@ -87,8 +90,8 @@ export class GameState extends BaseState {
 		if (!this.disableKey) {
 			this.level.update();
 
-			if (keyWasPressed(' ') || keyWasPressed('o')) {
-				_window.gStateStack.push(new PauseMenuState(this.user));
+			if (keyWasPressed(' ') || keyWasPressed('x')) {
+				_window.gStateStack.push(new PauseMenuState(this.user, this));
 			}
 		}
 	}

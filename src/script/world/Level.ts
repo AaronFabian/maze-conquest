@@ -150,6 +150,7 @@ export class Level extends World {
 	}
 
 	private beginShifting(direction: string) {
+		console.log(this);
 		if (this.nextMapPartX === null || this.nextMapPartY === null)
 			throw new SystemError('Unexpected configuration for next map');
 

@@ -84,13 +84,25 @@ export class _QuadImage {
 }
 
 export class Event {
+	private static registeredEvent: Map<string, () => void> = new Map();
 	static on(eventName: string, cb: () => void) {
-		document.addEventListener(eventName, cb);
+		if (Event.registeredEvent.has(eventName)) {
+			Event.clean(eventName);
+		}
+		window.addEventListener(eventName, cb);
+		Event.registeredEvent.set(eventName, cb);
 	}
 
 	static dispatch(eventName: string) {
 		const event = new window.Event(eventName);
-		document.dispatchEvent(event);
+		window.dispatchEvent(event);
+	}
+
+	private static clean(eventName: string) {
+		if (!Event.registeredEvent.get(eventName))
+			throw new Error('Unexpected behavior. Unsafe memory detected when registering the event at window');
+
+		window.removeEventListener(eventName, Event.registeredEvent.get(eventName)!);
 	}
 }
 

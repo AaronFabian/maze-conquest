@@ -140,6 +140,7 @@ export class BattleState extends BaseState {
 
 			hero.x = canvas.width / 2 + 320;
 			hero.y = canvas.height / 2 - 240 / 2 + 64 * (i + 1);
+			// TODO: Fix = If the hero dead. they still can be stand
 
 			heroes.push(hero);
 		}

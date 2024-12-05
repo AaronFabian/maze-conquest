@@ -5,7 +5,6 @@
 
 import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
-import { Entity } from '@/script/object/entity/Entity';
 import { Hero } from '@/script/object/party/Hero';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { HeroAttackState } from '@/script/state/entity/party/HeroAttackState';
@@ -28,8 +27,8 @@ export class User {
 	private allHeroes: Map<string, Hero>;
 	private party: string[];
 
-	private heroTable: { [key: string]: Function } = {
-		['soldier']: function (level: number): Hero {
+	private heroTable: { [key: string]: (lvl: number) => Hero } = {
+		['soldier']: (level: number) => {
 			const soldierDef: HeroDef = HERO_DEFS.soldier;
 			const soldier = new Hero(soldierDef, level);
 
@@ -43,6 +42,21 @@ export class User {
 			soldier.changeState('idle');
 
 			return soldier;
+		},
+		['wizard']: (level: number) => {
+			const wizardDef: HeroDef = HERO_DEFS.wizard;
+			const wizard = new Hero(wizardDef, level);
+
+			const wizardState = new Map<string, () => EntityBaseState>();
+			wizardState.set('idle', () => new HeroIdleState(wizard));
+			wizardState.set('run', () => new HeroBaseState(wizard));
+			wizardState.set('attack', () => new HeroAttackState(wizard));
+
+			wizard.setStateMachine = new StateMachine(wizardState);
+			wizard.setDirection = 'left';
+			wizard.changeState('idle');
+
+			return wizard;
 		},
 	};
 
