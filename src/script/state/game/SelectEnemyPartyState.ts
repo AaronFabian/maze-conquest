@@ -4,10 +4,7 @@ import { Textbox } from '@/script/gui/Textbox';
 import { Enemy } from '@/script/object/party/Enemy';
 import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
-import { ActionState } from '@/script/state/game/ActionState';
 import { BattleState } from '@/script/state/game/BattleState';
-import { EnemyActionState } from '@/script/state/game/EnemyActionState';
-import { SelectionState } from '@/script/state/game/SelectionState';
 
 const _window = window as any;
 
@@ -16,13 +13,17 @@ export class SelectEnemyPartyState extends BaseState {
 	textbox: Textbox;
 	counter: number;
 	selectedEnemy: Enemy;
-	selectionState: SelectionState;
 	performer: Hero;
 	selectedMove: string;
-	constructor(performer: Hero, selectedMove: string, battleState: BattleState, selectionState: SelectionState) {
+	onSelectedEnemy: (selected: Enemy) => void;
+	constructor(
+		performer: Hero,
+		selectedMove: string,
+		battleState: BattleState,
+		onSelectedEnemy: (selected: Enemy) => void
+	) {
 		super();
 		this.battleState = battleState;
-		this.selectionState = selectionState;
 		this.performer = performer;
 		this.selectedMove = selectedMove;
 
@@ -31,6 +32,7 @@ export class SelectEnemyPartyState extends BaseState {
 
 		// We don't care about where the panel should be render at the first time
 		this.textbox = this.generateTextbox();
+		this.onSelectedEnemy = onSelectedEnemy;
 	}
 
 	private generateTextbox() {
@@ -48,7 +50,7 @@ export class SelectEnemyPartyState extends BaseState {
 		this.battleState.update();
 
 		// If player press b then back to SelectionState
-		if (keyWasPressed('b')) {
+		if (keyWasPressed(' ')) {
 			_window.gStateStack.pop();
 		}
 
@@ -79,33 +81,9 @@ export class SelectEnemyPartyState extends BaseState {
 		// If the Enter key pressed that mean the Player have been make a choice
 		if (keyWasPressed('Enter')) {
 			if (this.selectedEnemy.isAlive) {
-				this.selectionState.moveStack.push(this.performer.moveSet['attack'](this.performer, this.selectedEnemy));
-
-				// If there is only one then stop next turn and go to ActionState
-				if (this.selectionState.turnStack.length === 1) {
-					// Remove this state
-					_window.gStateStack.pop();
-
-					// Remove selection state
-					_window.gStateStack.pop();
-
-					if (this.battleState.firstTurn === this.battleState.heroParty) {
-						_window.gStateStack.push(new EnemyActionState(this));
-						_window.gStateStack.push(new ActionState(this.battleState, this.selectionState));
-					} else {
-						_window.gStateStack.push(new ActionState(this.battleState, this.selectionState));
-						_window.gStateStack.push(new EnemyActionState(this));
-					}
-
-					// Reset the turn, This will be generated again when InformationState updated again
-					this.battleState.firstTurn = null;
-					this.battleState.secondTurn = null;
-				} else {
-					_window.gStateStack.pop();
-					this.selectionState.nextQueue();
-				}
+				this.onSelectedEnemy(this.selectedEnemy);
 			} else {
-				// Play sound
+				// Play sound that tell player you could not choose this enemy because the enemy K'O
 			}
 		}
 	}

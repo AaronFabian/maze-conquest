@@ -10,7 +10,7 @@ interface CommandMenu {
 	onSelect: () => void;
 }
 
-// TODO: Change this class name into BattleCommandMenu ?
+// TODO: Change this class name into CommandMenu ?
 export class HeroMoveMenu implements CanvasRendering {
 	x: number;
 	y: number;

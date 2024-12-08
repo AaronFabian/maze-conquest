@@ -6,6 +6,7 @@ import { BaseState } from '@/script/state/BaseState';
 import { ActionState } from '@/script/state/game/ActionState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
 import { BattleState } from '@/script/state/game/BattleState';
+import { EnemyActionState } from '@/script/state/game/EnemyActionState';
 import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState';
 import { SystemError } from '@/script/system/error/SystemError';
 
@@ -33,7 +34,7 @@ export class SelectionState extends BaseState {
 		this.moveStack = [];
 
 		// 03 This will highlight which hero currently give command at InformationState
-		this.battleInformationState.highLight = this.battleState.heroParty.party.indexOf(this.turnStack[0]);
+		this.battleInformationState.highLight = this.battleState.heroParty.party.indexOf(this.currentHeroTurn);
 
 		// 04 Create move menu
 		this.menu = this.generateHeroMoveMenu();
@@ -55,19 +56,48 @@ export class SelectionState extends BaseState {
 	}
 
 	private generateHeroMoveMenu(): HeroMoveMenu {
-		const currentHeroTurn = this.turnStack[0];
 		return new HeroMoveMenu(canvas.width / 2 + 60 + 3, canvas.height / 2 - 240 / 2 + 260, 120, 84, [
 			{
 				text: 'Attack',
 				onSelect: () => {
-					_window.gStateStack.push(new SelectEnemyPartyState(currentHeroTurn, 'attack', this.battleState, this));
+					_window.gStateStack.push(
+						new SelectEnemyPartyState(this.currentHeroTurn, 'attack', this.battleState, enemy => {
+							this.battleInformationState.highLight = null;
+							this.moveStack.push(this.currentHeroTurn.moveSet['attack'](this.currentHeroTurn, enemy));
+
+							// * The Action state starting point
+							// If there is only one then stop next turn and go to ActionState
+							if (this.turnStack.length === 1) {
+								// Remove SelectEnemyPartyState
+								_window.gStateStack.pop();
+
+								// Remove selection state
+								_window.gStateStack.pop();
+
+								if (this.battleState.firstTurn === this.battleState.heroParty) {
+									_window.gStateStack.push(new EnemyActionState(this.battleState));
+									_window.gStateStack.push(new ActionState(this.battleState, this));
+								} else {
+									_window.gStateStack.push(new ActionState(this.battleState, this));
+									_window.gStateStack.push(new EnemyActionState(this.battleState));
+								}
+
+								// Reset the turn, This will be generated again when InformationState updated again
+								this.battleState.firstTurn = null;
+								this.battleState.secondTurn = null;
+							} else {
+								_window.gStateStack.pop();
+								this.nextQueue();
+							}
+						})
+					);
 				},
 			},
 			{
 				// This is hero special move; summary: every turn this command will be different
-				text: HERO_DEFS[currentHeroTurn.name].heroCommand.text,
+				text: HERO_DEFS[this.currentHeroTurn.name].heroCommand.text,
 				onSelect: () => {
-					HERO_DEFS[currentHeroTurn.name].heroCommand.onAction(currentHeroTurn);
+					HERO_DEFS[this.currentHeroTurn.name].heroCommand.onAction(this.currentHeroTurn);
 				},
 			},
 			{
@@ -110,6 +140,10 @@ export class SelectionState extends BaseState {
 		}
 
 		return turnStack;
+	}
+
+	get currentHeroTurn() {
+		return this.turnStack[0];
 	}
 
 	override update() {
