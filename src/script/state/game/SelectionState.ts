@@ -61,13 +61,14 @@ export class SelectionState extends BaseState {
 				text: 'Attack',
 				onSelect: () => {
 					_window.gStateStack.push(
-						new SelectEnemyPartyState(this.currentHeroTurn, 'attack', this.battleState, enemy => {
+						new SelectEnemyPartyState(this.currentHeroTurn, this.battleState, enemy => {
 							this.battleInformationState.highLight = null;
 							this.moveStack.push(this.currentHeroTurn.moveSet['attack'](this.currentHeroTurn, enemy));
 
-							// * The Action state starting point
 							// If there is only one then stop next turn and go to ActionState
 							if (this.turnStack.length === 1) {
+								// * The Action state starting point
+
 								// Remove SelectEnemyPartyState
 								_window.gStateStack.pop();
 
@@ -76,15 +77,14 @@ export class SelectionState extends BaseState {
 
 								if (this.battleState.firstTurn === this.battleState.heroParty) {
 									_window.gStateStack.push(new EnemyActionState(this.battleState));
-									_window.gStateStack.push(new ActionState(this.battleState, this));
+									_window.gStateStack.push(new ActionState(this.battleState, this.moveStack));
 								} else {
-									_window.gStateStack.push(new ActionState(this.battleState, this));
+									_window.gStateStack.push(new ActionState(this.battleState, this.moveStack));
 									_window.gStateStack.push(new EnemyActionState(this.battleState));
 								}
 
 								// Reset the turn, This will be generated again when InformationState updated again
-								this.battleState.firstTurn = null;
-								this.battleState.secondTurn = null;
+								this.reset();
 							} else {
 								_window.gStateStack.pop();
 								this.nextQueue();
@@ -140,6 +140,12 @@ export class SelectionState extends BaseState {
 		}
 
 		return turnStack;
+	}
+
+	private reset() {
+		this.moveStack = [];
+		this.battleState.firstTurn = null;
+		this.battleState.secondTurn = null;
 	}
 
 	get currentHeroTurn() {

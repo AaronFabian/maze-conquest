@@ -14,18 +14,11 @@ export class SelectEnemyPartyState extends BaseState {
 	counter: number;
 	selectedEnemy: Enemy;
 	performer: Hero;
-	selectedMove: string;
 	onSelectedEnemy: (selected: Enemy) => void;
-	constructor(
-		performer: Hero,
-		selectedMove: string,
-		battleState: BattleState,
-		onSelectedEnemy: (selected: Enemy) => void
-	) {
+	constructor(performer: Hero, battleState: BattleState, onSelectedEnemy: (selected: Enemy) => void) {
 		super();
 		this.battleState = battleState;
 		this.performer = performer;
-		this.selectedMove = selectedMove;
 
 		this.counter = 0;
 		this.selectedEnemy = this.battleState.enemyParty.party[this.counter] as Enemy;

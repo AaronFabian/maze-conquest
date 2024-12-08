@@ -2,26 +2,22 @@ import { BaseState } from '@/script/state/BaseState';
 import { BattleState } from '@/script/state/game/BattleState';
 import { ExpCalculateState } from '@/script/state/game/ExpCalculateState';
 import { GameState } from '@/script/state/game/GameState';
-import { SelectionState } from '@/script/state/game/SelectionState';
 
 const _window = window as any;
 
 export class ActionState extends BaseState {
 	isPerformingAction: boolean;
 	isPlayerWin: boolean;
-	constructor(public battleState: BattleState, public selectEnemyState: SelectionState) {
+	constructor(public battleState: BattleState, public moveStack: Array<(s: ActionState) => void>) {
 		super();
 		this.isPerformingAction = false;
 		this.isPlayerWin = false;
-
-		// While performing the action, do not highlight any Hero
-		this.selectEnemyState.battleInformationState.highLight = null;
 	}
 
 	private checkWin() {
 		// Before performing action for enemy check is the enemy still alive
 		let stopAction = true;
-		for (const enemy of this.selectEnemyState.battleState.enemyParty.party)
+		for (const enemy of this.battleState.enemyParty.party)
 			if (enemy.isAlive) {
 				stopAction = false;
 				break;
@@ -54,12 +50,12 @@ export class ActionState extends BaseState {
 
 		if (!this.isPerformingAction && !this.isPlayerWin) {
 			// If stack empty that means there is no other movement
-			const isStackEmpty = this.selectEnemyState.moveStack.length === 0;
+			const isStackEmpty = this.moveStack.length === 0;
 			if (isStackEmpty) {
 				// Pop out this stack and update the enemy attack state
 				_window.gStateStack.pop();
 			} else {
-				const onAction = this.selectEnemyState.moveStack.shift()!;
+				const onAction = this.moveStack.shift()!;
 				onAction(this);
 			}
 		}
