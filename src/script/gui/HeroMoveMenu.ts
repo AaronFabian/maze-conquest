@@ -1,28 +1,25 @@
 import { ctx } from '@/global';
 import { keyWasPressed } from '@/index';
 import { Panel } from '@/script/gui/Panel';
-import { HeroCommand } from '@/script/interface/game/HeroCommand';
 import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
-import { Hero } from '@/script/object/party/Hero';
-import { BattleState } from '@/script/state/game/BattleState';
-import { SelectionState } from '@/script/state/game/SelectionState';
 
 const _window = window as any;
 
+interface CommandMenu {
+	text: string;
+	onSelect: () => void;
+}
+
+// TODO: Change this class name into BattleCommandMenu ?
 export class HeroMoveMenu implements CanvasRendering {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 	panel: Panel;
-	hero: Hero;
 	cursor: number;
-	menu: HeroCommand[];
-	selectionState: SelectionState;
-	battleState: BattleState;
-	constructor(s: SelectionState, hero: Hero, x: number, y: number, width: number, height: number, menu: HeroCommand[]) {
-		this.selectionState = s;
-		this.battleState = this.selectionState.battleState;
+	menu: CommandMenu[];
+	constructor(x: number, y: number, width: number, height: number, menu: CommandMenu[]) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -30,7 +27,6 @@ export class HeroMoveMenu implements CanvasRendering {
 		this.menu = menu;
 
 		this.panel = new Panel(x, y, width, height);
-		this.hero = hero;
 		this.cursor = 0;
 	}
 
@@ -42,7 +38,7 @@ export class HeroMoveMenu implements CanvasRendering {
 		}
 
 		if (keyWasPressed('Enter')) {
-			this.menu[this.cursor].onSelect(this.hero, this.battleState, this.selectionState);
+			this.menu[this.cursor].onSelect();
 		}
 	}
 

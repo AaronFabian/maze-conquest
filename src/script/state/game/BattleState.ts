@@ -18,6 +18,11 @@ import { Level } from '@/script/world/Level';
 
 const _window = window as any;
 
+/*
+	* 01 BattleState -> 
+	02 BattleInformationState ->
+	03 SelectionState ->
+*/
 export class BattleState extends BaseState {
 	level: Level;
 	finishOpening: boolean;

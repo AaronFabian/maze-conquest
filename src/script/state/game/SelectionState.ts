@@ -55,19 +55,24 @@ export class SelectionState extends BaseState {
 	}
 
 	private generateHeroMoveMenu(): HeroMoveMenu {
-		const currentHero = this.turnStack[0];
-		return new HeroMoveMenu(this, currentHero, canvas.width / 2 + 60 + 3, canvas.height / 2 - 240 / 2 + 260, 120, 84, [
+		const currentHeroTurn = this.turnStack[0];
+		return new HeroMoveMenu(canvas.width / 2 + 60 + 3, canvas.height / 2 - 240 / 2 + 260, 120, 84, [
 			{
 				text: 'Attack',
-				onSelect: (hero, battleState, selectionState) => {
-					_window.gStateStack.push(new SelectEnemyPartyState(hero, 'attack', battleState, selectionState));
+				onSelect: () => {
+					_window.gStateStack.push(new SelectEnemyPartyState(currentHeroTurn, 'attack', this.battleState, this));
 				},
 			},
-			// This is hero special move; summary: every turn this command will be different
-			HERO_DEFS[this.turnStack[0].name].heroCommand,
+			{
+				// This is hero special move; summary: every turn this command will be different
+				text: HERO_DEFS[currentHeroTurn.name].heroCommand.text,
+				onSelect: () => {
+					HERO_DEFS[currentHeroTurn.name].heroCommand.onAction(currentHeroTurn);
+				},
+			},
 			{
 				text: 'Items',
-				onSelect: (hero: Hero) => {
+				onSelect: () => {
 					// const state = new ShowItemDrawerState(this.battleState.user, 0, 0, selected => {
 					// 	_window.gStateStack.pop();
 					// 	// this.moveStack.push((actionState) => selected.effect({ state: null, user: this.battleState.user }, this.turnStack[0]));
@@ -80,7 +85,7 @@ export class SelectionState extends BaseState {
 			},
 			{
 				text: 'Run',
-				onSelect: (hero: Hero) => {
+				onSelect: () => {
 					console.log('Run');
 				},
 			},

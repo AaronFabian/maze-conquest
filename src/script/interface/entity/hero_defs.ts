@@ -134,7 +134,7 @@ export const HERO_DEFS: { [key: string]: HeroDef } = {
 		// This command will generate dynamic base on the hero job
 		heroCommand: {
 			text: 'Defense',
-			onSelect: (hero: Hero) => {
+			onAction: (hero: Hero) => {
 				console.log('Defense');
 			},
 		},
@@ -265,7 +265,7 @@ export const HERO_DEFS: { [key: string]: HeroDef } = {
 		// This command will generate dynamic base on the hero job
 		heroCommand: {
 			text: 'Magic',
-			onSelect: (hero: Hero) => {
+			onAction: (hero: Hero) => {
 				console.log('Black Magic');
 			},
 		},
