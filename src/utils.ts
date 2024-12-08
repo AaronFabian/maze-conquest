@@ -1,6 +1,7 @@
 // utility function and class
 
-import { PTM, Howl } from '@/global';
+import { Howl } from '@/global';
+import { AnimationDef } from '@/script/interface/game/AnimationDef';
 import { LoadingAssetScreen } from '@/script/system/screen/LoadingAssetScreen';
 
 export class Animation {
@@ -13,7 +14,7 @@ export class Animation {
 	timesPlayed: number;
 	stopAtFinish: boolean;
 
-	constructor(def: any) {
+	constructor(def: AnimationDef) {
 		this.frames = def.frames;
 		this.interval = def.interval;
 		this.texture = def.texture;
@@ -106,14 +107,6 @@ export class Event {
 	}
 }
 
-export function pixelToWorld(inPx: number): number {
-	return inPx / PTM;
-}
-
-export function worldToPixel(inWp: number): number {
-	return inWp * PTM;
-}
-
 export function generateQuads(image: HTMLImageElement, tileWidth: number, tileHeight: number): Array<_QuadImage> {
 	const imgWidth = image.width / tileWidth;
 	const imgHeight = image.height / tileHeight;
@@ -188,4 +181,8 @@ export function getWrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: n
 
 export function sleep(sleepTimeInMs: number): Promise<void> {
 	return new Promise<void>((res, _) => setTimeout(res, sleepTimeInMs));
+}
+
+export function padNum(val: number, fillString: string, maxFill: number = 2): string {
+	return val.toString().padStart(maxFill, fillString);
 }

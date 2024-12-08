@@ -9,7 +9,7 @@ import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
 import { StartState } from '@/script/state/game/StartState';
 import { User } from '@/script/system/model/User';
-import { getWrap } from '@/utils';
+import { getWrap, padNum } from '@/utils';
 
 const _window = window as any;
 
@@ -201,7 +201,7 @@ export class PauseMenuState extends BaseState {
 					const name = itemWiki.name;
 
 					ctx.fillStyle = `rgba(255, 255, 255, ${isThisItem ? 1 : 0.4})`;
-					ctx.fillText(`${isThisItem ? '> ' : '  '} ${quantity} - ${name}`, 16, 16 * (counter + 2) + 2);
+					ctx.fillText(`${isThisItem ? '> ' : '  '} ${padNum(quantity, '0')} - ${name}`, 16, 16 * (counter + 2) + 2);
 
 					// Render description
 					if (isThisItem) {

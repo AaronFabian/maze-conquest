@@ -18,23 +18,22 @@ export const Tween = _window.TWEEN.Tween;
 // an audio library for implementing sound in our browser; with Howl make implementing sound in browser easier.
 export const Howl = _window.Howl;
 
-export const PTM = 32;
 export const TILE_SIZE = 16;
 
 // assets
-const gImages = new Map<string, HTMLImageElement>();
+export const gImages = new Map<string, HTMLImageElement>();
 
 _window.gImages = gImages;
 
-const gFrames = new Map<string, Array<_QuadImage>>();
+export const gFrames = new Map<string, Array<_QuadImage>>();
 
 _window.gFrames = gFrames;
 
-const gSounds = new Map<string, any>();
+export const gSounds = new Map<string, any>();
 
 _window.gSounds = gSounds;
 
-const gStateStack = new StateStack();
+export const gStateStack = new StateStack();
 
 _window.gStateStack = gStateStack;
 

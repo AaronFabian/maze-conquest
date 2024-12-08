@@ -9,6 +9,8 @@ import { BattleState } from '@/script/state/game/BattleState';
 import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState';
 import { SystemError } from '@/script/system/error/SystemError';
 
+const _window = window as any;
+
 export class SelectionState extends BaseState {
 	battleState: BattleState;
 	battleInformationState: BattleInformationState;
@@ -58,15 +60,22 @@ export class SelectionState extends BaseState {
 			{
 				text: 'Attack',
 				onSelect: (hero, battleState, selectionState) => {
-					const _window = window as any;
 					_window.gStateStack.push(new SelectEnemyPartyState(hero, 'attack', battleState, selectionState));
 				},
 			},
+			// This is hero special move; summary: every turn this command will be different
 			HERO_DEFS[this.turnStack[0].name].heroCommand,
 			{
 				text: 'Items',
 				onSelect: (hero: Hero) => {
-					console.log('Items');
+					// const state = new ShowItemDrawerState(this.battleState.user, 0, 0, selected => {
+					// 	_window.gStateStack.pop();
+					// 	// this.moveStack.push((actionState) => selected.effect({ state: null, user: this.battleState.user }, this.turnStack[0]));
+					// 	_window.gStateStack.push(new SelectPartyState());
+					// 	// TODO: We need to refactor that SelectionState should be have method that can determine this turn already done or not
+					// });
+					// // state.setFilterCategory = [];
+					// gStateStack.push(state);
 				},
 			},
 			{

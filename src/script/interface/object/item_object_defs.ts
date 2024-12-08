@@ -71,19 +71,19 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 		id: 2,
 		key: 'potion',
 		name: 'Potion',
-		description: 'A regular Potion will restore 50 health points',
+		description: 'A regular Potion. Restore 50 health points',
 		type: ItemType.BattleItem,
 		effect(args, caster): boolean {
 			const state = args.state as GameState;
 			const user = args.user as User;
 
 			const quantity = user.items.get('potion');
-			if (quantity === undefined) throw new Error('Unexpected behavior while using item. Undefined Phoenix Feather');
+			if (quantity === undefined) throw new Error('Unexpected behavior while using item. Undefined Potion');
 			if (quantity - 1 < 0)
 				// Nothing happen; Just play the sound
 				return false;
 
-			if (state.level instanceof World) {
+			if (state !== null && state.level instanceof World) {
 				_window.gStateStack.push(
 					new UserUseItemState(state.user, 'potion', (selected: Hero) => {
 						_window.gStateStack.pop();
@@ -123,6 +123,67 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 			} else {
 				caster.currentHP += 50;
 				console.log(`${caster.name} HP healed by 50 points!`);
+			}
+
+			return true;
+		},
+	},
+	['hi-potion']: {
+		id: 3,
+		key: 'hi-potion',
+		name: 'Hi Potion',
+		description: 'Upgraded version of Potion. Restore 250 health points',
+		type: ItemType.BattleItem,
+		effect(args, caster): boolean {
+			const state: GameState | null = args.state as GameState;
+			const user = args.user as User;
+
+			const quantity = user.items.get('potion');
+			if (quantity === undefined) throw new Error('Unexpected behavior while using item. Undefined hi-potion');
+			if (quantity - 1 < 0)
+				// Nothing happen; Just play the sound
+				return false;
+
+			if (state !== null && state.level instanceof World) {
+				_window.gStateStack.push(
+					new UserUseItemState(state.user, 'hi-potion', (selected: Hero) => {
+						_window.gStateStack.pop();
+
+						console.log(`[System Log] ${selected.name} using Hi Potion!`);
+						if (selected.currentHP === selected.HP) {
+							console.log(`[System Log] ${selected.name} HP is full!`);
+							_window.gStateStack.push(
+								new DialogueState(state.level, `${selected.name} HP is full!`, () => _window.gStateStack.pop())
+							);
+							return;
+						}
+
+						if (selected.currentHP + 250 > selected.HP) {
+							const healedPoints = selected.HP - selected.currentHP;
+							selected.currentHP = selected.HP;
+							console.log(`[System Log] ${selected.name} HP healed by ${healedPoints} points!`);
+						} else {
+							selected.currentHP += 250;
+							console.log(`[System Log] ${selected.name} HP healed by 250 points!`);
+						}
+						user.items.set('hi-potion', quantity - 1);
+					})
+				);
+
+				return true;
+			}
+
+			// Normal use while in battle
+			if (caster === undefined) throw new Error("Undefined param 'caster'.");
+
+			console.log(`${caster.name} using Potion!`);
+			if (caster.currentHP + 250 > caster.HP) {
+				const healedPoints = caster.currentHP + 250 - caster.HP;
+				caster.currentHP = caster.HP;
+				console.log(`${caster.name} HP healed by ${healedPoints} points!`);
+			} else {
+				caster.currentHP += 250;
+				console.log(`${caster.name} HP healed by 250 points!`);
 			}
 
 			return true;

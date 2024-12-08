@@ -1,8 +1,6 @@
 import { canvas, ctx, Tween } from '@/global';
 import { ENEMY_DEFS } from '@/script/interface/entity/enemy_defs';
 import { EnemyDef } from '@/script/interface/entity/EnemyDef';
-import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
-import { HeroDef } from '@/script/interface/entity/HeroDef';
 import { Entity } from '@/script/object/entity/Entity';
 import { Enemy } from '@/script/object/party/Enemy';
 import { Hero } from '@/script/object/party/Hero';
@@ -12,9 +10,6 @@ import { EntityAttackState } from '@/script/state/entity/EntityAttackState';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
 import { EntityRunState } from '@/script/state/entity/EntityRunState';
-import { HeroAttackState } from '@/script/state/entity/party/HeroAttackState';
-import { HeroBaseState } from '@/script/state/entity/party/HeroBaseState';
-import { HeroIdleState } from '@/script/state/entity/party/HeroIdleState';
 import { BattleInformationState } from '@/script/state/game/BattleInformationState';
 import { BattleNatatorState } from '@/script/state/game/BattleNatatorState';
 import { StateMachine } from '@/script/state/StateMachine';
@@ -95,40 +90,40 @@ export class BattleState extends BaseState {
 		const heroes: Entity[] = [];
 
 		/*
-		// soldier
-		const soldierDef: HeroDef = HERO_DEFS.soldier;
-		const soldier = new Hero(soldierDef, 1);
+			// soldier
+			const soldierDef: HeroDef = HERO_DEFS.soldier;
+			const soldier = new Hero(soldierDef, 1);
 
-		const soldierState = new Map<string, () => EntityBaseState>();
-		soldierState.set('idle', () => new HeroIdleState(soldier));
-		soldierState.set('run', () => new HeroBaseState(soldier));
-		soldierState.set('attack', () => new HeroAttackState(soldier));
+			const soldierState = new Map<string, () => EntityBaseState>();
+			soldierState.set('idle', () => new HeroIdleState(soldier));
+			soldierState.set('run', () => new HeroBaseState(soldier));
+			soldierState.set('attack', () => new HeroAttackState(soldier));
 
-		soldier.setStateMachine = new StateMachine(soldierState);
-		soldier.setDirection = 'left';
-		soldier.changeState('idle');
+			soldier.setStateMachine = new StateMachine(soldierState);
+			soldier.setDirection = 'left';
+			soldier.changeState('idle');
 
-		// Make our party at the outside of the battle field
-		soldier.x = canvas.width / 2 + 320;
-		soldier.y = canvas.height / 2 - 240 / 2 + 64;
-		heroes.push(soldier);
+			// Make our party at the outside of the battle field
+			soldier.x = canvas.width / 2 + 320;
+			soldier.y = canvas.height / 2 - 240 / 2 + 64;
+			heroes.push(soldier);
 
-		// wizard
-		const wizardDef: HeroDef = HERO_DEFS.wizard;
-		const wizard = new Hero(wizardDef, 2);
+			// wizard
+			const wizardDef: HeroDef = HERO_DEFS.wizard;
+			const wizard = new Hero(wizardDef, 2);
 
-		const wizardState = new Map<string, () => EntityBaseState>();
-		wizardState.set('idle', () => new HeroIdleState(wizard));
-		wizardState.set('run', () => new HeroBaseState(wizard));
-		wizardState.set('attack', () => new HeroAttackState(wizard));
+			const wizardState = new Map<string, () => EntityBaseState>();
+			wizardState.set('idle', () => new HeroIdleState(wizard));
+			wizardState.set('run', () => new HeroBaseState(wizard));
+			wizardState.set('attack', () => new HeroAttackState(wizard));
 
-		wizard.setStateMachine = new StateMachine(wizardState);
-		wizard.setDirection = 'left';
-		wizard.changeState('idle');
+			wizard.setStateMachine = new StateMachine(wizardState);
+			wizard.setDirection = 'left';
+			wizard.changeState('idle');
 
-		wizard.x = canvas.width / 2 + 320;
-		wizard.y = canvas.height / 2 - 240 / 2 + 112;
-		heroes.push(wizard);
+			wizard.x = canvas.width / 2 + 320;
+			wizard.y = canvas.height / 2 - 240 / 2 + 112;
+			heroes.push(wizard);
 		*/
 
 		const userAllHeroes = this.user.getAllHeroes;

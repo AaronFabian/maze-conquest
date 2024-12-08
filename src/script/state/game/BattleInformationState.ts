@@ -1,6 +1,10 @@
+/**
+ * This state is rendering the all the Hero information at the
+ * Party object
+ */
+
 import { canvas, ctx } from '@/global';
 import { Panel } from '@/script/gui/Panel';
-import { ProgressBar } from '@/script/gui/ProgressBar';
 import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
 import { BattleState } from '@/script/state/game/BattleState';
@@ -25,6 +29,7 @@ export class BattleInformationState extends BaseState {
 	override update() {
 		this.battleState.update();
 
+		// 01
 		if (this.battleState.firstTurn !== null && this.battleState.secondTurn !== null) {
 			if (!this.panel.isAnimating && !this.finish) {
 				this.finish = true;

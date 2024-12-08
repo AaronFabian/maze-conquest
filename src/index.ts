@@ -40,6 +40,7 @@ async function init() {
 	const loadingScreen = new LoadingAssetScreen(imageToAwait);
 
 	imageToAwait.push(newImage('ui/background.png', 'start-screen-bg', loadingScreen));
+	imageToAwait.push(newImage('ui/dialogue.png', 'dialogue', loadingScreen));
 	imageToAwait.push(newImage('component/level1-tileset.png', 'level1-tileset', loadingScreen));
 	imageToAwait.push(newImage('component/level1.png', 'level1', loadingScreen));
 	imageToAwait.push(newImage('component/town-prototype.png', 'town-prototype', loadingScreen));
@@ -60,6 +61,7 @@ async function init() {
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));
 
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
+	_window.gFrames.set('dialogue', generateQuads(_window.gImages.get('dialogue'), 16, 16));
 	_window.gFrames.set('level1', generateQuads(_window.gImages.get('level1'), 80, 80));
 	_window.gFrames.set('player', generateQuads(_window.gImages.get('player'), 32, 32));
 	_window.gFrames.set('soldier', generateQuads(_window.gImages.get('soldier'), 100, 100));
@@ -106,8 +108,8 @@ function render() {
 	ctx.reset();
 
 	// create responsive game screen could be define here
-	// ctx.scale(0.5, 0.5);
-	// ctx.translate(canvas.width * 0.5 - 0, canvas.height * 0.5);
+	// ctx.scale(1, 1);
+	// ctx.translate(canvas.width * 1, canvas.height * 1);
 	_window.gStateStack.render();
 }
 

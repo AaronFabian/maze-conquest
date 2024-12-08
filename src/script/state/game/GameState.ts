@@ -33,7 +33,7 @@ export class GameState extends BaseState {
 		this.worlds.set(WorldType.Town, () => new Town(this));
 
 		// 01 Generate world level
-		this.level = this.worlds.get(WorldType.Town)!();
+		this.level = this.worlds.get(WorldType.Level)!();
 
 		// 02 Create player data
 		const playerDef: EntityDef = ENTITY_DEFS.player;
@@ -58,14 +58,15 @@ export class GameState extends BaseState {
 			items: new Map<string, number>([
 				['phoenix-feather', 99],
 				['potion', 99],
+				['hi-potion', 2],
 			]),
 			allHeroes: {
 				['soldier']: {
 					level: 1,
 				},
 				['wizard']: {
-					level: 1
-				}
+					level: 1,
+				},
 			},
 			party: ['soldier', 'wizard'],
 			active: true,
