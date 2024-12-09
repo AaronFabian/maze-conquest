@@ -1,5 +1,6 @@
 import { ctx, TILE_SIZE } from '@/global';
 import { keyWasPressed } from '@/index';
+import { Panel } from '@/script/gui/Panel';
 import { ITEM_OBJECT_DEFS } from '@/script/interface/object/item_object_defs';
 import { ItemObjectDef } from '@/script/interface/object/ItemObjectDef';
 import { BaseState } from '@/script/state/BaseState';
@@ -13,31 +14,56 @@ export class ShowItemDrawerState extends BaseState {
 	tileHeightCount: number;
 	filteredCategories: string[] | null;
 	cursor: number;
-	constructor(
-		private user: User,
-		private xPos: number,
-		private yPos: number,
-		private onItemSelected: (selectedItem: ItemObjectDef) => void
-	) {
+	private user: User;
+	private xPos: number;
+	private yPos: number;
+	private onItemSelected: (selectedItem: ItemObjectDef) => void;
+	items: Array<[string, number]>;
+	descPanel: Panel;
+	constructor(user: User, xPos: number, yPos: number, onItemSelected: (selected: ItemObjectDef) => void) {
 		super();
+		this.user = user;
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.onItemSelected = onItemSelected;
+
 		this.tileWidthCount = 20;
 		this.tileHeightCount = 6;
 		this.filteredCategories = null;
 		this.cursor = 1;
+
+		// Create reference for current user items
+		this.items = [];
+		for (const itemRef of this.user.items.entries()) {
+			this.items.push(itemRef);
+		}
+
+		this.descPanel = new Panel(this.xPos, this.yPos + TILE_SIZE * this.tileHeightCount + 16, 511, 125);
 	}
 
-	set setFilterCategory(categories: string[]) {
+	filterCategory(categories: string[]) {
 		if (categories.length === 0) throw new Error('Unprovided categories for filtered');
-		this.filteredCategories = categories;
+		this.items = [];
+		for (const itemRef of this.user.items.entries()) {
+			const [itemName, _] = itemRef;
+			const itemType = ITEM_OBJECT_DEFS[itemName].type;
+			if (categories.includes(itemType)) {
+				this.items.push(itemRef);
+			}
+		}
+
+		if (this.items.length === 0) console.warn('WARN: filtered items found nothing. Ignore if this condition correct');
 	}
 
 	override update() {
+		if (keyWasPressed(' ')) return _window.gStateStack.pop();
+
 		// TODO: There will be more items in user / this game. So the panel should be render some scroll effect
-		const maxOptions = this.user.items.size;
+		const maxOptions = this.items.length;
 
 		if (keyWasPressed('Enter')) {
 			let counter = 0;
-			for (const [key, _] of this.user.items.entries()) {
+			for (const [key, _] of this.items) {
 				const isThisItem = this.cursor === counter + 1;
 				if (isThisItem) {
 					return this.onItemSelected(ITEM_OBJECT_DEFS[key]);
@@ -87,7 +113,7 @@ export class ShowItemDrawerState extends BaseState {
 		//
 		ctx.font = '16px zig';
 		let counter = 0;
-		for (const [key, quantity] of this.user.items.entries()) {
+		for (const [key, quantity] of this.items) {
 			const isThisItem = this.cursor === counter + 1;
 			const itemWiki = ITEM_OBJECT_DEFS[key];
 			const name = itemWiki.name;
@@ -102,8 +128,7 @@ export class ShowItemDrawerState extends BaseState {
 				const desc = getWrap(ctx, itemWiki.description, 500 - 6);
 
 				// The panel
-				ctx.fillStyle = 'rgba(0, 0, 200, 0.8)';
-				ctx.fillRect(this.xPos, this.yPos + TILE_SIZE * this.tileHeightCount + 16, 511, 125);
+				this.descPanel.render();
 
 				// Item description
 				ctx.fillStyle = 'rgba(56, 56, 56, 1)';

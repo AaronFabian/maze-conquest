@@ -5,6 +5,8 @@ import { Hero } from '@/script/object/party/Hero';
 import { BaseState } from '@/script/state/BaseState';
 import { User } from '@/script/system/model/User';
 
+const _window = window as any;
+
 export class UserUseItemState extends BaseState {
 	cursor: number;
 	user: User;
