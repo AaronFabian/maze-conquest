@@ -1,5 +1,6 @@
 import { ctx } from '@/global';
 import { keyWasPressed } from '@/index';
+import { Panel } from '@/script/gui/Panel';
 import { ITEM_OBJECT_DEFS } from '@/script/interface/object/item_object_defs';
 import { ItemType } from '@/script/interface/object/ItemObjectDef';
 import { Hero } from '@/script/object/party/Hero';
@@ -25,6 +26,7 @@ export class PauseMenuState extends BaseState {
 	cursor: number;
 	localScreen: LocalScreen;
 	gameState: GameState;
+	panel: Panel;
 	constructor(user: User, gameState: GameState) {
 		super();
 		this.user = user;
@@ -32,11 +34,23 @@ export class PauseMenuState extends BaseState {
 
 		this.localScreen = LocalScreen.Menu;
 		this.cursor = 1;
+
+		// Will render multiple panel
+		this.panel = new Panel(0, 0, 0, 0);
 	}
 
 	override update() {
 		if (keyWasPressed('x') && this.localScreen === LocalScreen.Menu) {
 			return _window.gStateStack.pop();
+		}
+
+		if (keyWasPressed(' ')) {
+			switch (this.localScreen) {
+				case LocalScreen.Inventory:
+					this.cursor = 1;
+					this.localScreen = LocalScreen.Menu;
+					break;
+			}
 		}
 
 		if (keyWasPressed('Enter')) {
@@ -147,11 +161,17 @@ export class PauseMenuState extends BaseState {
 	}
 
 	override render() {
-		ctx.fillStyle = 'rgba(0, 0, 200, 0.8)';
-		ctx.fillRect(0, 0, 500, 125);
+		this.panel.x = 0;
+		this.panel.y = 0;
+		this.panel.width = 500;
+		this.panel.height = 125;
 
 		switch (this.localScreen) {
 			case LocalScreen.Menu:
+				this.panel.width = 180;
+				this.panel.height = 108;
+				this.panel.render();
+
 				ctx.font = '16px zig';
 				ctx.textAlign = 'start';
 				ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 1 ? 1 : 0.4})`;
@@ -169,6 +189,7 @@ export class PauseMenuState extends BaseState {
 				break;
 
 			case LocalScreen.Party:
+				this.panel.render();
 				ctx.font = '16px zig';
 				ctx.fillStyle = `rgba(255, 255, 255, 1)`;
 				ctx.fillText('Party member', 6, 16);
@@ -190,6 +211,7 @@ export class PauseMenuState extends BaseState {
 				break;
 
 			case LocalScreen.Inventory:
+				this.panel.render();
 				ctx.font = '16px zig';
 				ctx.fillStyle = `rgba(255, 255, 255, 1)`;
 				ctx.fillText('Items', 6, 16);
@@ -201,7 +223,7 @@ export class PauseMenuState extends BaseState {
 					const name = itemWiki.name;
 
 					ctx.fillStyle = `rgba(255, 255, 255, ${isThisItem ? 1 : 0.4})`;
-					ctx.fillText(`${isThisItem ? '> ' : '  '} ${padNum(quantity, '0')} - ${name}`, 16, 16 * (counter + 2) + 2);
+					ctx.fillText(`${isThisItem ? '> ' : '  '} ${padNum(quantity, '0')} - ${name}`, 18, 16 * (counter + 2) + 2);
 
 					// Render description
 					if (isThisItem) {
@@ -209,8 +231,11 @@ export class PauseMenuState extends BaseState {
 						const desc = getWrap(ctx, itemWiki.description, 500 - 6);
 
 						// The panel
-						ctx.fillStyle = 'rgba(0, 0, 200, 0.8)';
-						ctx.fillRect(505, 0, 500, 125);
+						this.panel.x = 505;
+						this.panel.y = 0;
+						this.panel.width = 500;
+						this.panel.height = 125;
+						this.panel.render();
 
 						// Item description
 						ctx.fillStyle = 'rgba(255, 255, 255, 1)';
@@ -225,6 +250,7 @@ export class PauseMenuState extends BaseState {
 				break;
 
 			case LocalScreen.ExitConfirmation:
+				this.panel.render();
 				ctx.font = '16px zig';
 				ctx.fillStyle = `rgba(255, 255, 255, 1)`;
 				ctx.fillText(`Exit game and return to title screen ?`, 6, 16);

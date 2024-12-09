@@ -74,8 +74,8 @@ async function init() {
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
 
 	// _window.gStateStack.push(new TutorialState());
-	_window.gStateStack.push(new StartState());
-	// _window.gStateStack.push(new GameState());
+	// _window.gStateStack.push(new StartState());
+	_window.gStateStack.push(new GameState());
 
 	animation();
 }

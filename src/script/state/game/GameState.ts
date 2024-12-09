@@ -91,7 +91,7 @@ export class GameState extends BaseState {
 		if (!this.disableKey) {
 			this.level.update();
 
-			if (keyWasPressed(' ') || keyWasPressed('x')) {
+			if (keyWasPressed(' ')) {
 				_window.gStateStack.push(new PauseMenuState(this.user, this));
 			}
 		}

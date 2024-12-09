@@ -1,6 +1,6 @@
 import { ctx, TILE_SIZE } from '@/global';
 import { keyWasPressed } from '@/index';
-import { Panel } from '@/script/gui/Panel';
+import { Panel, Panel2 } from '@/script/gui/Panel';
 import { ITEM_OBJECT_DEFS } from '@/script/interface/object/item_object_defs';
 import { ItemObjectDef } from '@/script/interface/object/ItemObjectDef';
 import { BaseState } from '@/script/state/BaseState';
@@ -19,7 +19,8 @@ export class ShowItemDrawerState extends BaseState {
 	private yPos: number;
 	private onItemSelected: (selectedItem: ItemObjectDef) => void;
 	items: Array<[string, number]>;
-	descPanel: Panel;
+	descPanel: Panel2;
+	drawerPanel: Panel2;
 	constructor(user: User, xPos: number, yPos: number, onItemSelected: (selected: ItemObjectDef) => void) {
 		super();
 		this.user = user;
@@ -38,7 +39,13 @@ export class ShowItemDrawerState extends BaseState {
 			this.items.push(itemRef);
 		}
 
-		this.descPanel = new Panel(this.xPos, this.yPos + TILE_SIZE * this.tileHeightCount + 16, 511, 125);
+		this.drawerPanel = new Panel2(this.xPos, this.yPos, this.tileWidthCount, this.tileHeightCount);
+		this.descPanel = new Panel2(
+			this.xPos,
+			this.yPos + TILE_SIZE * this.tileHeightCount + 16,
+			this.tileWidthCount + 9,
+			this.tileHeightCount
+		);
 	}
 
 	filterCategory(categories: string[]) {
@@ -82,36 +89,12 @@ export class ShowItemDrawerState extends BaseState {
 	}
 
 	override render() {
-		const quads = _window.gFrames.get('dialogue') as _QuadImage[];
 		const cursor = _window.gImages.get('cursor') as HTMLImageElement;
-
-		// The panel itself
-		for (let y = 0; y < this.tileHeightCount; y++) {
-			for (let x = 0; x < this.tileWidthCount; x++) {
-				if (y > 0 && x > 0 && y < this.tileHeightCount - 1 && x < this.tileWidthCount - 1) {
-					quads[4].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === 0 && x === 0) {
-					quads[0].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === 0 && x === this.tileWidthCount - 1) {
-					quads[2].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === this.tileHeightCount - 1 && x === 0) {
-					quads[6].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === this.tileHeightCount - 1 && x === this.tileWidthCount - 1) {
-					quads[8].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === this.tileHeightCount - 1 && x > 0) {
-					quads[7].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y > 0 && x === 0) {
-					quads[3].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y > 0 && x === this.tileWidthCount - 1) {
-					quads[5].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				} else if (y === 0) {
-					quads[1].drawImage(ctx, this.xPos + x * TILE_SIZE, this.yPos + y * TILE_SIZE);
-				}
-			}
-		}
+		this.drawerPanel.render();
 
 		//
 		ctx.font = '16px zig';
+		ctx.fillStyle = 'rgba(74, 53, 17, 1)';
 		let counter = 0;
 		for (const [key, quantity] of this.items) {
 			const isThisItem = this.cursor === counter + 1;
@@ -131,9 +114,7 @@ export class ShowItemDrawerState extends BaseState {
 				this.descPanel.render();
 
 				// Item description
-				ctx.fillStyle = 'rgba(56, 56, 56, 1)';
 				ctx.fillText('Description', this.xPos + 8, this.yPos * 2 + 18);
-				ctx.fillStyle = 'rgba(255, 255, 255, 1)';
 				desc.forEach((text, index) =>
 					ctx.fillText(text, this.xPos + 6, this.yPos * 2 + 16 * (index + 2) + 4 + TILE_SIZE * this.tileHeightCount)
 				);
