@@ -161,7 +161,7 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 
 				if (state !== null && state.level instanceof World) {
 					_window.gStateStack.push(
-						new UserUseItemState(state.user, 'potion', (selected: Hero) => {
+						new UserUseItemState(user, 'potion', (selected: Hero) => {
 							_window.gStateStack.pop();
 
 							console.log(`[System Log] ${selected.name} using Potion!`);
@@ -186,7 +186,7 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 						})
 					);
 
-					throw new Error('Unexpected error while using item');
+					return true;
 				}
 			}
 
@@ -311,7 +311,7 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 						})
 					);
 
-					throw new Error('Unexpected error while using item');
+					return true;
 				}
 			}
 
