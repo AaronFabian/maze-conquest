@@ -22,6 +22,7 @@ export class MazeGame extends Maze {
 				const initialX = random(1, this.height - 1);
 				const initialY = random(1, this.width - 1);
 
+				const notDoor = this.data[initialY][initialX] !== MazeObjectType.DOOR;
 				const notWALL = this.data[initialY][initialX] !== MazeObjectType.WALL;
 				const notSPACE = this.data[initialY][initialX] !== MazeObjectType.SPACE;
 				if (notWALL && notSPACE) {
@@ -38,6 +39,30 @@ export class MazeGame extends Maze {
 		} else {
 			[this.level.world.player.x, this.level.world.player.y] = [x!, y!];
 			console.log(`[Maze] set player x = ${x}, y = ${y}`);
+		}
+	}
+
+	initDoor() {
+		const maxAttempts = 100;
+		let attempts = 0;
+
+		while (attempts < maxAttempts) {
+			const initialX = random(1, this.width - 1);
+			const initialY = random(1, this.height - 1);
+
+			const notPlayer = this.data[initialY][initialX] !== MazeObjectType.PLAYER;
+			const notEnemy = this.data[initialY][initialX] !== MazeObjectType.ENEMY;
+			const notWALL = this.data[initialY][initialX] !== MazeObjectType.WALL;
+			const notSPACE = this.data[initialY][initialX] !== MazeObjectType.SPACE;
+
+			if (notWALL && notSPACE && notPlayer && notEnemy) {
+				this.data[initialY][initialX] = MazeObjectType.DOOR;
+				console.log(`[Maze] Door to next level at coords x = ${initialX}, y = ${initialY}`);
+
+				return; // Exit loop if a valid position is found
+			}
+
+			attempts += 1;
 		}
 	}
 

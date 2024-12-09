@@ -43,4 +43,28 @@ export const GAME_OBJECT_DEFS: { [key: string]: GameObjectDef } = {
 		width: 32,
 		height: 32,
 	},
+	door: {
+		animations: {
+			['default']: {
+				texture: 'door',
+				frames: [0],
+			},
+			['open']: {
+				frames: [0, 1, 2, 3, 4],
+				texture: 'door',
+				interval: 8,
+				looping: false,
+			},
+			['close']: {
+				frames: [4, 3, 2, 1, 0],
+				texture: 'door',
+				interval: 8,
+				looping: false,
+			},
+		},
+		x: 0,
+		y: 0,
+		width: 16,
+		height: 32,
+	},
 };

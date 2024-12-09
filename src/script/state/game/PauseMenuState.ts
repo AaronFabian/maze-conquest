@@ -203,7 +203,7 @@ export class PauseMenuState extends BaseState {
 					const heroInfo = `${isThisHero ? '> ' : '  '}${memberName} - Lv.${hero.level} - ${hero.currentHP}/${hero.HP}`;
 
 					ctx.fillStyle = `rgba(255, 255, 255, ${isThisHero ? 1 : 0.4})`;
-					ctx.fillText(heroInfo, 16, 16 * (i + 1) + 2);
+					ctx.fillText(heroInfo, 18, 16 * (i + 1) + 2);
 				}
 
 				ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === userParty.length + 1 ? 1 : 0.4})`;

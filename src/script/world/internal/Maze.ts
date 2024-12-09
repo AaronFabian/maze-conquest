@@ -8,7 +8,7 @@ export enum MazeObjectType {
 	PATH = 0,
 	WALL = 1,
 	PLAYER = 2,
-	FINISHED_POINT = 3,
+	DOOR = 3,
 	TRACE_POINT = 4,
 	ITEM = 5,
 	ENEMY = 6,

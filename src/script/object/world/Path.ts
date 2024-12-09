@@ -106,6 +106,7 @@ export class Path {
 			case MazeObjectType.WALL:
 				break;
 
+			case MazeObjectType.DOOR:
 			case MazeObjectType.PATH:
 				structure[1][0] = BlockType.NONE;
 				structure[2][0] = BlockType.NONE;
@@ -134,6 +135,7 @@ export class Path {
 			case MazeObjectType.WALL:
 				break;
 
+			case MazeObjectType.DOOR:
 			case MazeObjectType.PATH:
 				structure[1][4] = BlockType.NONE;
 				structure[2][4] = BlockType.NONE;
@@ -161,6 +163,7 @@ export class Path {
 			case MazeObjectType.WALL:
 				break;
 
+			case MazeObjectType.DOOR:
 			case MazeObjectType.PATH:
 				structure[0][1] = BlockType.NONE;
 				structure[0][2] = BlockType.NONE;
@@ -188,6 +191,7 @@ export class Path {
 			case MazeObjectType.WALL:
 				break;
 
+			case MazeObjectType.DOOR:
 			case MazeObjectType.PATH:
 				structure[4][1] = BlockType.NONE;
 				structure[4][2] = BlockType.NONE;
@@ -299,7 +303,35 @@ export class Path {
 		}
 	}
 
-	beginBattle() {
+	private checkDoNextLevel(player: Player) {
+		if (this.mazeObjectType !== MazeObjectType.DOOR) return;
+
+		// Using AABB
+		const box1: AABB = {
+			// Path
+			x: this.renderPosX * 80,
+			y: this.renderPosY * 80,
+			width: 80,
+			height: 80,
+		};
+		const box2: AABB = {
+			// Player
+			x: player.x,
+			y: player.y,
+			width: player.width,
+			height: player.height,
+		};
+
+		if (this.checkCollision(box1, box2)) {
+			this.goToNextLevel();
+		}
+	}
+
+	private goToNextLevel() {
+		console.log('Go to next level');
+	}
+
+	private beginBattle() {
 		// 01 We are going to Fade in and Fade out twice
 		_window.gStateStack.push(
 			new FadeInState({ r: 0, g: 0, b: 0 }, 500, () => {
@@ -348,6 +380,9 @@ export class Path {
 
 		// The Path will check whether should go to battle field or not
 		this.checkBattle(this.level.world.player);
+
+		// The Path will check if Player should go to next level or not
+		this.checkDoNextLevel(this.level.world.player);
 	}
 
 	render() {
@@ -371,9 +406,15 @@ export class Path {
 			}
 		}
 
-		ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
-		if (this.mazeObjectType === MazeObjectType.ENEMY)
-			// For debugging purpose
+		// For debugging purpose
+		if (this.mazeObjectType === MazeObjectType.ENEMY) {
+			ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
 			ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
+		}
+
+		if (this.mazeObjectType === MazeObjectType.DOOR) {
+			ctx.fillStyle = 'rgba(90, 34, 139, 0.6)';
+			ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
+		}
 	}
 }

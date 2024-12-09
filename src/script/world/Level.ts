@@ -104,6 +104,10 @@ export class Level extends World {
 		// 05 Tell this Level to generate Enemy
 		this.generateEnemies(this.currentMapPart);
 
+		// 06
+		this.maze.initDoor();
+		console.log(this.maze.data);
+
 		// 06 Set the player position in this current map with player
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
 		this.world.player.y = (playerYCoord - 8 * mapPartY) * 80 + 16 * 2;
@@ -134,7 +138,7 @@ export class Level extends World {
 		// const totalEnemies = random(1, Math.floor((paths[0].length + paths.length) / 2));
 
 		// A list that algorithm should be avoid
-		const objectShouldAvoid = [MazeObjectType.WALL, MazeObjectType.SPACE, MazeObjectType.ITEM];
+		const objectShouldAvoid = [MazeObjectType.WALL, MazeObjectType.SPACE, MazeObjectType.ITEM, MazeObjectType.DOOR];
 
 		for (let i = 1; i <= totalEnemies; i++) {
 			while (true) {

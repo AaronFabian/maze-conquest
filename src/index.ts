@@ -36,6 +36,7 @@ async function init() {
 
 	// declare local screen only for displaying loading screen
 	// in general "screen" still inherit from BaseState but they not relate to game update nor render
+	// TODO: new class for LoadingAssetScreen
 	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
 	const loadingScreen = new LoadingAssetScreen(imageToAwait);
 
@@ -56,22 +57,24 @@ async function init() {
 	imageToAwait.push(newImage('component/cursor.png', 'cursor', loadingScreen));
 	imageToAwait.push(newImage('component/object/portal.png', 'portal', loadingScreen));
 	imageToAwait.push(newImage('component/object/campfire.png', 'campfire', loadingScreen));
+	imageToAwait.push(newImage('component/object/door.png', 'door', loadingScreen));
 
 	const resolvedImages = await Promise.all(imageToAwait);
 	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));
 
-	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
-	_window.gFrames.set('dialogue', generateQuads(_window.gImages.get('dialogue'), 16, 16));
+	_window.gFrames.set('door', generateQuads(_window.gImages.get('door'), 16, 32));
+	_window.gFrames.set('npcs', generateQuads(_window.gImages.get('npcs'), 32, 32));
+	_window.gFrames.set('orc', generateQuads(_window.gImages.get('orc'), 100, 100));
 	_window.gFrames.set('level1', generateQuads(_window.gImages.get('level1'), 80, 80));
 	_window.gFrames.set('player', generateQuads(_window.gImages.get('player'), 32, 32));
-	_window.gFrames.set('soldier', generateQuads(_window.gImages.get('soldier'), 100, 100));
-	_window.gFrames.set('orc', generateQuads(_window.gImages.get('orc'), 100, 100));
-	_window.gFrames.set('wizard', generateQuads(_window.gImages.get('wizard'), 100, 100));
-	_window.gFrames.set('skeleton', generateQuads(_window.gImages.get('skeleton'), 100, 100));
-	_window.gFrames.set('npcs', generateQuads(_window.gImages.get('npcs'), 32, 32));
 	_window.gFrames.set('portal', generateQuads(_window.gImages.get('portal'), 32, 32));
+	_window.gFrames.set('wizard', generateQuads(_window.gImages.get('wizard'), 100, 100));
+	_window.gFrames.set('soldier', generateQuads(_window.gImages.get('soldier'), 100, 100));
 	_window.gFrames.set('campfire', generateQuads(_window.gImages.get('campfire'), 16, 16));
+	_window.gFrames.set('dialogue', generateQuads(_window.gImages.get('dialogue'), 16, 16));
+	_window.gFrames.set('skeleton', generateQuads(_window.gImages.get('skeleton'), 100, 100));
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
+	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
 	// _window.gStateStack.push(new TutorialState());
 	// _window.gStateStack.push(new StartState());
