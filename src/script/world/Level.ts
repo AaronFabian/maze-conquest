@@ -6,8 +6,9 @@ import { SystemError } from '@/script/system/error/SystemError';
 import { MapPart } from '@/script/world/map/MapPart';
 import { MazeObjectType } from '@/script/world/internal/Maze';
 import { MazeGame } from '@/script/world/internal/MazeGame';
-import { World } from '@/script/world/World';
+import { World, WorldType } from '@/script/world/World';
 import { Event, random } from '@/utils';
+import { User } from '../system/model/User.js';
 
 export class Level extends World {
 	world: GameState;
@@ -31,16 +32,22 @@ export class Level extends World {
 	wrapEffect: boolean;
 	objects: GameObject[];
 	private tweenRef: any;
+	user: User;
 
-	constructor(world: GameState) {
+	constructor(world: GameState, user: User) {
 		super();
 
 		this.world = world;
+		this.user = user;
 
 		// 01
 		this.cameraOffsetX = 0;
 		this.cameraOffsetY = 0;
-		this.maze = new MazeGame(21, 21, this);
+		const base = 9;
+		const level = user.worlds.get(WorldType.Level);
+		if (level === undefined) throw new Error('Unexpected error. Given undefined worlds data from User.');
+
+		this.maze = new MazeGame(base + level * 2, base + level * 2, this);
 
 		// 02 Fill the maze dimension and fill with ex: WALL
 		this.maze.create();
@@ -86,6 +93,9 @@ export class Level extends World {
 		// the player required for make player spawn randomly
 		this.maze.mapSlicer();
 
+		// 03
+		this.maze.initDoor();
+
 		// 03 Take sliced map and then render that map only
 		// const renderWidth = 15;
 		// const renderHeight = 8;
@@ -98,15 +108,11 @@ export class Level extends World {
 		console.log('[System] Player position ', playerXCoord, playerYCoord);
 		console.log(`[System] Player using mapPartX ${mapPartX}, mapPartY ${mapPartY}`);
 
-		// 04 create Path instances from sliced Map
+		// 04 create Path instances from sliced Map, it will copy the data reference at create Path
 		this.currentMapPart = new MapPart(currentMap, this.currentMapPartX, this.currentMapPartY, this);
 
-		// 05 Tell this Level to generate Enemy
+		// 05 Tell this Level to generate Enemy, "generate" means, it will be new generated every player move to the other map part
 		this.generateEnemies(this.currentMapPart);
-
-		// 06
-		this.maze.initDoor();
-		console.log(this.maze.data);
 
 		// 06 Set the player position in this current map with player
 		this.world.player.x = (playerXCoord - 15 * mapPartX) * 80 + 16 * 2;
@@ -142,7 +148,9 @@ export class Level extends World {
 
 		for (let i = 1; i <= totalEnemies; i++) {
 			while (true) {
-				const [x, y] = [random(1, paths[0].length - 1), random(1, paths.length - 1)];
+				const xHorizontal = paths[0].length - 1;
+				const yVertical = paths.length - 1;
+				const [x, y] = [random(1, xHorizontal), random(1, yVertical)];
 				if (!objectShouldAvoid.find(o => o === paths[y][x].mazeObjectType)) {
 					paths[y][x].mazeObjectType = MazeObjectType.ENEMY;
 					// ! This not final, When generating enemy they can have the same spot

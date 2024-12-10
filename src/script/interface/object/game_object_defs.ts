@@ -50,7 +50,7 @@ export const GAME_OBJECT_DEFS: { [key: string]: GameObjectDef } = {
 				frames: [0],
 			},
 			['open']: {
-				frames: [0, 1, 2, 3, 4],
+				frames: [4, 0, 1, 2, 3, 4],
 				texture: 'door',
 				interval: 8,
 				looping: false,

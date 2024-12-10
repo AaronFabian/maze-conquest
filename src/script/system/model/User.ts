@@ -59,6 +59,7 @@ export class User {
 			return wizard;
 		},
 	};
+	worlds: Map<string, number>;
 
 	constructor(def: any) {
 		this.createdAt = def.createdAt;
@@ -78,6 +79,11 @@ export class User {
 
 		this.createdAt = def.createdAt;
 		this.active = def.active;
+
+		this.worlds = new Map();
+		for (const [key, value] of Object.entries(def.worlds as { [key: string]: number })) {
+			this.worlds.set(key, value);
+		}
 
 		console.log('[System Log] User with UID: ' + this._uid);
 	}

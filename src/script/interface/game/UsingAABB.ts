@@ -1,0 +1,3 @@
+interface UsingAABB {
+	usingAABB(): void;
+}

@@ -25,12 +25,41 @@ export class GameState extends BaseState {
 
 	constructor() {
 		super();
+		const DUMMY_PLAYER_DATA = {
+			_uid: 9999,
+			items: new Map<string, number>([
+				['phoenix-feather', 99],
+				['potion', 99],
+				['hi-potion', 2],
+			]),
+			allHeroes: {
+				['soldier']: {
+					level: 1,
+				},
+				['wizard']: {
+					level: 1,
+				},
+			},
+			party: ['soldier', 'wizard'],
+			active: true,
+			username: 'Aaron Fabian',
+			createdAt: Date.now(),
+			worlds: {
+				[WorldType.Town]: 1,
+				[WorldType.Level]: 1,
+			},
+		};
+
+		// 00
+		this.user = new User(DUMMY_PLAYER_DATA);
+
+		// 00
 		this.disableKey = false;
 
 		// 00 Put all worlds but don't load any World yet
 		this.worlds = new Map<WorldType, () => World>();
-		this.worlds.set(WorldType.Level, () => new Level(this));
 		this.worlds.set(WorldType.Town, () => new Town(this));
+		this.worlds.set(WorldType.Level, () => new Level(this, this.user));
 
 		// 01 Generate world level
 		this.level = this.worlds.get(WorldType.Level)!();
@@ -52,29 +81,6 @@ export class GameState extends BaseState {
 
 		// 03 Setup maze level
 		this.level.setup();
-
-		const DUMMY_PLAYER_DATA = {
-			_uid: 9999,
-			items: new Map<string, number>([
-				['phoenix-feather', 99],
-				['potion', 99],
-				['hi-potion', 2],
-			]),
-			allHeroes: {
-				['soldier']: {
-					level: 1,
-				},
-				['wizard']: {
-					level: 1,
-				},
-			},
-			party: ['soldier', 'wizard'],
-			active: true,
-			username: 'Aaron Fabian',
-			createdAt: Date.now(),
-		};
-
-		this.user = new User(DUMMY_PLAYER_DATA);
 
 		console.log(this.user);
 		console.log('%c -game state-', 'color: #30AEBF;');

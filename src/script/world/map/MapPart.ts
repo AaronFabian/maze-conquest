@@ -41,9 +41,10 @@ export class MapPart implements CanvasRendering {
 
 		// Do not check collision if Player at idle state
 		const player = this.level.world.player;
-		if (player.stateMachine?.getCurrent() instanceof PlayerWalkState)
-			for (const yRow of this.paths) {
-				for (const path of yRow) {
+		for (const yRow of this.paths) {
+			for (const path of yRow) {
+				// Do not check if Player not walking
+				if (player.stateMachine!.getCurrent() instanceof PlayerWalkState) {
 					path.update();
 					if (path.isPlayerCollided) {
 						isCancelPlayer = true;
@@ -61,9 +62,15 @@ export class MapPart implements CanvasRendering {
 						}
 						break;
 					}
+				} else {
+					// whether collide or not keep checking
+					if (path.mazeObjectType === MazeObjectType.DOOR) {
+						path.door!.update();
+					}
 				}
-				if (isCancelPlayer) break;
 			}
+			if (isCancelPlayer) break;
+		}
 	}
 
 	render() {

@@ -1,14 +1,15 @@
-import { ctx } from '@/global';
+import { ctx, Tween } from '@/global';
 import { AABB } from '@/script/interface/game/AABB';
 import { Player } from '@/script/object/entity/Player';
+import { Door } from '@/script/object/world/Door';
 import { MapButton } from '@/script/object/world/MapButton';
 import { BattleState } from '@/script/state/game/BattleState';
 import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
-import { Level } from '@/script/world/Level';
 import { MazeObjectType } from '@/script/world/internal/Maze';
-import { World } from '@/script/world/World';
+import { Level } from '@/script/world/Level';
+import { World, WorldType } from '@/script/world/World';
 import { _QuadImage } from '@/utils';
 
 const _window = window as any;
@@ -31,6 +32,7 @@ export class Path {
 	isDangerPath: boolean;
 	mazeObjectType: MazeObjectType;
 	isPlayerCollided: boolean;
+	door: Door | null;
 
 	constructor(level: World, xPos: number, yPos: number, renderPosX: number, renderPosY: number) {
 		this.level = level as Level;
@@ -45,6 +47,9 @@ export class Path {
 		this.isPlayerCollided = false;
 
 		this.mazeObjectType = this.level.maze.data[this.yPos][this.xPos];
+
+		// By default door to next Level is null.
+		this.door = null;
 	}
 
 	generate(currentMapPartX: number, currentMapPartY: number) {
@@ -237,10 +242,15 @@ export class Path {
 		else throw new Error('Unexpected SpriteId configuration');
 
 		this.spriteId = spriteId;
+
+		// Door
+		if (this.mazeObjectType === MazeObjectType.DOOR) {
+			this.setDoor();
+		}
 	}
 
 	private evaluate(player: Player): boolean {
-		const level = player.level as Level;
+		const level = this.level;
 
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
@@ -303,32 +313,84 @@ export class Path {
 		}
 	}
 
-	private checkDoNextLevel(player: Player) {
-		if (this.mazeObjectType !== MazeObjectType.DOOR) return;
+	// private checkDoNextLevel(player: Player) {
+	// 	if (this.mazeObjectType !== MazeObjectType.DOOR) return;
 
-		// Using AABB
-		const box1: AABB = {
-			// Path
-			x: this.renderPosX * 80,
-			y: this.renderPosY * 80,
-			width: 80,
-			height: 80,
-		};
-		const box2: AABB = {
-			// Player
-			x: player.x,
-			y: player.y,
-			width: player.width,
-			height: player.height,
-		};
+	// 	// Using AABB
+	// 	const box1: AABB = {
+	// 		// Path
+	// 		x: this.renderPosX * 80,
+	// 		y: this.renderPosY * 80,
+	// 		width: 80,
+	// 		height: 80,
+	// 	};
+	// 	const box2: AABB = {
+	// 		// Player
+	// 		x: player.x,
+	// 		y: player.y,
+	// 		width: player.width,
+	// 		height: player.height,
+	// 	};
 
-		if (this.checkCollision(box1, box2)) {
-			this.goToNextLevel();
-		}
+	// 	if (this.checkCollision(box1, box2)) {
+	// 		this.goToNextLevel();
+	// 	}
+	// }
+
+	setDoor() {
+		if (this.mazeObjectType !== MazeObjectType.DOOR)
+			throw new Error('new Door set while Path itself not MazeObjectType Door');
+
+		const centerX = this.renderPosX * 80 + 16 * 2;
+		const centerY = this.renderPosY * 80 + 16;
+		this.door = new Door(this.level.world.player, centerX, centerY, door => {
+			// "door" param is referencing into current door instance
+			door.setAnimation = 'open';
+
+			// Stop the player movement
+			this.level.shifting = true;
+
+			// Make Player like they are moving into the door
+			const player = this.level.world.player;
+			player.direction = 'up';
+			player.changeState('walk');
+
+			// Play the animation; onComplete go to next level
+			new Tween(player)
+				.to({ x: door!.x, y: door!.y + 16 })
+				.onUpdate(() => door.currentAnimation.update())
+				.onComplete(() => this.goToNextLevel())
+				.start();
+		});
 	}
 
 	private goToNextLevel() {
-		console.log('Go to next level');
+		const worldRef = this.level.world;
+		const playerRef = this.level.world.player;
+
+		_window.gStateStack.push(
+			new FadeInState({ r: 0, g: 0, b: 0 }, 1500, () => {
+				// Do another stuff here if needed
+				// ...
+
+				// 01
+				const level = this.level.user.worlds.get(WorldType.Level);
+				if (level === undefined) throw new Error('Unexpected error while increasing Player Level difficulty');
+
+				this.level.user.worlds.set(WorldType.Level, level + 1);
+
+				// 02 Reset the reference
+				worldRef.setWorld = WorldType.Level;
+				playerRef.level = worldRef.level;
+				worldRef.level.setup();
+
+				// 03 Slightly tweak to make Player looks waiting the FadeOutState
+				playerRef.changeState('idle');
+
+				// 04
+				_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+			})
+		);
 	}
 
 	private beginBattle() {
@@ -382,13 +444,19 @@ export class Path {
 		this.checkBattle(this.level.world.player);
 
 		// The Path will check if Player should go to next level or not
-		this.checkDoNextLevel(this.level.world.player);
+		if (this.mazeObjectType === MazeObjectType.DOOR && this.door !== null) {
+			this.door!.update();
+		}
 	}
 
 	render() {
 		const sprites = _window.gFrames.get('level1') as _QuadImage[];
 		if (!this.spriteId === null) throw new Error('[Path] spriteId found null');
 		sprites[this.spriteId!].drawImage(ctx, this.renderPosX * 80, this.renderPosY * 80);
+
+		if (this.mazeObjectType === MazeObjectType.DOOR && this.door !== null) {
+			this.door.render();
+		}
 
 		for (let y = 0; y <= 4; y++) {
 			for (let x = 0; x <= 4; x++) {
@@ -409,11 +477,6 @@ export class Path {
 		// For debugging purpose
 		if (this.mazeObjectType === MazeObjectType.ENEMY) {
 			ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
-			ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
-		}
-
-		if (this.mazeObjectType === MazeObjectType.DOOR) {
-			ctx.fillStyle = 'rgba(90, 34, 139, 0.6)';
 			ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
 		}
 	}
