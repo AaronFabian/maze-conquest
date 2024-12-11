@@ -7,6 +7,7 @@ import { Player } from '@/script/object/entity/Player';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { PromptState } from '@/script/state/game/PromptState';
+import { WhileChangingWorldState } from '@/script/state/game/WhileChangingWorldState';
 import { Town } from '@/script/world/Town';
 import { WorldType } from '@/script/world/World';
 
@@ -98,16 +99,19 @@ export class Portal extends GameObject {
 								// Do another stuff here
 								//
 
-								// 01 Reset the reference
-								this.town.gameState.setWorld = WorldType.Level;
-								this.player.level = this.town.gameState.level;
-								this.town.gameState.level.setup();
+								// 01
+								this.town.gameState.changeWorld(WorldType.Level);
 
 								// 02 Slightly tweak to make Player looks waiting the FadeOutState
 								this.player.changeState('idle');
 
 								// 03
-								_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+								_window.gStateStack.push(
+									new WhileChangingWorldState(this.town.gameState.user, WorldType.Level, () => {
+										// 04
+										_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+									})
+								);
 							})
 							.start();
 					},

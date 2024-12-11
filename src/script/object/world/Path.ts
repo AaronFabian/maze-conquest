@@ -7,6 +7,7 @@ import { BattleState } from '@/script/state/game/BattleState';
 import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
+import { WhileChangingWorldState } from '@/script/state/game/WhileChangingWorldState';
 import { MazeObjectType } from '@/script/world/internal/Maze';
 import { Level } from '@/script/world/Level';
 import { World, WorldType } from '@/script/world/World';
@@ -313,30 +314,6 @@ export class Path {
 		}
 	}
 
-	// private checkDoNextLevel(player: Player) {
-	// 	if (this.mazeObjectType !== MazeObjectType.DOOR) return;
-
-	// 	// Using AABB
-	// 	const box1: AABB = {
-	// 		// Path
-	// 		x: this.renderPosX * 80,
-	// 		y: this.renderPosY * 80,
-	// 		width: 80,
-	// 		height: 80,
-	// 	};
-	// 	const box2: AABB = {
-	// 		// Player
-	// 		x: player.x,
-	// 		y: player.y,
-	// 		width: player.width,
-	// 		height: player.height,
-	// 	};
-
-	// 	if (this.checkCollision(box1, box2)) {
-	// 		this.goToNextLevel();
-	// 	}
-	// }
-
 	setDoor() {
 		if (this.mazeObjectType !== MazeObjectType.DOOR)
 			throw new Error('new Door set while Path itself not MazeObjectType Door');
@@ -365,30 +342,28 @@ export class Path {
 	}
 
 	private goToNextLevel() {
-		const worldRef = this.level.world;
-		const playerRef = this.level.world.player;
+		const stateRef = this.level.world;
 
 		_window.gStateStack.push(
 			new FadeInState({ r: 0, g: 0, b: 0 }, 1500, () => {
-				// Do another stuff here if needed
-				// ...
-
 				// 01
 				const level = this.level.user.worlds.get(WorldType.Level);
 				if (level === undefined) throw new Error('Unexpected error while increasing Player Level difficulty');
 
 				this.level.user.worlds.set(WorldType.Level, level + 1);
 
-				// 02 Reset the reference
-				worldRef.setWorld = WorldType.Level;
-				playerRef.level = worldRef.level;
-				worldRef.level.setup();
+				// 02
+				stateRef.changeWorld(WorldType.Level);
 
 				// 03 Slightly tweak to make Player looks waiting the FadeOutState
-				playerRef.changeState('idle');
+				stateRef.player.changeState('idle');
 
-				// 04
-				_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+				_window.gStateStack.push(
+					new WhileChangingWorldState(stateRef.user, WorldType.Level, () => {
+						// 04
+						_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+					})
+				);
 			})
 		);
 	}

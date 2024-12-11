@@ -7,6 +7,7 @@ import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
 import { UserUseItemState } from '@/script/state/game/UserUseItemState';
+import { WhileChangingWorldState } from '@/script/state/game/WhileChangingWorldState';
 import { User } from '@/script/system/model/User';
 import { Town } from '@/script/world/Town';
 import { World, WorldType } from '@/script/world/World';
@@ -52,16 +53,19 @@ export const ITEM_OBJECT_DEFS: { [key: string]: ItemObjectDef } = {
 					// Do another stuff here if needed
 					// ...
 
-					// 01 Reset the reference
-					state.setWorld = WorldType.Town;
-					state.player.level = state.level;
-					state.level.setup();
+					// 01
+					state.changeWorld(WorldType.Town);
 
 					// 02 Slightly tweak to make Player looks waiting the FadeOutState
 					state.player.changeState('idle');
 
 					// 03
-					_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+					_window.gStateStack.push(
+						new WhileChangingWorldState(state.user, WorldType.Town, () => {
+							// 04
+							_window.gStateStack.push(new FadeOutState({ r: 0, g: 0, b: 0 }, 1500, () => {}));
+						})
+					);
 				})
 			);
 

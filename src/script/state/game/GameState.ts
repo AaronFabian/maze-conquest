@@ -93,6 +93,13 @@ export class GameState extends BaseState {
 		this.level = this.worlds.get(worldType)!();
 	}
 
+	changeWorld(worldType: WorldType) {
+		// Do not use this for instantiate, because player is not yet if this fn called at instantiate
+		this.setWorld = worldType;
+		this.player.level = this.level; // Reset Player Level reference to new Level reference
+		this.level.setup();
+	}
+
 	override update() {
 		if (!this.disableKey) {
 			this.level.update();

@@ -66,9 +66,10 @@ export class Door extends GameObject {
 			// Because the canvas at center the UI will looks not precise
 			ctx.save();
 			ctx.resetTransform();
-			ctx.font = '16px zig';
+			ctx.font = '14px zig';
+			ctx.textAlign = 'center';
 			ctx.fillStyle = 'rgb(255,255,255)';
-			ctx.fillText('Press Enter key to proceed', 38, canvas.height - 24);
+			ctx.fillText('Press Enter key to proceed', canvas.width / 2, canvas.height - 16);
 			ctx.restore();
 		}
 	}
