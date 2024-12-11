@@ -44,7 +44,7 @@ export const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 canvas.width = 1280;
 canvas.height = 720;
 canvas.style.border = '1px solid white'; // ! delete dev purpose
-canvas.style.scale = '0.9'; // ! delete dev purpose
+// canvas.style.scale = '0.9'; // ! delete dev purpose
 
 export const input = {
 	mouse: {

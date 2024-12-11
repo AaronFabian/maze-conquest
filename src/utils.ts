@@ -2,7 +2,6 @@
 
 import { Howl } from '@/global';
 import { AnimationDef } from '@/script/interface/game/AnimationDef';
-import { LoadingAssetScreen } from '@/script/system/screen/LoadingAssetScreen';
 
 export class Animation {
 	frames: number[];
@@ -135,19 +134,29 @@ export function newHowler(src: string, loop: boolean = false): Promise<unknown> 
 	});
 }
 
-export function newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
+/*
+	export function newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
+		const imgElement = new Image();
+		imgElement.src = src;
+		imgElement.alt = alt;
+		
+		return new Promise((resolve, reject) => {
+			imgElement.onerror = e => reject(e);
+			imgElement.onload = () => {
+				state.assetLoaded += 1;
+				state.render();
+				resolve(imgElement);
+			};
+		});
+	}
+*/
+
+export function _newImage(src: string, alt: string) {
 	const imgElement = new Image();
 	imgElement.src = src;
 	imgElement.alt = alt;
 
-	return new Promise((resolve, reject) => {
-		imgElement.onerror = e => reject(e);
-		imgElement.onload = () => {
-			state.assetLoaded += 1;
-			state.render();
-			resolve(imgElement);
-		};
-	});
+	return imgElement;
 }
 
 export function random(from: number = 0, to: number = 1): number {

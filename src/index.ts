@@ -12,13 +12,13 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
-import { StartState } from '@/script/state/game/StartState';
 import { GameState } from '@/script/state/game/GameState';
-import { LoadingAssetScreen } from '@/script/system/screen/LoadingAssetScreen';
-import { newImage, generateQuads } from '@/utils';
+import { StartState } from '@/script/state/game/StartState';
+import { TutorialState } from '@/script/state/game/TutorialState';
+import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen';
+import { generateQuads, _newImage } from '@/utils';
 import { SystemError } from '@/script/system/error/SystemError';
 import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
-import { TutorialState } from '@/script/state/game/TutorialState';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -34,33 +34,27 @@ async function init() {
 	// Initialize Cloud Firestore and get a reference to the service
 	const db = getFirestore(app);
 
-	// declare local screen only for displaying loading screen
-	// in general "screen" still inherit from BaseState but they not relate to game update nor render
-	// TODO: new class for LoadingAssetScreen
-	const imageToAwait: Array<Promise<HTMLImageElement>> = [];
-	const loadingScreen = new LoadingAssetScreen(imageToAwait);
+	const loadingAssetScreen = new _LoadingAssetsScreen<HTMLImageElement>();
+	loadingAssetScreen.push(_newImage('ui/background.png', 'start-screen-bg'));
+	loadingAssetScreen.push(_newImage('ui/dialogue.png', 'dialogue'));
+	loadingAssetScreen.push(_newImage('component/level1-tileset.png', 'level1-tileset'));
+	loadingAssetScreen.push(_newImage('component/level1.png', 'level1'));
+	loadingAssetScreen.push(_newImage('component/town-prototype.png', 'town-prototype'));
+	loadingAssetScreen.push(_newImage('component/forest-prototype.png', 'forest-prototype'));
+	loadingAssetScreen.push(_newImage('component/wrap-effect.png', 'wrap-effect'));
+	loadingAssetScreen.push(_newImage('component/level1-battlefield.png', 'level1-battlefield'));
+	loadingAssetScreen.push(_newImage('component/character/player.png', 'player'));
+	loadingAssetScreen.push(_newImage('component/character/soldier.png', 'soldier'));
+	loadingAssetScreen.push(_newImage('component/character/wizard.png', 'wizard'));
+	loadingAssetScreen.push(_newImage('component/character/orc.png', 'orc'));
+	loadingAssetScreen.push(_newImage('component/character/npcs.png', 'npcs'));
+	loadingAssetScreen.push(_newImage('component/character/skeleton.png', 'skeleton'));
+	loadingAssetScreen.push(_newImage('component/cursor.png', 'cursor'));
+	loadingAssetScreen.push(_newImage('component/object/portal.png', 'portal'));
+	loadingAssetScreen.push(_newImage('component/object/campfire.png', 'campfire'));
+	loadingAssetScreen.push(_newImage('component/object/door.png', 'door'));
 
-	imageToAwait.push(newImage('ui/background.png', 'start-screen-bg', loadingScreen));
-	imageToAwait.push(newImage('ui/dialogue.png', 'dialogue', loadingScreen));
-	imageToAwait.push(newImage('component/level1-tileset.png', 'level1-tileset', loadingScreen));
-	imageToAwait.push(newImage('component/level1.png', 'level1', loadingScreen));
-	imageToAwait.push(newImage('component/town-prototype.png', 'town-prototype', loadingScreen));
-	imageToAwait.push(newImage('component/forest-prototype.png', 'forest-prototype', loadingScreen));
-	imageToAwait.push(newImage('component/wrap-effect.png', 'wrap-effect', loadingScreen));
-	imageToAwait.push(newImage('component/level1-battlefield.png', 'level1-battlefield', loadingScreen));
-	imageToAwait.push(newImage('component/character/player.png', 'player', loadingScreen));
-	imageToAwait.push(newImage('component/character/soldier.png', 'soldier', loadingScreen));
-	imageToAwait.push(newImage('component/character/wizard.png', 'wizard', loadingScreen));
-	imageToAwait.push(newImage('component/character/orc.png', 'orc', loadingScreen));
-	imageToAwait.push(newImage('component/character/npcs.png', 'npcs', loadingScreen));
-	imageToAwait.push(newImage('component/character/skeleton.png', 'skeleton', loadingScreen));
-	imageToAwait.push(newImage('component/cursor.png', 'cursor', loadingScreen));
-	imageToAwait.push(newImage('component/object/portal.png', 'portal', loadingScreen));
-	imageToAwait.push(newImage('component/object/campfire.png', 'campfire', loadingScreen));
-	imageToAwait.push(newImage('component/object/door.png', 'door', loadingScreen));
-
-	const resolvedImages = await Promise.all(imageToAwait);
-	resolvedImages.forEach(image => _window.gImages.set(image.alt, image));
+	await loadingAssetScreen.load(image => _window.gImages.set(image.alt, image));
 
 	_window.gFrames.set('door', generateQuads(_window.gImages.get('door'), 16, 32));
 	_window.gFrames.set('npcs', generateQuads(_window.gImages.get('npcs'), 32, 32));
