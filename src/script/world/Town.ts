@@ -93,18 +93,7 @@ export class Town extends World {
 						height: this.gameState.player.height,
 					};
 					if (this.checkCollision(rect, box2)) {
-						// Here cancel the Player movement
-						const playerDirection = player.direction;
-						if (playerDirection === 'left') {
-							player.x += 2;
-						} else if (playerDirection === 'right') {
-							player.x += -2;
-						} else if (playerDirection === 'up') {
-							player.y += 2;
-						} else if (playerDirection === 'down') {
-							player.y += -2;
-						}
-						break;
+						player.cancelMovement();
 					}
 				}
 
@@ -114,7 +103,7 @@ export class Town extends World {
 			player.currentAnimation!.update();
 			this.portal.currentAnimation.update();
 			this.campfire.currentAnimation.update();
-			this.npcs.forEach(npc => npc.currentAnimation?.update());
+			this.npcs.forEach(npc => npc.currentAnimation!.update());
 		}
 	}
 

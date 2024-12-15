@@ -1,4 +1,4 @@
-import { TWEEN } from '@/global';
+import { GUEST_DATA, TWEEN } from '@/global';
 import { keyWasPressed } from '@/index';
 import { ENTITY_DEFS } from '@/script/interface/entity/entity_defs';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
@@ -13,6 +13,7 @@ import { User } from '@/script/system/model/User';
 import { Level } from '@/script/world/Level';
 import { Town } from '@/script/world/Town';
 import { World, WorldType } from '@/script/world/World';
+import { getAuth } from 'firebase/auth';
 
 const _window = window as any;
 
@@ -23,35 +24,10 @@ export class GameState extends BaseState {
 	worlds: Map<WorldType, () => World>;
 	user: User;
 
-	constructor() {
+	constructor(user: User) {
 		super();
-		const DUMMY_PLAYER_DATA = {
-			_uid: 9999,
-			items: new Map<string, number>([
-				['phoenix-feather', 99],
-				['potion', 99],
-				['hi-potion', 2],
-			]),
-			allHeroes: {
-				['soldier']: {
-					level: 1,
-				},
-				['wizard']: {
-					level: 1,
-				},
-			},
-			party: ['soldier', 'wizard'],
-			active: true,
-			username: 'Aaron Fabian',
-			createdAt: Date.now(),
-			worlds: {
-				[WorldType.Town]: 1,
-				[WorldType.Level]: 1,
-			},
-		};
 
-		// 00
-		this.user = new User(DUMMY_PLAYER_DATA);
+		this.user = user;
 
 		// 00
 		this.disableKey = false;
@@ -62,7 +38,7 @@ export class GameState extends BaseState {
 		this.worlds.set(WorldType.Level, () => new Level(this, this.user));
 
 		// 01 Generate world level
-		this.level = this.worlds.get(WorldType.Level)!();
+		this.level = this.worlds.get(WorldType.Town)!();
 
 		// 02 Create player data
 		const playerDef: EntityDef = ENTITY_DEFS.player;
@@ -94,6 +70,9 @@ export class GameState extends BaseState {
 	}
 
 	changeWorld(worldType: WorldType) {
+		if (this.player === undefined)
+			throw new Error('Unexpected error while changing the world. Maybe forgot to instantiate the Player ?');
+
 		// Do not use this for instantiate, because player is not yet if this fn called at instantiate
 		this.setWorld = worldType;
 		this.player.level = this.level; // Reset Player Level reference to new Level reference

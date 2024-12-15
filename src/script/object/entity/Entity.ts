@@ -20,6 +20,7 @@ export class Entity implements CanvasRendering {
 	// late init !
 	stateMachine?: StateMachine<EntityBaseState>;
 	currentAnimation?: Animation;
+	onInteract: (obj: Entity, other: Entity) => void;
 
 	constructor(def: EntityDef) {
 		this.HP = def.HP;
@@ -35,9 +36,9 @@ export class Entity implements CanvasRendering {
 
 		this.renderOffSetX = def.renderOffSetX ?? 0;
 		this.renderOffSetY = def.renderOffSetY ?? 0;
-	}
 
-	onInteract() {}
+		this.onInteract = def.onInteract ?? function () {};
+	}
 
 	onDestroy() {}
 

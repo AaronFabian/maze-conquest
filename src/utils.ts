@@ -2,6 +2,8 @@
 
 import { Howl } from '@/global';
 import { AnimationDef } from '@/script/interface/game/AnimationDef';
+import { UserDef } from './script/interface/system/UserDef.js';
+import { DocumentData } from 'firebase/firestore';
 
 export class Animation {
 	frames: number[];
@@ -194,4 +196,16 @@ export function sleep(sleepTimeInMs: number): Promise<void> {
 
 export function padNum(val: number, fillString: string, maxFill: number = 2): string {
 	return val.toString().padStart(maxFill, fillString);
+}
+
+export function fromDocToUserDef(doc: DocumentData): UserDef {
+	return {
+		active: doc.active,
+		username: doc.username,
+		createdAt: doc.createdAt,
+		party: [...doc.party],
+		allHeroes: window.structuredClone(doc.allHeroes),
+		items: window.structuredClone(doc.items),
+		worlds: window.structuredClone(doc.worlds),
+	};
 }

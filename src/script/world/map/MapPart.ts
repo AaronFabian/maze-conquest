@@ -49,18 +49,7 @@ export class MapPart implements CanvasRendering {
 					if (path.isPlayerCollided) {
 						isCancelPlayer = true;
 
-						// Here cancel the Player movement
-						const playerDirection = this.level.world.player.direction;
-						if (playerDirection === 'left') {
-							this.level.world.player.x += 2;
-						} else if (playerDirection === 'right') {
-							this.level.world.player.x += -2;
-						} else if (playerDirection === 'up') {
-							this.level.world.player.y += 2;
-						} else if (playerDirection === 'down') {
-							this.level.world.player.y += -2;
-						}
-						break;
+						this.level.world.player.cancelMovement();
 					}
 				} else {
 					// whether collide or not keep checking

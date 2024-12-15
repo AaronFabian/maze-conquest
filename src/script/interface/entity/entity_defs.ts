@@ -1,5 +1,10 @@
-import { canvas } from '@/global';
+import { canvas, gStateStack } from '@/global';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
+import { Player } from '@/script/object/entity/Player.js';
+import { DialogueState } from '@/script/state/game/DialogueState';
+import { HandleAsyncState } from '@/script/state/game/HandleAsyncState';
+import { PromptState } from '@/script/state/game/PromptState';
+import { Town } from '@/script/world/Town';
 
 export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 	player: {
@@ -148,5 +153,54 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 		height: 16,
 		renderOffSetX: -8,
 		renderOffSetY: -13,
+
+		/*
+			obj: this
+			other: another entity that interact with; mainly with Player entity
+		*/
+		onInteract: (obj, other) => {
+			const player = other as Player;
+			const town = player.level as Town;
+			if (!(town instanceof Town)) throw new Error('Unexpected error while saving. town is not instance of Town class');
+
+			// 01
+			gStateStack.push(
+				new PromptState(
+					canvas.width / 2 - 180,
+					canvas.height / 2 - 134 + 240,
+					120,
+					32,
+					'Save your progress ? This progress will save your game into cloud',
+					{
+						onYes: () => {
+							// 02
+							gStateStack.push(
+								new HandleAsyncState({
+									info: 'Saving data into cloud. Do not close the window',
+									operation: async () => {
+										await new Promise((res, rej) => setTimeout(res, 5000));
+									},
+									onAsyncEnd: () => {
+										// 03
+										gStateStack.pop();
+										gStateStack.push(
+											new DialogueState(player.level, 'Save completed !', () => {
+												gStateStack.pop();
+											})
+										);
+									},
+								})
+							);
+						},
+						onNo: () => {
+							// ... nothing to do
+						},
+					}
+				)
+			);
+		},
 	},
 };
+
+ENTITY_DEFS['tutorialNPC'] = { ...ENTITY_DEFS['beginningNPC'] };
+ENTITY_DEFS['tutorialNPC'].onInteract = () => {};
