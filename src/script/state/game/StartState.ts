@@ -8,7 +8,7 @@ import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
 import { TutorialState } from '@/script/state/game/TutorialState';
 import { User as _User } from '@/script/system/model/User';
-import { fromDocToUserDef, sleep } from '@/utils';
+import { sleep } from '@/utils';
 import {
 	createUserWithEmailAndPassword,
 	deleteUser,
@@ -122,6 +122,9 @@ export class StartState extends BaseState {
 			const docRef = doc(db, 'users', user.uid);
 			const docSnap = await getDoc(docRef);
 
+			const userDef = { ...docSnap.data()! } as UserDef;
+			const _user = new _User(userDef);
+
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 					// pop it self
@@ -130,7 +133,7 @@ export class StartState extends BaseState {
 					// pop StartState (this)
 					_window.gStateStack.pop();
 
-					_window.gStateStack.push(new GameState(new _User(fromDocToUserDef(docSnap.data()!))));
+					_window.gStateStack.push(new GameState(_user));
 
 					_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 				})

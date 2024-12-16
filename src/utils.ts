@@ -199,18 +199,6 @@ export function padNum(val: number, fillString: string, maxFill: number = 2): st
 	return val.toString().padStart(maxFill, fillString);
 }
 
-export function fromDocToUserDef(doc: DocumentData): UserDef {
-	return {
-		active: doc.active,
-		username: doc.username,
-		createdAt: doc.createdAt,
-		party: [...doc.party],
-		allHeroes: window.structuredClone(doc.allHeroes),
-		items: window.structuredClone(doc.items),
-		worlds: window.structuredClone(doc.worlds),
-	};
-}
-
 /* 
 export async function hashMessage(msg: string) {
 	const encoder = new TextEncoder();
