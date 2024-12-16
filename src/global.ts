@@ -2,11 +2,13 @@
 import '@/style.css';
 
 // this import will make our library globally available
-import '@/lib/tween.js';
 import '@/lib/howler.core.min.js';
+import '@/lib/tween.js';
 
-import { _QuadImage } from '@/utils';
 import { StateStack } from '@/script/state/StateStack';
+import { WorldType } from '@/script/world/World';
+import { _QuadImage } from '@/utils';
+import { UserDef } from './script/interface/system/UserDef.js';
 
 const _window = window as any;
 
@@ -19,6 +21,30 @@ export const Tween = _window.TWEEN.Tween;
 export const Howl = _window.Howl;
 
 export const TILE_SIZE = 16;
+
+export const GUEST_DATA: UserDef = {
+	items: {
+		['phoenix-feather']: 99,
+		['potion']: 99,
+		['hi-potion']: 99,
+	},
+	allHeroes: {
+		['soldier']: {
+			level: 1,
+		},
+		['wizard']: {
+			level: 1,
+		},
+	},
+	party: ['soldier', 'wizard'],
+	active: true,
+	username: 'Guest User',
+	createdAt: Date.now(),
+	worlds: {
+		[WorldType.Town]: 1,
+		[WorldType.Level]: 1,
+	},
+};
 
 // assets
 export const gImages = new Map<string, HTMLImageElement>();
@@ -56,7 +82,7 @@ export const input = {
 		y: 0,
 	},
 	keyboard: {
-		keysPressed: new Map<string, boolean>(),
+		keysPressed: <{ [key: string]: boolean }>{},
 		isDown: <{ [key: string]: boolean }>{
 			w: false,
 			a: false,

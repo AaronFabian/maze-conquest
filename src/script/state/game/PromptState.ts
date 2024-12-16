@@ -1,7 +1,8 @@
-import { canvas } from '@/global';
+import { ctx } from '@/global';
+import { Panel } from '@/script/gui/Panel';
 import { Prompt, PromptAnswer } from '@/script/gui/Prompt';
 import { BaseState } from '@/script/state/BaseState';
-import { World } from '@/script/world/World';
+import { getWrap } from '@/utils';
 
 const _window = window as any;
 
@@ -11,15 +12,24 @@ const _window = window as any;
 
 export class PromptState extends BaseState {
 	prompt: Prompt;
-	world: World;
+	textChunk: string[];
 	onYes: () => void;
 	onNo: () => void;
-	constructor(world: World, { onYes, onNo }: { onYes: () => void; onNo: () => void }) {
+	panel: Panel;
+	constructor(
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		text: string,
+		{ onYes, onNo }: { onYes: () => void; onNo: () => void }
+	) {
 		super();
-		this.world = world;
 		this.onYes = onYes;
 		this.onNo = onNo;
-		this.prompt = new Prompt(canvas.width / 2 - 180, canvas.height / 2 - 134 + 240, 120, 32);
+		this.textChunk = getWrap(ctx, text, width - 3);
+		this.prompt = new Prompt(x, y, width, height);
+		this.panel = new Panel(this.prompt.x, this.prompt.y + this.prompt.height - 8, 360, 80);
 	}
 
 	override update() {
@@ -37,6 +47,13 @@ export class PromptState extends BaseState {
 	}
 
 	override render() {
+		this.panel.render();
 		this.prompt.render();
+
+		ctx.font = '16px zig';
+		ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+		this.textChunk.forEach((text, index) =>
+			ctx.fillText(text, this.prompt.x + 3, this.prompt.y + 34 + 16 * (index + 1))
+		);
 	}
 }

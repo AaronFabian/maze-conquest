@@ -20,4 +20,24 @@ export class Player extends Entity {
 		this.xCoord = 1;
 		this.yCoord = 1;
 	}
+
+	cancelMovement() {
+		switch (this.direction) {
+			case 'left':
+				this.x += 2;
+				break;
+			case 'right':
+				this.x -= 2;
+				break;
+			case 'up':
+				this.y += 2;
+				break;
+			case 'down':
+				this.y -= 2;
+				break;
+
+			default:
+				throw new Error('Unexpected error while cancelling movement');
+		}
+	}
 }

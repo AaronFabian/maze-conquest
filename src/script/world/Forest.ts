@@ -42,7 +42,7 @@ export class Forest extends World {
 		this.player.x = 112;
 		this.player.y = 208 + 32;
 
-		this.npc = new Entity(ENTITY_DEFS.beginningNPC);
+		this.npc = new Entity(ENTITY_DEFS.tutorialNPC);
 		this.npc.x = 112;
 		this.npc.y = 208;
 
@@ -82,46 +82,14 @@ export class Forest extends World {
 				// Water Collision
 				for (const waterCol of this.layerWaterEdge) {
 					if (this.checkCollision(waterCol, playerAABB)) {
-						switch (this.player.direction) {
-							case 'left':
-								this.player.x += 2;
-								break;
-							case 'right':
-								this.player.x -= 2;
-								break;
-							case 'up':
-								this.player.y += 2;
-								break;
-							case 'down':
-								this.player.y -= 2;
-								break;
-
-							default:
-								throw new Error('Unexpected error while checking collision at Forest update()');
-						}
+						this.player.cancelMovement();
 					}
 				}
 
 				// Tree Collision
 				for (const treeCol of this.layerTree) {
 					if (this.checkCollision(treeCol, playerAABB)) {
-						switch (this.player.direction) {
-							case 'left':
-								this.player.x += 2;
-								break;
-							case 'right':
-								this.player.x -= 2;
-								break;
-							case 'up':
-								this.player.y += 2;
-								break;
-							case 'down':
-								this.player.y -= 2;
-								break;
-
-							default:
-								throw new Error('Unexpected error while checking collision at Forest update()');
-						}
+						this.player.cancelMovement();
 					}
 				}
 			}

@@ -11,7 +11,7 @@ import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
+import { canvas, ctx, firebaseConfig, GUEST_DATA, input, TWEEN } from '@/global';
 import { GameState } from '@/script/state/game/GameState';
 import { StartState } from '@/script/state/game/StartState';
 import { TutorialState } from '@/script/state/game/TutorialState';
@@ -19,6 +19,7 @@ import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen'
 import { generateQuads, _newImage } from '@/utils';
 import { SystemError } from '@/script/system/error/SystemError';
 import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
+import { User } from './script/system/model/User';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -71,14 +72,14 @@ async function init() {
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
 	// _window.gStateStack.push(new TutorialState());
-	// _window.gStateStack.push(new StartState());
-	_window.gStateStack.push(new GameState());
+	_window.gStateStack.push(new StartState());
+	// _window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 
 	animation();
 }
 
 export function keyWasPressed(key: string): boolean {
-	return input.keyboard.keysPressed.has(key);
+	return input.keyboard.keysPressed[key];
 }
 
 function update() {
@@ -86,11 +87,11 @@ function update() {
 
 	_window.gStateStack.update();
 
-	input.keyboard.keysPressed.clear();
+	input.keyboard.keysPressed = {};
 }
 
 window.addEventListener('keypress', ({ key }) => {
-	input.keyboard.keysPressed.set(key, true);
+	input.keyboard.keysPressed[key] = true;
 });
 
 window.addEventListener('keyup', ({ key }) => {
@@ -138,7 +139,8 @@ function animation() {
 		cancelAnimationFrame(animationId);
 
 		const ico = document.querySelector("link[rel~='icon']")! as HTMLLinkElement;
-		ico.href = './assets/warning.ico';
+		ico.href =
+			'https://firebasestorage.googleapis.com/v0/b/maze-conquest-api.firebasestorage.app/o/warning.ico?alt=media&token=018ba8d3-33a1-48ed-9dba-ad565a4653be';
 
 		canvas.style.animation = 'shake 0.5s';
 

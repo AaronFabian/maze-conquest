@@ -1,21 +1,34 @@
 import { ctx } from '@/global';
+import { keyWasPressed } from '@/index';
 import { AABB } from '@/script/interface/game/AABB';
 import { Entity } from '@/script/object/entity/Entity';
 import { Player } from '@/script/object/entity/Player';
 import { Hitbox } from '@/script/object/Hitbox';
 import { EntityIdleState } from '@/script/state/entity/EntityIdleState';
+import { PlayerWalkState } from '@/script/state/entity/player/PlayerWalkState';
 
 export class NPCIdleState extends EntityIdleState {
 	player: Player;
-	hitbox: Hitbox;
+	talkTriggerBox: Hitbox;
+	collisionBox: Hitbox;
 	constructor(entity: Entity, player: Player) {
 		super(entity);
 		this.player = player;
-		this.hitbox = new Hitbox(
+
+		this.talkTriggerBox = new Hitbox(
 			this.entity.x - 8,
 			this.entity.y - 8,
 			this.entity.width + 16,
 			this.entity.height + 20,
+			player,
+			() => {}
+		);
+
+		this.collisionBox = new Hitbox(
+			this.entity.x,
+			this.entity.y,
+			this.entity.width,
+			this.entity.height,
 			player,
 			() => {}
 		);
@@ -38,14 +51,24 @@ export class NPCIdleState extends EntityIdleState {
 			height: this.player.height,
 		};
 
-		if (this.checkCollision(this.hitbox, playerAABB)) {
-			// ...
+		if (this.checkCollision(this.talkTriggerBox, playerAABB)) {
+			if (keyWasPressed('Enter')) {
+				this.entity.onInteract(this.entity, this.player);
+			}
+		}
+
+		if (this.player.stateMachine!.getCurrent() instanceof PlayerWalkState) {
+			if (this.checkCollision(this.collisionBox, playerAABB)) {
+				this.player.cancelMovement();
+			}
 		}
 	}
 
 	override render() {
 		super.render();
+
+		// debug-purpose
 		ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-		ctx.fillRect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height);
+		ctx.fillRect(this.talkTriggerBox.x, this.talkTriggerBox.y, this.talkTriggerBox.width, this.talkTriggerBox.height);
 	}
 }

@@ -1,5 +1,13 @@
-import { canvas } from '@/global';
+import { canvas, gStateStack } from '@/global';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
+import { Player } from '@/script/object/entity/Player';
+import { DialogueState } from '@/script/state/game/DialogueState';
+import { HandleAsyncState } from '@/script/state/game/HandleAsyncState';
+import { PromptState } from '@/script/state/game/PromptState';
+import { Town } from '@/script/world/Town';
+import { validateBeforeSave } from '@/utils';
+import { getAuth } from 'firebase/auth';
+import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
 export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 	player: {
@@ -148,5 +156,79 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 		height: 16,
 		renderOffSetX: -8,
 		renderOffSetY: -13,
+
+		/*
+			obj: this
+			other: another entity that interact with; mainly with Player entity
+		*/
+		onInteract: (obj, other) => {
+			const player = other as Player;
+			const town = player.level as Town;
+			if (!(town instanceof Town)) throw new Error('Unexpected error while saving. town is not instance of Town class');
+
+			// 01
+			gStateStack.push(
+				new PromptState(
+					canvas.width / 2 - 180,
+					canvas.height / 2 - 134 + 240,
+					120,
+					32,
+					'Save your progress ? This progress will save your game into cloud',
+					{
+						onYes: () => {
+							// 02
+							gStateStack.push(
+								new HandleAsyncState({
+									info: 'Saving data into cloud. Do not close the window',
+									operation: async () => {
+										const user = town.gameState.user;
+										const auth = getAuth();
+										const db = getFirestore();
+
+										const allHeroes: any = {};
+										for (const [k, hero] of user.getAllHeroes.entries()) {
+											allHeroes[k] = { level: hero.level };
+										}
+
+										const items = Object.fromEntries(user.items);
+										const worlds = Object.fromEntries(user.worlds);
+
+										// Party appears to be an iterable, spreading is fine here
+										const party = [...user.getParty];
+
+										const data = {
+											allHeroes,
+											items,
+											party,
+											worlds,
+										};
+
+										const isValid = validateBeforeSave(data);
+										if (!isValid) throw new Error('Fatal Error while saving user data ! Invalid property');
+
+										await updateDoc(doc(db, 'users', auth.currentUser!.uid), data);
+									},
+									onAsyncEnd: () => {
+										// 03
+										gStateStack.pop();
+										gStateStack.push(
+											new DialogueState(player.level, 'Save completed !', () => {
+												gStateStack.pop();
+											})
+										);
+									},
+								})
+							);
+						},
+						onNo: () => {
+							// ... nothing to do
+						},
+					}
+				)
+			);
+		},
 	},
 };
+
+ENTITY_DEFS['tutorialNPC'] = { ...ENTITY_DEFS['beginningNPC'] };
+ENTITY_DEFS['tutorialNPC'].onInteract = () => {};

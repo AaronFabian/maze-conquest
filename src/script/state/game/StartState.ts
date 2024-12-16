@@ -1,12 +1,13 @@
-import { canvas, ctx, TWEEN, Tween } from '@/global';
+import { canvas, ctx, GUEST_DATA, TWEEN, Tween } from '@/global';
 import { keyWasPressed } from '@/index';
+import { UserDef } from '@/script/interface/system/UserDef';
 import { BaseState } from '@/script/state/BaseState';
 import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
-import { StoryOpeningState } from '@/script/state/game/StoryOpeningState';
 import { TutorialState } from '@/script/state/game/TutorialState';
+import { User as _User } from '@/script/system/model/User';
 import { sleep } from '@/utils';
 import {
 	createUserWithEmailAndPassword,
@@ -19,18 +20,7 @@ import {
 	updateProfile,
 	User,
 } from 'firebase/auth';
-import {
-	collection,
-	doc,
-	DocumentData,
-	DocumentReference,
-	DocumentSnapshot,
-	getDoc,
-	getFirestore,
-	onSnapshot,
-	setDoc,
-	updateDoc,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
 
 const _window = window as any;
 
@@ -43,17 +33,6 @@ enum LocalScreen {
 	FreshStartConfirmationScreen,
 	LogoutConfirmationScreen,
 }
-
-export const DUMMY_PLAYER_DATA = {
-	allHeroes: {
-		['soldier']: {
-			level: 1,
-		},
-	},
-	party: ['soldier'],
-	active: true,
-	createdAt: Date.now(),
-};
 
 export class StartState extends BaseState {
 	private blinkOpacity: number = 1;
@@ -97,15 +76,18 @@ export class StartState extends BaseState {
 
 			this.user = auth.currentUser;
 
-			const db = getFirestore();
-			const docRef = doc(db, 'users', this.user.uid);
-			const docSnap = await getDoc(docRef);
-			onSnapshot(docRef, {
-				next: (snp: DocumentSnapshot<DocumentData, DocumentData>) => {
-					console.log(snp.data());
-				},
-			});
+			/*
+				const db = getFirestore();
+				const docRef = doc(db, 'users', this.user.uid);
+				const docSnap = await getDoc(docRef);
 
+				console.log(docSnap.data());
+				onSnapshot(docRef, {
+				next: (snp: DocumentSnapshot<DocumentData, DocumentData>) => {
+						console.log(snp.data());
+					},
+				});
+			*/
 			const photoUrl = new Image();
 			if (this.user.photoURL !== null) {
 				photoUrl.src = this.user.photoURL;
@@ -136,6 +118,13 @@ export class StartState extends BaseState {
 			// IdP data available using getAdditionalUserInfo(result)
 			// ...
 
+			const db = getFirestore();
+			const docRef = doc(db, 'users', user.uid);
+			const docSnap = await getDoc(docRef);
+
+			const userDef = { ...docSnap.data()! } as UserDef;
+			const _user = new _User(userDef);
+
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 					// pop it self
@@ -144,7 +133,7 @@ export class StartState extends BaseState {
 					// pop StartState (this)
 					_window.gStateStack.pop();
 
-					_window.gStateStack.push(new GameState());
+					_window.gStateStack.push(new GameState(_user));
 
 					_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 				})
@@ -188,8 +177,6 @@ export class StartState extends BaseState {
 
 			// User may use old account and somehow create new account
 			// We need to confirm User does he want to start fresh or continue the old save data
-			// if () {}
-
 			// Fresh start User
 			const db = getFirestore();
 			const docRef = doc(db, 'users', user.uid);
@@ -204,8 +191,12 @@ export class StartState extends BaseState {
 			}
 
 			const usersRef = collection(db, 'users');
-			await setDoc(doc(usersRef, user.uid), DUMMY_PLAYER_DATA);
+			const initData = window.structuredClone(GUEST_DATA);
+			initData.username = user.displayName!;
+
+			await setDoc(doc(usersRef, user.uid), initData);
 			console.log('[System] Fresh user created');
+
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 					// pop it self
@@ -276,8 +267,12 @@ export class StartState extends BaseState {
 
 		// 04 Create new game save data
 		const usersRef = collection(db, 'users');
-		await setDoc(doc(usersRef, user!.uid), DUMMY_PLAYER_DATA);
+		const initData = window.structuredClone(GUEST_DATA);
+		initData.username = user.displayName!;
+		await setDoc(doc(usersRef, user!.uid), initData);
 		console.log('[System] User start fresh start');
+
+		// 05
 		_window.gStateStack.push(
 			new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 				// pop it self
@@ -304,19 +299,8 @@ export class StartState extends BaseState {
 
 				case LocalScreen.LoadGameScreen:
 					if (this.cursor === 1) {
-						_window.gStateStack.push(
-							new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
-								// pop it self
-								// ...
-
-								// pop StartState (this)
-								_window.gStateStack.pop();
-
-								_window.gStateStack.push(new GameState());
-
-								_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
-							})
-						);
+						this.localScreen = LocalScreen.AsyncOperation;
+						this.handleLoadGame();
 					}
 
 					if (this.cursor === 2) {
@@ -371,6 +355,8 @@ export class StartState extends BaseState {
 
 								// TODO:
 								// _window.gStateStack.push(new StoryOpeningState());
+
+								_window.gStateStack.push(new GameState(new _User(GUEST_DATA)));
 
 								_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 							})
@@ -447,6 +433,36 @@ export class StartState extends BaseState {
 		// Cursor down
 		if (keyWasPressed('s')) {
 			this.cursor = this.cursor + 1 > maxOptions ? 1 : this.cursor + 1;
+		}
+	}
+	private async handleLoadGame() {
+		try {
+			const db = getFirestore();
+			const userUid = getAuth().currentUser!.uid;
+			const docRef = doc(db, 'users', userUid);
+			const docSnap = await getDoc(docRef);
+
+			// Load the user data and create the User instance
+			const userDef = { ...docSnap.data() } as UserDef;
+			const user = new _User(userDef);
+
+			_window.gStateStack.push(
+				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+					// pop it self
+					// ...
+
+					// pop StartState (this)
+					_window.gStateStack.pop();
+
+					console.log();
+					_window.gStateStack.push(new GameState(user));
+
+					_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
+				})
+			);
+		} catch (error) {
+			console.error(error);
+			throw new Error('Unhandled error');
 		}
 	}
 
