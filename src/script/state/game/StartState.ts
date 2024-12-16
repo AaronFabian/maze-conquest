@@ -1,5 +1,6 @@
 import { canvas, ctx, GUEST_DATA, TWEEN, Tween } from '@/global';
 import { keyWasPressed } from '@/index';
+import { UserDef } from '@/script/interface/system/UserDef';
 import { BaseState } from '@/script/state/BaseState';
 import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
@@ -19,17 +20,7 @@ import {
 	updateProfile,
 	User,
 } from 'firebase/auth';
-import {
-	collection,
-	doc,
-	DocumentData,
-	DocumentSnapshot,
-	getDoc,
-	getFirestore,
-	onSnapshot,
-	setDoc,
-	updateDoc,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
 
 const _window = window as any;
 
@@ -448,6 +439,10 @@ export class StartState extends BaseState {
 			const docRef = doc(db, 'users', userUid);
 			const docSnap = await getDoc(docRef);
 
+			// Load the user data and create the User instance
+			const userDef = { ...docSnap.data() } as UserDef;
+			const user = new _User(userDef);
+
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
 					// pop it self
@@ -456,7 +451,8 @@ export class StartState extends BaseState {
 					// pop StartState (this)
 					_window.gStateStack.pop();
 
-					_window.gStateStack.push(new GameState(new _User(fromDocToUserDef(docSnap.data()!))));
+					console.log();
+					_window.gStateStack.push(new GameState(user));
 
 					_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
 				})

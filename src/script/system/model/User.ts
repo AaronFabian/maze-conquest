@@ -61,25 +61,16 @@ export class User {
 		this.username = def.username;
 		this.createdAt = def.createdAt;
 
-		this.party = [];
-		def.party.forEach(heroName => this.party.push(heroName));
+		this.party = [...def.party];
 
-		this.items = new Map();
-		for (const [key, value] of Object.entries(def.items)) {
-			this.items.set(key, value);
-		}
+		this.items = new Map(Object.entries(def.items));
+
+		this.worlds = new Map(Object.entries(def.worlds));
 
 		this.allHeroes = new Map();
 		for (const [key, value] of Object.entries(def.allHeroes)) {
 			this.allHeroes.set(key, heroTable[key](value.level));
 		}
-
-		this.worlds = new Map();
-		for (const [key, value] of Object.entries(def.worlds)) {
-			this.worlds.set(key, value);
-		}
-
-		// console.log('[System Log] User with UID: ' + this._uid);
 	}
 
 	get getParty() {

@@ -72,14 +72,14 @@ async function init() {
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
 	// _window.gStateStack.push(new TutorialState());
-	// _window.gStateStack.push(new StartState());
-	_window.gStateStack.push(new GameState(new User(GUEST_DATA)));
+	_window.gStateStack.push(new StartState());
+	// _window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 
 	animation();
 }
 
 export function keyWasPressed(key: string): boolean {
-	return input.keyboard.keysPressed.has(key);
+	return input.keyboard.keysPressed[key];
 }
 
 function update() {
@@ -87,11 +87,11 @@ function update() {
 
 	_window.gStateStack.update();
 
-	input.keyboard.keysPressed.clear();
+	input.keyboard.keysPressed = {};
 }
 
 window.addEventListener('keypress', ({ key }) => {
-	input.keyboard.keysPressed.set(key, true);
+	input.keyboard.keysPressed[key] = true;
 });
 
 window.addEventListener('keyup', ({ key }) => {

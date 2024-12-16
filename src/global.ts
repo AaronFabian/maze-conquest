@@ -82,7 +82,7 @@ export const input = {
 		y: 0,
 	},
 	keyboard: {
-		keysPressed: new Map<string, boolean>(),
+		keysPressed: <{ [key: string]: boolean }>{},
 		isDown: <{ [key: string]: boolean }>{
 			w: false,
 			a: false,

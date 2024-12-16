@@ -2,7 +2,8 @@
 
 import { Howl } from '@/global';
 import { AnimationDef } from '@/script/interface/game/AnimationDef';
-import { UserDef } from './script/interface/system/UserDef.js';
+import { UserDef } from '@/script/interface/system/UserDef';
+import { User } from '@/script/system/model/User';
 import { DocumentData } from 'firebase/firestore';
 
 export class Animation {
@@ -208,4 +209,25 @@ export function fromDocToUserDef(doc: DocumentData): UserDef {
 		items: window.structuredClone(doc.items),
 		worlds: window.structuredClone(doc.worlds),
 	};
+}
+
+/* 
+export async function hashMessage(msg: string) {
+	const encoder = new TextEncoder();
+	const data = encoder.encode(msg);
+	const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+	
+	return hashHex;
+}
+*/
+
+export function validateBeforeSave(data: any): boolean {
+	if (data.items === undefined) return false;
+	if (data.worlds === undefined) return false;
+	if (data.allHeroes === undefined) return false;
+	if (data.party === undefined || data.party.length <= 0) return false;
+
+	return true;
 }

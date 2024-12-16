@@ -1,10 +1,13 @@
 import { canvas, gStateStack } from '@/global';
 import { EntityDef } from '@/script/interface/entity/EntityDef';
-import { Player } from '@/script/object/entity/Player.js';
+import { Player } from '@/script/object/entity/Player';
 import { DialogueState } from '@/script/state/game/DialogueState';
 import { HandleAsyncState } from '@/script/state/game/HandleAsyncState';
 import { PromptState } from '@/script/state/game/PromptState';
 import { Town } from '@/script/world/Town';
+import { validateBeforeSave } from '@/utils';
+import { getAuth } from 'firebase/auth';
+import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
 export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 	player: {
@@ -178,7 +181,32 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 								new HandleAsyncState({
 									info: 'Saving data into cloud. Do not close the window',
 									operation: async () => {
-										await new Promise((res, rej) => setTimeout(res, 5000));
+										const user = town.gameState.user;
+										const auth = getAuth();
+										const db = getFirestore();
+
+										const allHeroes: any = {};
+										for (const [k, hero] of user.getAllHeroes.entries()) {
+											allHeroes[k] = { level: hero.level };
+										}
+
+										const items = Object.fromEntries(user.items);
+										const worlds = Object.fromEntries(user.worlds);
+
+										// Party appears to be an iterable, spreading is fine here
+										const party = [...user.getParty];
+
+										const data = {
+											allHeroes,
+											items,
+											party,
+											worlds,
+										};
+
+										const isValid = validateBeforeSave(data);
+										if (!isValid) throw new Error('Fatal Error while saving user data ! Invalid property');
+
+										await updateDoc(doc(db, 'users', auth.currentUser!.uid), data);
 									},
 									onAsyncEnd: () => {
 										// 03
