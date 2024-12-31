@@ -232,3 +232,22 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 
 ENTITY_DEFS['tutorialNPC'] = { ...ENTITY_DEFS['beginningNPC'] };
 ENTITY_DEFS['tutorialNPC'].onInteract = () => {};
+
+/*
+	Nested sub-collection at firebase 
+
+	const isValid = validateBeforeSave(data);
+	if (!isValid) throw new Error('Fatal Error while saving user data ! Invalid property');
+
+	// 01 Create the field
+	await updateDoc(doc(db, 'users', auth.currentUser!.uid), data);
+	
+	// 02 Now create/update the allHeroes 'subcollection'
+	const allHeroesRef = collection(doc(db, 'users', auth.currentUser!.uid), 'allHeroes');
+
+	// 02 Create or update hero documents in the allHeroes subcollection
+	for (const [heroName, heroData] of Object.entries(allHeroes)) {
+		const heroDocRef = doc(allHeroesRef, heroName); // Create a document for each hero
+		await setDoc(heroDocRef, heroData);  // Store hero data (e.g., level)
+	}
+*/
