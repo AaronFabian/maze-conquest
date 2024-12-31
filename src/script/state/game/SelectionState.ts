@@ -1,5 +1,5 @@
 import { canvas } from '@/global';
-import { HeroMoveMenu } from '@/script/gui/HeroMoveMenu';
+import { CommandMenu } from '@/script/gui/CommandMenu';
 import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { ItemType } from '@/script/interface/object/ItemObjectDef';
 import { Hero } from '@/script/object/party/Hero';
@@ -18,7 +18,7 @@ const _window = window as any;
 export class SelectionState extends BaseState {
 	battleState: BattleState;
 	battleInformationState: BattleInformationState;
-	menu: HeroMoveMenu;
+	menu: CommandMenu;
 	turnStack: Hero[];
 	moveStackHistory: Hero[];
 	moveStack: Array<(s: ActionState) => void>;
@@ -40,7 +40,7 @@ export class SelectionState extends BaseState {
 		this.battleInformationState.highLight = this.battleState.heroParty.party.indexOf(this.currentHeroTurn);
 
 		// 04 Create move menu
-		this.menu = this.generateHeroMoveMenu();
+		this.menu = this.generateCommandMenu();
 	}
 
 	nextQueue() {
@@ -55,11 +55,11 @@ export class SelectionState extends BaseState {
 		this.battleInformationState.highLight = idx;
 
 		// 03
-		this.menu = this.generateHeroMoveMenu();
+		this.menu = this.generateCommandMenu();
 	}
 
-	private generateHeroMoveMenu(): HeroMoveMenu {
-		return new HeroMoveMenu(canvas.width / 2 + 60 + 3, canvas.height / 2 - 240 / 2 + 260, 120, 84, [
+	private generateCommandMenu(): CommandMenu {
+		return new CommandMenu(canvas.width / 2 + 60 + 3, canvas.height / 2 - 240 / 2 + 260, 120, 84, [
 			{
 				text: 'Attack',
 				onSelect: () => {

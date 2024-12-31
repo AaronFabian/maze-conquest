@@ -5,21 +5,20 @@ import { CanvasRendering } from '@/script/interface/state/CanvasRendering';
 
 const _window = window as any;
 
-interface CommandMenu {
+interface Command {
 	text: string;
 	onSelect: () => void;
 }
 
-// TODO: Change this class name into CommandMenu ?
-export class HeroMoveMenu implements CanvasRendering {
+export class CommandMenu implements CanvasRendering {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 	panel: Panel;
 	cursor: number;
-	menu: CommandMenu[];
-	constructor(x: number, y: number, width: number, height: number, menu: CommandMenu[]) {
+	menu: Command[];
+	constructor(x: number, y: number, width: number, height: number, menu: Command[]) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
