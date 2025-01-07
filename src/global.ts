@@ -4,6 +4,7 @@ import '@/style.css';
 // this import will make our library globally available
 import '@/lib/howler.core.min.js';
 import '@/lib/tween.js';
+import '@/lib/controller';
 
 import { StateStack } from '@/script/state/StateStack';
 import { WorldType } from '@/script/world/World';
