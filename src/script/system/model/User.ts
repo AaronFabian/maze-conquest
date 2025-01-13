@@ -69,7 +69,10 @@ export class User {
 
 		this.allHeroes = new Map();
 		for (const [key, value] of Object.entries(def.allHeroes)) {
-			this.allHeroes.set(key, heroTable[key](value.level));
+			// 01 Init the Hero
+			const hero: Hero = heroTable[key](value.level);
+
+			this.allHeroes.set(key, hero);
 		}
 	}
 

@@ -137,24 +137,7 @@ export function newHowler(src: string, loop: boolean = false): Promise<unknown> 
 	});
 }
 
-/*
-	export function newImage(src: string, alt: string, state: LoadingAssetScreen): Promise<HTMLImageElement> {
-		const imgElement = new Image();
-		imgElement.src = src;
-		imgElement.alt = alt;
-		
-		return new Promise((resolve, reject) => {
-			imgElement.onerror = e => reject(e);
-			imgElement.onload = () => {
-				state.assetLoaded += 1;
-				state.render();
-				resolve(imgElement);
-			};
-		});
-	}
-*/
-
-export function _newImage(src: string, alt: string) {
+export function newImage(src: string, alt: string) {
 	const imgElement = new Image();
 	imgElement.src = src;
 	imgElement.alt = alt;
