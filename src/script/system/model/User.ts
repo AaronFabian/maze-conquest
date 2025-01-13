@@ -80,4 +80,60 @@ export class User {
 	get getAllHeroes() {
 		return this.allHeroes;
 	}
+
+	convertIntoDBObject(): { [x: string]: any } {
+		/*
+			active: Boolean
+			allHeroes: {
+				String: {
+					level: String
+				}
+			}
+			createdAt: Number
+			items: {
+				String: Number
+			}
+			party: Array
+			username: String
+			worlds: {
+				String: String
+			}
+		*/
+
+		const allHeroes: { [key: string]: { [key: string]: number } } = {};
+		for (const [k, hero] of this.getAllHeroes.entries()) {
+			allHeroes[k] = { level: hero.level };
+		}
+
+		const items = Object.fromEntries(this.items);
+		const worlds = Object.fromEntries(this.worlds);
+
+		// Party appears to be an iterable, spreading is fine here
+		const party = [...this.getParty];
+
+		const dbObject = {
+			allHeroes,
+			items,
+			party,
+			worlds,
+		};
+
+		// We want the program to stop if there is undefined / unexpected data structure
+		const ok = this.validateBeforeSave(dbObject);
+		if (!ok) {
+			console.error(dbObject, this);
+			throw new Error('Unexpected error while converting the User');
+		}
+
+		return dbObject;
+	}
+
+	private validateBeforeSave(data: any): boolean {
+		if (data.items === undefined) return false;
+		if (data.worlds === undefined) return false;
+		if (data.allHeroes === undefined) return false;
+		if (data.party === undefined || data.party.length <= 0) return false;
+
+		return true;
+	}
 }

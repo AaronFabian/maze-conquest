@@ -108,7 +108,8 @@ export class StartState extends BaseState {
 			const credential: OAuthCredential | null = GoogleAuthProvider.credentialFromResult(userCred);
 			if (credential === null) throw new Error('Credential not available');
 
-			const token = credential!.accessToken;
+			// If you want to validate the user at the server
+			// const token = credential!.accessToken;
 
 			// The signed-in user info.
 			const user = userCred.user;

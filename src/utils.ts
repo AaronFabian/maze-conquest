@@ -210,12 +210,3 @@ export async function hashMessage(msg: string) {
 	return hashHex;
 }
 */
-
-export function validateBeforeSave(data: any): boolean {
-	if (data.items === undefined) return false;
-	if (data.worlds === undefined) return false;
-	if (data.allHeroes === undefined) return false;
-	if (data.party === undefined || data.party.length <= 0) return false;
-
-	return true;
-}
