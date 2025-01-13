@@ -9,7 +9,7 @@ import '@/lib/controller';
 import { StateStack } from '@/script/state/StateStack';
 import { WorldType } from '@/script/world/World';
 import { _QuadImage } from '@/utils';
-import { UserDef } from './script/interface/system/UserDef.js';
+import { UserDef } from './script/interface/system/UserDef';
 
 const _window = window as any;
 
@@ -22,6 +22,7 @@ export const Tween = _window.TWEEN.Tween;
 export const Howl = _window.Howl;
 
 export const TILE_SIZE = 16;
+export const SERVER_BASE_URL = process.env.PUBLIC_SERVER_BASE_URL;
 
 export const GUEST_DATA: UserDef = {
 	items: {

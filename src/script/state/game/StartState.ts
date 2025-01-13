@@ -7,9 +7,9 @@ import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
 import { TutorialState } from '@/script/state/game/TutorialState';
-import { User as _User } from '@/script/system/model/User';
+import { User } from '@/script/system/model/User';
 import { sleep } from '@/utils';
-import {
+import firebase, {
 	createUserWithEmailAndPassword,
 	deleteUser,
 	getAuth,
@@ -18,7 +18,6 @@ import {
 	signInWithPopup,
 	signOut,
 	updateProfile,
-	User,
 } from 'firebase/auth';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -38,7 +37,7 @@ export class StartState extends BaseState {
 	private blinkOpacity: number = 1;
 	private localScreen: LocalScreen;
 	private cursor: number;
-	private user: User | null;
+	private user: firebase.User | null;
 	userPhotoUrl: HTMLImageElement | null;
 
 	constructor() {
@@ -123,7 +122,7 @@ export class StartState extends BaseState {
 			const docSnap = await getDoc(docRef);
 
 			const userDef = { ...docSnap.data()! } as UserDef;
-			const _user = new _User(userDef);
+			const _user = new User(userDef);
 
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
@@ -356,7 +355,7 @@ export class StartState extends BaseState {
 								// TODO:
 								// _window.gStateStack.push(new StoryOpeningState());
 
-								_window.gStateStack.push(new GameState(new _User(GUEST_DATA)));
+								_window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 
 								_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 							})
@@ -444,7 +443,7 @@ export class StartState extends BaseState {
 
 			// Load the user data and create the User instance
 			const userDef = { ...docSnap.data() } as UserDef;
-			const user = new _User(userDef);
+			const user = new User(userDef);
 
 			_window.gStateStack.push(
 				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {

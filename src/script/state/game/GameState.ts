@@ -13,7 +13,6 @@ import { User } from '@/script/system/model/User';
 import { Level } from '@/script/world/Level';
 import { Town } from '@/script/world/Town';
 import { World, WorldType } from '@/script/world/World';
-import { getAuth } from 'firebase/auth';
 
 const _window = window as any;
 

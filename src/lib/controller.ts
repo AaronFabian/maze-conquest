@@ -1,7 +1,7 @@
-import { input } from '@/global';
+import { input, SERVER_BASE_URL } from '@/global';
 import { getAuth } from 'firebase/auth';
 
-window.addEventListener('DOMContentLoaded', _ => {
+function generateDpad() {
 	// D Pad
 	const dPad = document.querySelector<HTMLElement>('.d-pad')!;
 	const yDPadInp = document.getElementById('dPadYInp')! as HTMLInputElement;
@@ -41,7 +41,9 @@ window.addEventListener('DOMContentLoaded', _ => {
 		xDpadRange.value = xDpadInp.value;
 		updateDpadTransform();
 	});
+}
 
+function generateKeypad() {
 	// Key Pad
 	const keyPad = document.querySelector<HTMLElement>('.key')!;
 	const keyPadYInp = document.getElementById('keyPadYInp')! as HTMLInputElement;
@@ -79,7 +81,9 @@ window.addEventListener('DOMContentLoaded', _ => {
 		keyPadXRange.value = keyPadXInp.value;
 		updateKeyPadTransform();
 	});
+}
 
+function generateMiscSettings() {
 	// Misc settings
 	const spController = document.querySelector<HTMLElement>('.sp-controller')!;
 	const inpHideGui = document.getElementById('hideGUI')!;
@@ -124,10 +128,23 @@ window.addEventListener('DOMContentLoaded', _ => {
 			onTouchUp(pad.dataset.key!);
 		});
 	});
+}
 
+window.addEventListener('DOMContentLoaded', _ => {
+	// 01
+	generateDpad();
+
+	// 02
+	generateKeypad();
+
+	// 03
+	generateMiscSettings();
+
+	// 04
 	// Smartphone remote control
 	let chatWs: WebSocket | null = null;
 	let connecting = false;
+	const roomNumberEl = document.getElementById('roomNumber')!;
 	const connectWithSpBtn = document.getElementById('connectWithSp')! as HTMLInputElement;
 	function connectChat(wsURL: string) {
 		chatWs = new WebSocket(wsURL);
@@ -139,9 +156,11 @@ window.addEventListener('DOMContentLoaded', _ => {
 		chatWs.onclose = function (evt) {
 			console.log('[System] websocket has closed');
 
-			// setTimeout(function () {
-			// 	connectChat(wsURL);
-			// }, 1000);
+			// Reset
+			chatWs = null; // Set WebSocket object to null to prevent reusing an old connection
+			connecting = false; // Reset the connecting state
+			connectWithSpBtn.checked = false; // Do not check the button after closing the WebSocket
+			roomNumberEl.innerText = '-';
 		};
 
 		chatWs.onmessage = function (evt) {
@@ -161,6 +180,13 @@ window.addEventListener('DOMContentLoaded', _ => {
 					case 'cancel':
 						input.keyboard.isDown[key] = false;
 						break;
+					case 'idleStop':
+						chatWs!.close(1000, 'User close connection');
+						break;
+					case 'checkForConnection':
+						console.warn('Check connection ok!');
+						break;
+
 					default:
 						console.error(evt);
 						throw new Error('Unexpected command input');
@@ -171,22 +197,29 @@ window.addEventListener('DOMContentLoaded', _ => {
 		chatWs.onerror = function (evt) {
 			console.error('[System Error] ', evt);
 		};
-
-		// setTimeout(function () {
-		// 	if (chatWs!.readyState === WebSocket.OPEN) {
-		// 		console.log('ready');
-		// 	}
-		// }, 1000);
 	}
-	connectWithSpBtn.addEventListener('click', async _ => {
-		if (connecting) return;
 
+	connectWithSpBtn.addEventListener('click', async _ => {
+		// Prevent mash button from user
+		if (connecting) {
+			connectWithSpBtn.checked = true;
+			return;
+		}
+
+		// Exit if already connected
+		if (chatWs != null) return chatWs.close(1000, 'User close connection');
+
+		// Generate randomUUID and take position 2 from UUID
+		// That position 2 will be the token for connection into server
+		// ex: '41ccb258-[ -> fa97 <- ]-4bfd-96e9-68113f281d4d'
 		const roomID = crypto.randomUUID();
 		const token = roomID.split('-')[1];
 
+		// From firebase get the current user
 		const auth = getAuth();
 		const user = auth.currentUser;
 
+		// User must logged in to use this feature
 		if (user == null) {
 			connecting = false;
 			connectWithSpBtn.checked = false; // Do not check the button;
@@ -194,35 +227,46 @@ window.addEventListener('DOMContentLoaded', _ => {
 			return;
 		}
 
+		// Get user uid from firebase
+		const uid = user.uid;
+
+		// Handle invalid connection, sometimes the firebase return invalid
+		// ex: /example-id it should be example-id
+		if (uid.includes('/')) {
+			connecting = false;
+			connectWithSpBtn.checked = false;
+			alert('Something wrong while connecting. Please try again.');
+			return;
+		}
+
 		// Remove the empty space, such as: Google Map -> GoogleMap
-		const userName = user.displayName?.replace(/\s+/g, '');
-		if (userName === undefined) {
-			connecting = false;
-			connectWithSpBtn.checked = false; // Do not check the button;
-			alert('Something wrong with username');
-			return;
+		// const userName = user.displayName?.replace(/\s+/g, '');
+
+		try {
+			const response = await fetch(`${SERVER_BASE_URL}/api/v1/room/${uid}${token}`);
+			const body = await response.json();
+			if (!response.ok) {
+				connecting = false;
+				connectWithSpBtn.checked = false; // Do not check the button;
+				alert(`Something wrong while connecting\nmessages: ${body.data.messages}`);
+				return;
+			}
+
+			const wsURL = body['ChatWebsocketAddr'];
+			connectChat(wsURL);
+
+			roomNumberEl.innerText = token;
+			alert(`Type this '${token}' token into your smartphone app\n* Do not share this token *`);
+		} catch (error) {
+			console.error(error);
 		}
+	});
 
-		if (chatWs != null) {
-			chatWs.close(1000, 'User close connection');
-			chatWs = null; // Set WebSocket object to null to prevent reusing an old connection
-			connecting = false; // Reset the connecting state
-			connectWithSpBtn.checked = false; // Do not check the button after closing the WebSocket
-			return; // Exit if already connected
-		}
+	// Check connection button
+	const checkSocketBtn = document.getElementById('checkSocketBtn') as HTMLButtonElement;
+	checkSocketBtn.addEventListener('click', _ => {
+		if (chatWs === null) return;
 
-		const response = await fetch(`http://localhost:8000/api/v1/room/${userName}${token}`);
-		const body = await response.json();
-		if (!response.ok) {
-			connecting = false;
-			connectWithSpBtn.checked = false; // Do not check the button;
-			alert(`Something wrong while connecting\nmessages: ${body.data.messages}`);
-			return;
-		}
-
-		const wsURL = body.ChatWebsocketAddr;
-		connectChat(wsURL);
-
-		alert(`Type this '${token}' token into your smartphone app\n* Do not share this token *`);
+		chatWs.send('{"command": "checkForConnection"}');
 	});
 });
