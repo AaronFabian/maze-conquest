@@ -5,7 +5,8 @@
 
 import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
-import { UserDef } from '@/script/interface/system/UserDef';
+import { DbObject } from '@/script/interface/system/DbObject';
+import { HeroStats, UserDef } from '@/script/interface/system/UserDef';
 import { Hero } from '@/script/object/party/Hero';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { HeroAttackState } from '@/script/state/entity/party/HeroAttackState';
@@ -13,7 +14,7 @@ import { HeroBaseState } from '@/script/state/entity/party/HeroBaseState';
 import { HeroIdleState } from '@/script/state/entity/party/HeroIdleState';
 import { StateMachine } from '@/script/state/StateMachine';
 
-const heroTable: { [key: string]: (lvl: number) => Hero } = {
+const _heroTable: { [key: string]: (lvl: number) => Hero } = {
 	['soldier']: (level: number) => {
 		const soldierDef: HeroDef = HERO_DEFS.soldier;
 		const soldier = new Hero(soldierDef, level);
@@ -69,8 +70,24 @@ export class User {
 
 		this.allHeroes = new Map();
 		for (const [key, value] of Object.entries(def.allHeroes)) {
+			let level = value.level;
+			let currentExp = value.currentExp;
+			let expToLevel = value.expToLevel;
+			if (!level) {
+				(level = 1), console.warn('[System] Value.level is not available in while assigning');
+			}
+
+			if (!currentExp) {
+				(currentExp = 0), console.warn('[System] Value.currentExp is not available in while assigning');
+			}
+			if (!expToLevel) {
+				// No need to give error value, By default frontend know the value
+				console.warn('[System] Value.expToLevel is not available in while assigning');
+			}
+
 			// 01 Init the Hero
-			const hero: Hero = heroTable[key](value.level);
+			const hero: Hero = _heroTable[key](level);
+			hero.currentExp = currentExp;
 
 			this.allHeroes.set(key, hero);
 		}
@@ -85,27 +102,9 @@ export class User {
 	}
 
 	convertIntoDBObject(): { [x: string]: any } {
-		/*
-			active: Boolean
-			allHeroes: {
-				String: {
-					level: String
-				}
-			}
-			createdAt: Number
-			items: {
-				String: Number
-			}
-			party: Array
-			username: String
-			worlds: {
-				String: String
-			}
-		*/
-
-		const allHeroes: { [key: string]: { [key: string]: number } } = {};
+		const allHeroes: { [key: string]: HeroStats } = {};
 		for (const [k, hero] of this.getAllHeroes.entries()) {
-			allHeroes[k] = { level: hero.level };
+			allHeroes[k] = { level: hero.level, currentExp: hero.currentExp, expToLevel: hero.expToLevel };
 		}
 
 		const items = Object.fromEntries(this.items);
@@ -114,7 +113,7 @@ export class User {
 		// Party appears to be an iterable, spreading is fine here
 		const party = [...this.getParty];
 
-		const dbObject = {
+		const dbObject: DbObject = {
 			allHeroes,
 			items,
 			party,

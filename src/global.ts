@@ -33,9 +33,13 @@ export const GUEST_DATA: UserDef = {
 	allHeroes: {
 		['soldier']: {
 			level: 1,
+			currentExp: 0,
+			expToLevel: 10,
 		},
 		['wizard']: {
 			level: 1,
+			currentExp: 0,
+			expToLevel: 10,
 		},
 	},
 	party: ['soldier', 'wizard'],

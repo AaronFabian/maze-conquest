@@ -54,7 +54,7 @@ export class Hero extends Entity {
 
 		this.level = level;
 		this.currentExp = 0;
-		this.expToLevel = this.level * this.level * 5 * 0.75;
+		this.expToLevel = Math.ceil(this.level * this.level * 5 * 0.75);
 
 		this.calculateStats();
 
@@ -84,7 +84,7 @@ export class Hero extends Entity {
 
 	levelUP() {
 		this.level += 1;
-		this.expToLevel = this.level * this.level * 5 * 0.75;
+		this.expToLevel = Math.ceil(this.level * this.level * 5 * 0.75);
 
 		this.statsLevelUp();
 
@@ -97,8 +97,9 @@ export class Hero extends Entity {
 			throw new SystemError('Unexpected error while calculateAttack(). the return value get undefined');
 
 		const dmg = Math.max(1, baseDmg * this.attack - enemy.defense);
-		enemy.damage(dmg);
 		console.log(`[Battle Log] ${enemy.name} damaged by ${dmg}`);
+
+		enemy.damage(dmg);
 		if (enemy.currentHP <= 0) {
 			enemy.isAlive = false;
 		}
