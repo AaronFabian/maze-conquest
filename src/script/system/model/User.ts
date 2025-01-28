@@ -5,7 +5,6 @@
 
 import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
-import { DbObject } from '@/script/interface/system/DbObject';
 import { HeroStats } from '@/script/interface/system/HeroStats';
 import { UserDef } from '@/script/interface/system/UserDef';
 import { Hero } from '@/script/object/party/Hero';
@@ -102,7 +101,7 @@ export class User {
 		return this.allHeroes;
 	}
 
-	convertIntoDBObject(): { [x: string]: any } {
+	toPlainObject(): UserDef {
 		const allHeroes: { [key: string]: HeroStats } = {};
 		for (const [k, hero] of this.getAllHeroes.entries()) {
 			allHeroes[k] = { level: hero.level, currentExp: hero.currentExp, expToLevel: hero.expToLevel };
@@ -114,7 +113,7 @@ export class User {
 		// Party appears to be an iterable, spreading is fine here
 		const party = [...this.getParty];
 
-		const dbObject: DbObject = {
+		const userDef = <UserDef>{
 			allHeroes,
 			items,
 			party,
@@ -122,16 +121,16 @@ export class User {
 		};
 
 		// We want the program to stop if there is undefined / unexpected data structure
-		const ok = this.validateBeforeSave(dbObject);
+		const ok = this.validateBeforeSave(userDef);
 		if (!ok) {
-			console.error(dbObject, this);
+			console.error(userDef, this);
 			throw new Error('Unexpected error while converting the User');
 		}
 
-		return dbObject;
+		return userDef;
 	}
 
-	private validateBeforeSave(data: any): boolean {
+	private validateBeforeSave(data: UserDef): boolean {
 		if (data.items === undefined) return false;
 		if (data.worlds === undefined) return false;
 		if (data.allHeroes === undefined) return false;

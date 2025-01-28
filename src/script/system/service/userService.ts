@@ -9,7 +9,7 @@ async function saveFile(userGameData: User) {
 	const userUid = auth.currentUser!.uid;
 
 	// 00 Update into database directly
-	await updateDoc(doc(db, 'users', userUid), userGameData.convertIntoDBObject());
+	await updateDoc(doc(db, 'users', userUid), userGameData.toPlainObject() as { [key: string]: any });
 
 	// 01 HTTP request: Update the mix_stats
 	const error = await mixStatsService.updatePower(userUid);
