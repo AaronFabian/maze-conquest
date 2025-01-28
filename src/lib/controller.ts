@@ -1,4 +1,4 @@
-import { input, SERVER_BASE_URL } from '@/global';
+import { input, MODE, SERVER_BASE_URL, WS_PROTOCOL } from '@/global';
 import { getAuth } from 'firebase/auth';
 
 interface ControllerConfigDef {
@@ -216,81 +216,59 @@ class SmartphoneController {
 	connecting: boolean = false;
 	roomNumberEl = document.getElementById('roomNumber')!;
 	connectWithSpBtn = document.getElementById('connectWithSp')! as HTMLInputElement;
+	checkSocketBtn = document.getElementById('checkSocketBtn') as HTMLButtonElement;
 	constructor() {
-		this.connectWithSpBtn.addEventListener('click', async (_: Event) => {
-			// Prevent mash button from user
-			if (this.connecting) {
-				this.connectWithSpBtn.checked = true;
-				return;
-			}
-
-			// Exit if already connected
-			if (this.chatWs != null) return this.chatWs.close(1000, 'User close connection');
-
-			// Generate randomUUID and take position 2 from UUID
-			// That position 2 will be the token for connection into server
-			// ex: '41ccb258-[ -> fa97 <- ]-4bfd-96e9-68113f281d4d'
-			const roomID = crypto.randomUUID();
-			const token = roomID.split('-')[1];
-
-			// From firebase get the current user
-			const auth = getAuth();
-			const user = auth.currentUser;
-
-			// User must logged in to use this feature
-			if (user == null) {
-				this.connecting = false;
-				this.connectWithSpBtn.checked = false; // Do not check the button;
-				alert('Please login to use this feature');
-				return;
-			}
-
-			// Get user uid from firebase
-			const uid = user.uid;
-
-			// Handle invalid connection, sometimes the firebase return invalid
-			// ex: /example-id it should be example-id
-			if (uid.includes('/')) {
-				this.connecting = false;
-				this.connectWithSpBtn.checked = false;
-				alert('Something wrong while connecting. Please try again.');
-				return;
-			}
-
-			// Remove the empty space, such as: Google Map -> GoogleMap
-			// const userName = user.displayName?.replace(/\s+/g, '');
-
-			try {
-				const response = await fetch(`${SERVER_BASE_URL}/api/v1/room/${uid}${token}`);
-				if (!response.ok) {
-					this.connecting = false;
-					this.connectWithSpBtn.checked = false; // Do not check the button;
-					alert(`Something wrong while connecting\nmessages: ${response.text}`);
-					return;
-				}
-
-				const body = await response.json();
-
-				const wsURL = body['ChatWebsocketAddr'];
-				this.connectChat(wsURL);
-
-				this.roomNumberEl.innerText = token;
-				alert(`Input this '${token}' token into your smartphone app\n* Do not share this token *`);
-			} catch (error) {
-				console.error(error);
-			}
-		});
-
-		// Check connection button
-		const checkSocketBtn = document.getElementById('checkSocketBtn') as HTMLButtonElement;
-		checkSocketBtn.addEventListener('click', _ => {
-			if (this.chatWs === null) return;
-
-			this.chatWs.send('{"command": "checkForConnection"}');
-		});
+		this.connectWithSpBtn.addEventListener('click', this.connectWithSP.bind(this));
+		this.checkSocketBtn.addEventListener('click', this.checkSocket.bind(this));
 	}
 
-	async connectChat(wsURL: string) {
+	// Check connection button
+	private checkSocket(_: Event) {
+		if (this.chatWs === null) return;
+		this.chatWs.send('{"command": "checkForConnection"}');
+	}
+
+	private connectWithSP(_: Event) {
+		// Prevent mash button from user
+		if (this.connecting) {
+			this.connectWithSpBtn.checked = true;
+			return;
+		}
+
+		// Exit if already connected
+		if (this.chatWs != null) return this.chatWs.close(1000, 'User close connection');
+
+		// From firebase get the current user
+		const auth = getAuth();
+		const user = auth.currentUser;
+
+		// User must logged in to use this feature
+		if (user == null) {
+			this.connecting = false;
+			this.connectWithSpBtn.checked = false; // Do not check the button;
+			alert('Please login to use this feature');
+			return;
+		}
+
+		// Generate randomUUID and take position 2 from UUID
+		// That position 2 will be the token for connection into server
+		// ex: '41ccb258-[ -> fa97 <- ]-4bfd-96e9-68113f281d4d'
+		const roomID = crypto.randomUUID();
+		const token = roomID.split('-')[1];
+
+		// Get user uid from firebase
+		const uid = user.uid;
+
+		try {
+			this.roomNumberEl.innerText = token;
+			this.generateWebSocket(`${WS_PROTOCOL}://${SERVER_BASE_URL}/api/v1/ws/${uid}${token}`);
+			alert(`Input this '${token}' token into your smartphone app\n* Do not share this token *`);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	private generateWebSocket(wsURL: string) {
 		this.chatWs = new WebSocket(wsURL);
 
 		this.chatWs.onopen = function (evt) {
@@ -350,11 +328,11 @@ const main = function (_: Event) {
 
 	// 01
 	// GUI controller
-	const controller = new Controller(localConfig);
+	new Controller(localConfig);
 
 	// 02
 	// Smartphone remote control
-	const smartphoneController = new SmartphoneController();
+	new SmartphoneController();
 };
 
 window.addEventListener('load', main);

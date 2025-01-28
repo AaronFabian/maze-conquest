@@ -21,8 +21,12 @@ export const Tween = _window.TWEEN.Tween;
 // an audio library for implementing sound in our browser; with Howl make implementing sound in browser easier.
 export const Howl = _window.Howl;
 
+export const MODE = process.env.MODE;
+export const SERVER_BASE_URL = MODE === 'prod' ? process.env.PUBLIC_SERVER_BASE_URL : process.env.LOCAL_URL;
+export const SERVER_URL_WITH_PROTOCOL = MODE === 'prod' ? 'https://' + SERVER_BASE_URL : 'http://' + SERVER_BASE_URL;
+export const WS_PROTOCOL = MODE === 'prod' ? 'wss' : 'ws';
+
 export const TILE_SIZE = 16;
-export const SERVER_BASE_URL = process.env.PUBLIC_SERVER_BASE_URL;
 
 export const GUEST_DATA: UserDef = {
 	items: {

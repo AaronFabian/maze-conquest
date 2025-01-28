@@ -1,9 +1,9 @@
-import { SERVER_BASE_URL } from '@/global';
+import { SERVER_URL_WITH_PROTOCOL } from '@/global';
 
 async function updatePower(uid: string): Promise<Error | null> {
 	try {
-		console.log(`${SERVER_BASE_URL}/api/v1/mix_stats/${uid}/power`);
-		const response = await fetch(`${SERVER_BASE_URL}/api/v1/mix_stats/${uid}/power`, { method: 'PATCH' });
+		console.log(`${SERVER_URL_WITH_PROTOCOL}/api/v1/mix_stats/${uid}/power`);
+		const response = await fetch(`${SERVER_URL_WITH_PROTOCOL}/api/v1/mix_stats/${uid}/power`, { method: 'PATCH' });
 
 		if (!response.ok) {
 			const responseData = await response.json();
