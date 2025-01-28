@@ -1,5 +1,5 @@
 import { input, SERVER_BASE_URL } from '@/global';
-import { getAuth } from 'firebase/auth';
+import { getAuth, validatePassword } from 'firebase/auth';
 
 function generateDpad() {
 	// D Pad
@@ -130,7 +130,7 @@ function generateMiscSettings() {
 	});
 }
 
-window.addEventListener('DOMContentLoaded', _ => {
+window.addEventListener('load', _ => {
 	// 01
 	generateDpad();
 

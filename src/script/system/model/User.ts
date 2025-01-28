@@ -6,7 +6,8 @@
 import { HERO_DEFS } from '@/script/interface/entity/hero_defs';
 import { HeroDef } from '@/script/interface/entity/HeroDef';
 import { DbObject } from '@/script/interface/system/DbObject';
-import { HeroStats, UserDef } from '@/script/interface/system/UserDef';
+import { HeroStats } from '@/script/interface/system/HeroStats';
+import { UserDef } from '@/script/interface/system/UserDef';
 import { Hero } from '@/script/object/party/Hero';
 import { EntityBaseState } from '@/script/state/entity/EntityBaseState';
 import { HeroAttackState } from '@/script/state/entity/party/HeroAttackState';

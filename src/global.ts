@@ -26,9 +26,9 @@ export const SERVER_BASE_URL = process.env.PUBLIC_SERVER_BASE_URL;
 
 export const GUEST_DATA: UserDef = {
 	items: {
-		['phoenix-feather']: 99,
-		['potion']: 99,
-		['hi-potion']: 99,
+		['phoenix-feather']: 10,
+		['potion']: 10,
+		['hi-potion']: 10,
 	},
 	allHeroes: {
 		['soldier']: {

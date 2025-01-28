@@ -13,9 +13,11 @@ import firebase, {
 	createUserWithEmailAndPassword,
 	deleteUser,
 	getAuth,
+	getRedirectResult,
 	GoogleAuthProvider,
 	OAuthCredential,
 	signInWithPopup,
+	signInWithRedirect,
 	signOut,
 	updateProfile,
 } from 'firebase/auth';
@@ -216,6 +218,25 @@ export class StartState extends BaseState {
 			const errorCode = error.code;
 			const errorMessage = error.message;
 			console.error(errorCode, errorMessage);
+			if (error.code == 'auth/popup-blocked') {
+				const auth = getAuth();
+				await signInWithRedirect(auth, new GoogleAuthProvider());
+
+				// After returning from the redirect when your app initializes you can obtain the result
+				const result = await getRedirectResult(auth);
+				if (result) {
+					// This is the signed-in user
+					const user = result.user;
+					// This gives you a Facebook Access Token.
+					const credential = GoogleAuthProvider.credentialFromResult(result);
+					const token = credential!.accessToken;
+				}
+				// As this API can be used for sign-in, linking and reauthentication,
+				// check the operationType to determine what triggered this redirect
+				// operation.
+				const operationType = result?.operationType;
+			}
+
 			console.warn('[System] Popup closed by user, failed to register user');
 			alert('Warning: Popup closed by user');
 

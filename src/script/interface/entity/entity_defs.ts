@@ -6,6 +6,7 @@ import { HandleAsyncState } from '@/script/state/game/HandleAsyncState';
 import { PromptState } from '@/script/state/game/PromptState';
 import { userService } from '@/script/system/service/userService';
 import { Town } from '@/script/world/Town';
+import { getAuth } from 'firebase/auth';
 
 export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 	player: {
@@ -163,6 +164,14 @@ export const ENTITY_DEFS: { [key: string]: EntityDef } = {
 			const player = other as Player;
 			const town = player.level as Town;
 			if (!(town instanceof Town)) throw new Error('Unexpected error while saving. town is not instance of Town class');
+
+			const isUserLoggedIn = getAuth().currentUser;
+			if (isUserLoggedIn === null)
+				return gStateStack.push(
+					new DialogueState(town, 'Please logged in to use this feature!', () => {
+						gStateStack.pop();
+					})
+				);
 
 			// 01
 			gStateStack.push(

@@ -3,13 +3,13 @@ import { mixStatsService } from '@/script/system/service/mixStatsService';
 import { getAuth } from 'firebase/auth';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
-async function saveFile(user: User) {
+async function saveFile(userGameData: User) {
 	const auth = getAuth();
 	const db = getFirestore();
 	const userUid = auth.currentUser!.uid;
 
 	// 00 Update into database directly
-	await updateDoc(doc(db, 'users', userUid), user.convertIntoDBObject());
+	await updateDoc(doc(db, 'users', userUid), userGameData.convertIntoDBObject());
 
 	// 01 HTTP request: Update the mix_stats
 	const error = await mixStatsService.updatePower(userUid);
