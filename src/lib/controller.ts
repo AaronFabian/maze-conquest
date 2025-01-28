@@ -262,13 +262,14 @@ class SmartphoneController {
 
 			try {
 				const response = await fetch(`${SERVER_BASE_URL}/api/v1/room/${uid}${token}`);
-				const body = await response.json();
 				if (!response.ok) {
 					this.connecting = false;
 					this.connectWithSpBtn.checked = false; // Do not check the button;
-					alert(`Something wrong while connecting\nmessages: ${body.data.messages}`);
+					alert(`Something wrong while connecting\nmessages: ${response.text}`);
 					return;
 				}
+
+				const body = await response.json();
 
 				const wsURL = body['ChatWebsocketAddr'];
 				this.connectChat(wsURL);
@@ -289,7 +290,7 @@ class SmartphoneController {
 		});
 	}
 
-	connectChat(wsURL: string) {
+	async connectChat(wsURL: string) {
 		this.chatWs = new WebSocket(wsURL);
 
 		this.chatWs.onopen = function (evt) {
