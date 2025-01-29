@@ -1,8 +1,9 @@
 import { SERVER_URL_WITH_PROTOCOL } from '@/global';
+import { MixStats } from '@/script/system/model/MixStats';
+import { MixStatsDef } from '@/script/interface/system/MixStatsDef';
 
 async function updatePower(uid: string): Promise<Error | null> {
 	try {
-		console.log(`${SERVER_URL_WITH_PROTOCOL}/api/v1/mix_stats/${uid}/power`);
 		const response = await fetch(`${SERVER_URL_WITH_PROTOCOL}/api/v1/mix_stats/${uid}/power`, { method: 'PATCH' });
 
 		if (!response.ok) {
@@ -33,4 +34,24 @@ async function updatePower(uid: string): Promise<Error | null> {
 	}
 }
 
-export const mixStatsService = { updatePower };
+async function getLeaderboard(): Promise<{ error?: Error; value?: MixStats[] }> {
+	try {
+		const response = await fetch(`${SERVER_URL_WITH_PROTOCOL}/api/v1/mix_stats/leaderboard`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ uidCursor: null }),
+		});
+
+		if (!response.ok) return { error: new Error(response.statusText) };
+
+		const body = await response.json();
+		const leaderboard = body.data.leaderboard as Array<MixStatsDef>;
+		const mixStatsArr: MixStats[] = leaderboard.map(def => new MixStats(def));
+
+		return { value: mixStatsArr };
+	} catch (error) {
+		return { error: error as Error };
+	}
+}
+
+export const mixStatsService = { updatePower, getLeaderboard };

@@ -6,6 +6,7 @@ import { CurtainOpenState } from '@/script/state/game/CurtainOpenState';
 import { FadeInState } from '@/script/state/game/FadeInState';
 import { FadeOutState } from '@/script/state/game/FadeOutState';
 import { GameState } from '@/script/state/game/GameState';
+import { LeaderboardState } from '@/script/state/game/LeaderboardState';
 import { TutorialState } from '@/script/state/game/TutorialState';
 import { User } from '@/script/system/model/User';
 import { sleep } from '@/utils';
@@ -310,7 +311,7 @@ export class StartState extends BaseState {
 	}
 
 	override update() {
-		if (keyWasPressed('Enter')) {
+		if (keyWasPressed('Enter'))
 			switch (this.localScreen) {
 				case LocalScreen.StartScreen:
 					this.localScreen = LocalScreen.AsyncOperation;
@@ -330,6 +331,16 @@ export class StartState extends BaseState {
 					}
 
 					if (this.cursor === 3) {
+						// New game without Google
+						_window.gStateStack.push(
+							new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+								_window.gStateStack.pop();
+
+								_window.gStateStack.push(new LeaderboardState());
+
+								_window.gStateStack.push(new FadeOutState({ r: 255, g: 255, b: 255 }, 2000, () => {}));
+							})
+						);
 					}
 
 					if (this.cursor === 4) {
@@ -426,7 +437,6 @@ export class StartState extends BaseState {
 				default:
 					throw new Error('Unknown behavior from changing StartState local screen');
 			}
-		}
 
 		// Here we defined dynamically how many options are there for each SCREEN
 		let maxOptions = 3;
@@ -517,7 +527,7 @@ export class StartState extends BaseState {
 			ctx.fillText('Logout', canvas.width / 2, canvas.height / 2 + 52);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 3 ? 1 : 0.4})`;
-			ctx.fillText('BFS and DFS Simulation', canvas.width / 2, canvas.height / 2 + 104);
+			ctx.fillText('Leaderboard', canvas.width / 2, canvas.height / 2 + 104);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 4 ? 1 : 0.4})`;
 			ctx.fillText('Back', canvas.width / 2, canvas.height / 2 + 156);
