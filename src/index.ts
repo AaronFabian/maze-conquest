@@ -19,7 +19,8 @@ import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen'
 import { generateQuads, newImage } from '@/utils';
 import { SystemError } from '@/script/system/error/SystemError';
 import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
-import { User } from './script/system/model/User';
+import { User } from '@/script/system/model/User';
+import { LeaderboardState } from '@/script/state/game/LeaderboardState';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -71,7 +72,7 @@ async function init() {
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
-	// _window.gStateStack.push(new TutorialState());
+	// _window.gStateStack.push(new LeaderboardState());
 	_window.gStateStack.push(new StartState());
 	// _window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 

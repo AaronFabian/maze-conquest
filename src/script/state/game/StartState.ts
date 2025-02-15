@@ -550,7 +550,7 @@ export class StartState extends BaseState {
 			ctx.fillText('Load game', canvas.width / 2, canvas.height / 2 + 52);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 3 ? 1 : 0.4})`;
-			ctx.fillText('BFS and DFS Simulation', canvas.width / 2, canvas.height / 2 + 104);
+			ctx.fillText('Leaderboard', canvas.width / 2, canvas.height / 2 + 104);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 4 ? 1 : 0.4})`;
 			ctx.fillText('Back', canvas.width / 2, canvas.height / 2 + 156);
