@@ -400,6 +400,15 @@ export class StartState extends BaseState {
 					}
 
 					if (this.cursor === 3) {
+						_window.gStateStack.push(
+							new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+								_window.gStateStack.pop();
+
+								_window.gStateStack.push(new LeaderboardState());
+
+								_window.gStateStack.push(new FadeOutState({ r: 255, g: 255, b: 255 }, 2000, () => {}));
+							})
+						);
 					}
 
 					if (this.cursor === 4) {
@@ -637,7 +646,7 @@ export class StartState extends BaseState {
 			ctx.font = '16px zig';
 			ctx.textAlign = 'center';
 			ctx.fillStyle = `rgb(255, 255, 255)`;
-			ctx.fillText('© International Paradigm', canvas.width / 2, canvas.height - 24);
+			ctx.fillText(`© International Paradigm ${new Date().getFullYear()}`, canvas.width / 2, canvas.height - 24);
 		}
 	}
 
