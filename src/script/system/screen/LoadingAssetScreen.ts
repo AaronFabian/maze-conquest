@@ -75,7 +75,6 @@ export class _LoadingAssetsScreen<T> {
 		ctx.fillText(`Loading ${this.assetsLoaded} of ${this.assets.length}`, canvas.width / 2, canvas.height / 2);
 
 		// loading bar
-		ctx.strokeStyle = `rgba(255,255,255,1)`;
 		ctx.rect(0 + 100, canvas.height / 2 + 36, canvas.width - 200, 8);
 		ctx.stroke();
 

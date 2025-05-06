@@ -42,7 +42,7 @@ export class MazeGame extends Maze {
 		}
 	}
 
-	initDoor() {
+	generateDoor() {
 		const maxAttempts = 100;
 		let attempts = 0;
 
@@ -85,5 +85,13 @@ export class MazeGame extends Maze {
 		}
 
 		this.slicedMap = slicedMap;
+	}
+
+	static generateMazeMap(): Maze {
+		const maze = new Maze(17, 17);
+		maze.create();
+		maze.dig(1, 1);
+
+		return maze;
 	}
 }

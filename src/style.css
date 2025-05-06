@@ -11,6 +11,12 @@ body {
 	background-color: black;
 }
 
+/* The game screen itself, aspect ratio 16:9 (set in index.ts) */
+canvas {
+	margin: auto;
+	width: 99%;
+}
+
 input[type='number'] {
 	width: 60px;
 	font-family: zig;
@@ -40,7 +46,7 @@ main {
 }
 
 .sp-controller {
-	width: 100%;
+	width: 99%;
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -149,5 +155,61 @@ button[data-key]:active {
 	}
 	to {
 		transform: translate(1px, -2px);
+	}
+}
+
+@media screen and (max-width: 440px) {
+	main {
+		height: 100vh;
+	}
+
+	input[type='range'] {
+		height: 4px;
+	}
+
+	.setting {
+		position: absolute;
+		top: unset;
+		bottom: 0;
+		left: 0; /*left and right will stretch out the width*/
+		right: 0;
+		padding: 4px 12px;
+		color: white;
+		background-color: rgb(56, 56, 56);
+		transition-duration: 200ms;
+		font-size: 10px;
+	}
+
+	.setting.off {
+		transform: translateY(100%);
+	}
+
+	.toggle {
+		position: absolute;
+		left: 0;
+		bottom: unset;
+		top: -20px;
+		rotate: 180deg;
+	}
+
+	.sp-controller {
+		width: 100%;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.d-pad {
+			margin: auto;
+		}
+		.key {
+			margin: auto;
+
+			button {
+				display: block;
+			}
+		}
 	}
 }

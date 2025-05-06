@@ -11,7 +11,7 @@ export class UserUseItemState extends BaseState {
 	cursor: number;
 	user: User;
 	heroListPanel: Panel;
-	itemInfoPanel: Panel;
+	itemNamePanel: Panel;
 	onConfirm: (selected: Hero) => void;
 	itemName: string;
 	constructor(user: User, itemName: string, onConfirm: (selected: Hero) => void) {
@@ -20,7 +20,7 @@ export class UserUseItemState extends BaseState {
 		this.user = user;
 		this.itemName = itemName;
 		this.onConfirm = onConfirm;
-		this.itemInfoPanel = new Panel(canvas.width / 2 - 360 / 2, canvas.height / 2 - 240 / 2 + 260, 112, 30);
+		this.itemNamePanel = new Panel(canvas.width / 2 - 360 / 2, canvas.height / 2 - 240 / 2 + 260, 130, 30);
 		this.heroListPanel = new Panel(canvas.width / 2 - 360 / 2, canvas.height / 2 - 240 / 2 + 280, 360, 64);
 	}
 
@@ -46,14 +46,14 @@ export class UserUseItemState extends BaseState {
 
 	override render() {
 		this.heroListPanel.render();
-		this.itemInfoPanel.render();
+		this.itemNamePanel.render();
 
 		ctx.font = '16px zig';
 		ctx.fillStyle = 'rgb(255, 255, 255)';
 		ctx.textAlign = 'left';
 
 		// Item
-		ctx.fillText(this.itemName, this.itemInfoPanel.x + 8, this.itemInfoPanel.y + 20);
+		ctx.fillText(this.itemName, this.itemNamePanel.x + 8, this.itemNamePanel.y + 20);
 
 		// Hero list
 		let counter = 1;
