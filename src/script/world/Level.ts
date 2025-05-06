@@ -3,12 +3,12 @@ import { GAME_OBJECT_DEFS } from '@/script/interface/object/game_object_defs';
 import { GameObject } from '@/script/object/GameObject';
 import { GameState } from '@/script/state/game/GameState';
 import { SystemError } from '@/script/system/error/SystemError';
-import { MapPart } from '@/script/world/map/MapPart';
+import { User } from '@/script/system/model/User';
 import { MazeObjectType } from '@/script/world/internal/Maze';
 import { MazeGame } from '@/script/world/internal/MazeGame';
+import { MapPart } from '@/script/world/map/MapPart';
 import { World, WorldType } from '@/script/world/World';
 import { Event, random } from '@/utils';
-import { User } from '../system/model/User.js';
 
 export class Level extends World {
 	world: GameState;
@@ -94,7 +94,7 @@ export class Level extends World {
 		this.maze.mapSlicer();
 
 		// 03
-		this.maze.initDoor();
+		this.maze.generateDoor();
 
 		// 03 Take sliced map and then render that map only
 		// const renderWidth = 15;

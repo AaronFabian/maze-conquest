@@ -6,20 +6,17 @@
  */
 
 // *** Application Entry Point ***
-import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-import { canvas, ctx, firebaseConfig, GUEST_DATA, input, TWEEN } from '@/global';
-import { GameState } from '@/script/state/game/GameState';
+import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';
-import { TutorialState } from '@/script/state/game/TutorialState';
-import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen';
-import { generateQuads, newImage } from '@/utils';
 import { SystemError } from '@/script/system/error/SystemError';
 import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
-import { User } from './script/system/model/User';
+import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen';
+import { generateQuads, newImage } from '@/utils';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -29,11 +26,11 @@ let _fpsInterval = 1000 / _fps;
 async function init() {
 	// Initialize Firebase
 	const app = initializeApp(firebaseConfig);
-	const analytics = getAnalytics(app);
+	const _ = getAnalytics(app); // analytics
 	getAuth(app);
 
 	// Initialize Cloud Firestore and get a reference to the service
-	const db = getFirestore(app);
+	const __ = getFirestore(app); // db
 
 	const loadingAssetScreen = new _LoadingAssetsScreen<HTMLImageElement>();
 	loadingAssetScreen.push(newImage('ui/background.png', 'start-screen-bg'));
@@ -71,7 +68,7 @@ async function init() {
 	_window.gFrames.set('wrap-effect', generateQuads(_window.gImages.get('wrap-effect'), 32, 32));
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
-	// _window.gStateStack.push(new TutorialState());
+	// _window.gStateStack.push(new LeaderboardState());
 	_window.gStateStack.push(new StartState());
 	// _window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 
@@ -104,17 +101,13 @@ window.addEventListener('keydown', ({ key }) => {
 
 function render() {
 	ctx.reset();
-
-	// create responsive game screen could be define here
-	// ctx.scale(1, 1);
-	// ctx.translate(canvas.width * 1, canvas.height * 1);
 	_window.gStateStack.render();
 }
 
 function animation() {
 	const animationId = requestAnimationFrame(animation);
 
-	// treat all computer have the same execute speed
+	// treat all computer have the same execute speed (est: 60fps)
 	const msNow: number = window.performance.now();
 	const elapsed = msNow - _msPrev;
 	if (elapsed < _fpsInterval) return;
@@ -144,7 +137,7 @@ function animation() {
 
 		canvas.style.animation = 'shake 0.5s';
 
-		// new FatalErrorScreen(error as Error);
+		new FatalErrorScreen(error as Error);
 	}
 }
 

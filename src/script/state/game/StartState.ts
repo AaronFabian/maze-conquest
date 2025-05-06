@@ -9,6 +9,7 @@ import { GameState } from '@/script/state/game/GameState';
 import { LeaderboardState } from '@/script/state/game/LeaderboardState';
 import { TutorialState } from '@/script/state/game/TutorialState';
 import { User } from '@/script/system/model/User';
+import { MazeMapBg } from '@/script/world/internal/MazeBg';
 import { sleep } from '@/utils';
 import firebase, {
 	createUserWithEmailAndPassword,
@@ -41,7 +42,8 @@ export class StartState extends BaseState {
 	private localScreen: LocalScreen;
 	private cursor: number;
 	private user: firebase.User | null;
-	userPhotoUrl: HTMLImageElement | null;
+	private userPhotoUrl: HTMLImageElement | null;
+	mazeMapBg: MazeMapBg;
 
 	constructor() {
 		super();
@@ -59,6 +61,9 @@ export class StartState extends BaseState {
 		tween2.chain(tween1);
 
 		tween1.start();
+
+		// asynchronous background
+		this.mazeMapBg = new MazeMapBg();
 	}
 
 	private async checkUserSignedIn() {
@@ -310,7 +315,41 @@ export class StartState extends BaseState {
 		);
 	}
 
+	private async handleLoadGame() {
+		try {
+			const db = getFirestore();
+			const userUid = getAuth().currentUser!.uid;
+			const docRef = doc(db, 'users', userUid);
+			const docSnap = await getDoc(docRef);
+
+			// Load the user data and create the User instance
+			const userDef = { ...docSnap.data() } as UserDef;
+			const user = new User(userDef);
+
+			_window.gStateStack.push(
+				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
+					// pop it self
+					// ...
+
+					// pop StartState (this)
+					_window.gStateStack.pop();
+
+					console.log();
+					_window.gStateStack.push(new GameState(user));
+
+					_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
+				})
+			);
+		} catch (error) {
+			console.error(error);
+			throw new Error('Unhandled error');
+		}
+	}
+
 	override update() {
+		// Background
+		this.mazeMapBg.update();
+
 		if (keyWasPressed('Enter'))
 			switch (this.localScreen) {
 				case LocalScreen.StartScreen:
@@ -466,39 +505,10 @@ export class StartState extends BaseState {
 			this.cursor = this.cursor + 1 > maxOptions ? 1 : this.cursor + 1;
 		}
 	}
-	private async handleLoadGame() {
-		try {
-			const db = getFirestore();
-			const userUid = getAuth().currentUser!.uid;
-			const docRef = doc(db, 'users', userUid);
-			const docSnap = await getDoc(docRef);
-
-			// Load the user data and create the User instance
-			const userDef = { ...docSnap.data() } as UserDef;
-			const user = new User(userDef);
-
-			_window.gStateStack.push(
-				new FadeInState({ r: 255, g: 255, b: 255 }, 1000, () => {
-					// pop it self
-					// ...
-
-					// pop StartState (this)
-					_window.gStateStack.pop();
-
-					console.log();
-					_window.gStateStack.push(new GameState(user));
-
-					_window.gStateStack.push(new CurtainOpenState({ r: 155, g: 155, b: 155 }, 0, 2000, () => {}));
-				})
-			);
-		} catch (error) {
-			console.error(error);
-			throw new Error('Unhandled error');
-		}
-	}
 
 	override render() {
-		ctx.drawImage(_window.gImages.get('start-screen-bg'), 0, 0);
+		// ctx.drawImage(_window.gImages.get('start-screen-bg'), 0, 0);
+		this.mazeMapBg.render();
 
 		if (this.localScreen === LocalScreen.StartScreen) {
 			ctx.font = '96px zig';
@@ -550,7 +560,7 @@ export class StartState extends BaseState {
 			ctx.fillText('Load game', canvas.width / 2, canvas.height / 2 + 52);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 3 ? 1 : 0.4})`;
-			ctx.fillText('BFS and DFS Simulation', canvas.width / 2, canvas.height / 2 + 104);
+			ctx.fillText('Leaderboard', canvas.width / 2, canvas.height / 2 + 104);
 
 			ctx.fillStyle = `rgba(255, 255, 255, ${this.cursor === 4 ? 1 : 0.4})`;
 			ctx.fillText('Back', canvas.width / 2, canvas.height / 2 + 156);
@@ -650,5 +660,7 @@ export class StartState extends BaseState {
 		ctx.fillText('Welcome, ' + this.user!.displayName, canvas.width / 2, canvas.height - 24);
 	}
 
-	override exit = () => TWEEN.removeAll();
+	override exit() {
+		TWEEN.removeAll();
+	}
 }

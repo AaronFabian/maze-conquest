@@ -182,14 +182,14 @@ export function padNum(val: number, fillString: string, maxFill: number = 2): st
 	return val.toString().padStart(maxFill, fillString);
 }
 
-/* 
+/*
 export async function hashMessage(msg: string) {
 	const encoder = new TextEncoder();
 	const data = encoder.encode(msg);
 	const hashBuffer = await crypto.subtle.digest('SHA-256', data);
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
 	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-	
+
 	return hashHex;
 }
 */

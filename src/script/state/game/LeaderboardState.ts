@@ -1,3 +1,8 @@
+/**
+ * For small state like this, It's still maintainable using imperative
+ * rendering, imperative doesn't mean unreadable.
+ */
+
 import { canvas, ctx, gStateStack, TWEEN, Tween } from '@/global';
 import { keyWasPressed } from '@/index';
 import { Text } from '@/script/gui/Text';
@@ -78,7 +83,7 @@ export class LeaderboardState extends BaseState {
 			tween1.chain(tween2);
 			tween2.chain(tween1);
 
-			tween1.delay(value.length * 250).start();
+			tween1.delay(value.length * 150).start();
 
 			this.localScreen = LocalScreen.Idle;
 		} catch (error) {
@@ -116,6 +121,10 @@ export class LeaderboardState extends BaseState {
 				break;
 
 			case LocalScreen.Fetching:
+				ctx.font = '14px zig';
+				ctx.fillStyle = `rgba(255, 255, 255, ${this.blink})`;
+				ctx.textAlign = 'center';
+				ctx.fillText('Loading data', canvas.width / 2, canvas.height / 2 + 96);
 				break;
 
 			case LocalScreen.Error:

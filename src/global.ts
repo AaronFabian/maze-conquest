@@ -2,14 +2,14 @@
 import '@/style.css';
 
 // this import will make our library globally available
-import '@/lib/howler.core.min.js';
-import '@/lib/tween.js';
 import '@/lib/controller';
+import '@/lib/howler.core.min.js';
+import '@/lib/_tween.js';
 
+import { UserDef } from '@/script/interface/system/UserDef';
 import { StateStack } from '@/script/state/StateStack';
 import { WorldType } from '@/script/world/World';
 import { _QuadImage } from '@/utils';
-import { UserDef } from './script/interface/system/UserDef';
 
 const _window = window as any;
 
