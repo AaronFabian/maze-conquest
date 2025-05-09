@@ -1,0 +1,43 @@
+name: Deploy Frontend to Backend
+
+on:
+  push:
+    branches:
+      - main # or your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Frontend
+        uses: actions/checkout@v3
+        with:
+          path: frontend
+
+      - name: Install & Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Checkout Backend Repo
+        uses: actions/checkout@v3
+        with:
+          repository: AaronFabian/maze-conquest-api
+          token: ${{ secrets.MAZE_API_PAT }} # Use PAT if pushing
+          path: maze-conquest-api
+
+      - name: Copy Frontend dist to maze-conquest-api public folder
+        run: |
+          rm -rf maze-conquest-api/public/*
+          cp -r frontend/dist/* maze-conquest-api/public/
+
+      - name: Commit and Push to maze-conquest-api
+        run: |
+          cd maze-conquest-api
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add public/
+          git diff --quiet && echo "No changes to commit" || git commit -m "[AUTO] Update frontend build from frontend repo"
+          git push origin main
