@@ -39,5 +39,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add public/
-          git diff --quiet && echo "No changes to commit" || git commit -m "[AUTO] Update frontend build from frontend repo"
+          git commit -m "[AUTO] Update frontend build from frontend repo"
           git push origin main
