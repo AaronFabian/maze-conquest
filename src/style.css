@@ -9,6 +9,7 @@ body {
 	justify-content: center;
 	align-items: center;
 	background-color: black;
+	overflow: hidden;
 }
 
 /* The game screen itself, aspect ratio 16:9 (set in index.ts) */
