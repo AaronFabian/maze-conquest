@@ -15,11 +15,11 @@ jobs:
         with:
           path: frontend
 
-      - name: Install & Build Frontend
-        run: |
-          cd frontend
-          npm install
-          npm run build
+      # - name: Install & Build Frontend
+      #   run: |
+      #     cd frontend
+      #     npm install
+      #     npm run build
 
       - name: Checkout Backend Repo
         uses: actions/checkout@v3
