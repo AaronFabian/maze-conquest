@@ -117,13 +117,10 @@ function animation() {
 		update();
 		render();
 	} catch (error) {
-		switch (true) {
-			case error instanceof SystemError:
-				error.print();
-				break;
-			default:
-				console.error('Fatal Error while animating', error);
-				break;
+		if (error instanceof SystemError) {
+			error.print();
+		} else {
+			console.error('Fatal Error while animating', error);
 		}
 
 		document.title = 'Game crashed !';
