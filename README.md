@@ -1,150 +1,181 @@
-# Maze Conquest
+# 🏰 Maze Conquest
 
-#### 🌐 Access real game here
+### 🌐 Play the Game
 
-👉 <a>https://imakeyouhappy.site</a>
+👉 **[Play Maze Conquest](https://imakeyouhappy.site)**
 
-#### 💬Documentation in 2 languages
+### 📚 Documentation
 
-👉 <a href="#English">English Documentation</a>
-👉 <a href="#日本語">日本語のドキュメント</a>
+👉 [English Documentation](#english-documentation)
+👉 [日本語のドキュメント](#日本語)
 
 ---
 
-## 📝<span id="English">English<span> Documentation
+## <span id="english-documentation">📖 English Documentation</span>
 
-## 🌟Bookmark
+### 🔖 Table of Contents
 
-- <a href="#en-description">Description</a>
-- <a href="#en-how-to-play">How to play</a>
-- <a href="#en-technologies">Technologies</a>
-- <a href="#en-install-locally">Install locally</a>
-- <a href="#en-about-project">About Project</a>
+- [Description](#description)
+- [How to Play](#how-to-play)
+- [Technologies Used](#technologies-used)
+- [Local Installation](#local-installation)
+- [About This Project](#about-this-project)
 
-## 📃 <span id="en-description">Description</span>
+---
 
-An RPG game, with infinite level of the deep. Player level up to gain power, and conquest to infinite maze. The deeper maze you go, the harder enemy will become. You can play anywhere you want, use your Google email to save your progress to cloud !
+## <span id="description">📋 Description</span>
 
-## 🎮 <span id="en-how-to-play">How to play</span>
+**Maze Conquest** is an RPG adventure game featuring infinite dungeon depths. Level up your character to gain power and conquer endless mazes. The deeper you venture, the stronger your enemies become. Play anywhere and use your Google account to save your progress to the cloud!
 
-❗Quick guide for controller
-| Platform | Buttons |
-| --------- | ------------------------ |
-| `Computer` | `w a s d` : move/select `Enter` : Confirm `Space` : Cancel, Open Menu |
-| `Smartphone (android/ios)` | There are a buttons at a screen. For the first time access the website, controller should be appear |
-| `Wireless Controller` | You could wirelessly and seamlessly control the player/command using your smartphone, reference to this repository <a href="https://github.com/AaronFabian/maze-conquest-sp">`https://github.com/AaronFabian/maze-conquest-sp`</a> |
+---
 
-1. Press `Enter` in your keyboard! This you open Maze Conquest url <a href="https://imakeyouhappy.site">`https://imakeyouhappy.site`</a>, this should be your first screen and you will be see this game opening like below.
-   ![alt text](./media/startscreen.png)
-2. Are you new to this game or our veteran gamers ? If you are new to this game then you should choose `NEW GAME` otherwise choose `LOAD GAME` to continue your progress
-   ![alt text](./media/selectscreen.png)
-3. If you choose `NEW GAME`, There are 2 options ! `REGISTER WITH GOOGLE` & `PLAY WITHOUT SIGN IN`. Do what your like, it's recommended to choose `REGISTER WITH GOOGLE` since it will save your game progress and you could continue everywhere you like. _Let's enjoy the game !_
-   ![alt text](./media/newgamescreen.png)
-4. You will begin at the `Beginning Town`. Notice the `red spotlight` character. She will handle saving your progress to the cloud. If you go to portal door like at the bottom, It will transfer you to the _Maze_
-   ![alt text](./media/beginningtown.png)
-5. Here is the preview of the Maze. **Brace Yourself !** Notice the `green spotlight` it indicate enemy, they will respawn randomly whenever you go to another side of the maze. the `blue spotlight` indicate there are another are you could go if you proceed. The `door` to go to next level of the maze located randomly, But _once it located they will never move_ so don't miss it !
-   ![alt text](./media/maze.png)
-6. Let say you encountered enemy. Here is the layout you will see.
-   - `ATTACK`: Choose which one you want to attack. Damage variety base on your character level
-   - `DEFENSE`: Whenever you uncertain with the condition, choose defense _currently under development_ ⛔
-   - `ITEMS`: Let you open inventories, you could heal your character whenever you need
-   - `RUN`: You could run from the battle if you must.
-     ![alt text](./media/battlescreen.png)
-7. At any place, you could open inventory ! Press `Space` and inventory UI will be open. press `Enter` to confirm
-   ![alt text](./media/menupanel.png)
+## <span id="how-to-play">🎮 How to Play</span>
 
-   - `CONTINUE`: Back to game.
-   - `PARTY`: See party current status. (HP, LV, etc...)
-   - `HEROES`: Switch your heroes. _currently under development_ ⛔
-   - `INVENTORY`: See list of items (potion, hi potion, phoenix feather, etc...)
-   - `EXIT`: Back to title screen. caution: make sure to save your progress before exit game.
+### 🎮 Controls
 
-   ❓Quick tips: use `Phoenix Feather` to escape from dungeon.
+| Platform                | Controls                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Computer**            | `WASD`: Move/Navigate • `Enter`: Confirm • `Space`: Cancel/Open Menu                                          |
+| **Mobile**              | Touch controls (buttons appear on first visit)                                                                |
+| **Wireless Controller** | Use your smartphone as a wireless controller ([Setup Guide](https://github.com/AaronFabian/maze-conquest-sp)) |
 
-## 👨‍💻Technologies
+### 🚀 Getting Started
 
-- Frontend 🌐
+1. **Launch the Game**
+   Visit [https://imakeyouhappy.site](https://imakeyouhappy.site) and press `Enter` to begin.
 
-  - JavaScript
-    Base game, all JavaScript in this project generated by TypeScript, except libraries.
-  - TypeScript
-    This project written 100% with TypeScript, in this project Object Oriented Programming Design Pattern are carefully written for scalability.
-  - Browser Canvas API
-  - Tween JS
-    Animation Library, asynchronously animating value.
-  - Webpack
-    JavaScript compiler, make file more compact and give code to run compatible at any legacy/old version browser. Also development server created by webpack.
-  - Node
-    Required for installing all required dependencies.
+   ![Start Screen](./media/startscreen.png)
 
-- Backend 📡
+2. **Choose Your Path**
 
-  - GO
-  - GO Fiber
-  - Firebase Client
-    Refer to this repository for more details 👉 <a href=""></a>
+   - **New Player**: Select `NEW GAME`
+   - **Returning Player**: Select `LOAD GAME` to continue your adventure
 
-- Infrastructure 👷
+   ![Select Screen](./media/selectscreen.png)
 
-  - Google Cloud Run
-    This application use stateless server, run whenever they needed.
-  - Google Firebase Firestore (Database)
-    Any data that no more than 1MB, image will not stored here as well.
-  - Google Cloud Storage (Object Storage)
-    Browser image asset will be stored at Google Cloud Storage.
-  - Docker
-    Releasing this app use container to run.
-  - Github Action CI/CD
-    In this repository, after merge to main branch, the /dist folder will be automatically pushed to backend repository.
+3. **Account Options** (for new games)
 
-## 🔻<span id="en-install-locally">Install locally</span>
+   - `REGISTER WITH GOOGLE`: Save progress to the cloud (recommended)
+   - `PLAY WITHOUT SIGN IN`: Play locally without saving
 
-| Warning                                                                                                                |
-| ---------------------------------------------------------------------------------------------------------------------- |
-| Application may not work properly for everyone. Backend verification, environment variable are required.               |
-| Local git is required. download local git 👉 <a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a> |
+   ![New Game Screen](./media/newgamescreen.png)
 
-1. Open / create folder you want to place this application. From opened / created folder, paste terminal command below.
+4. **Beginning Town**
+   Start your journey in the Beginning Town. The character with the **red spotlight** handles cloud saves. Enter the portal door at the bottom to access the Maze.
+
+   ![Beginning Town](./media/beginningtown.png)
+
+5. **The Maze**
+   **Prepare for battle!** Navigate through procedurally generated mazes where:
+
+   - **Green spotlight**: Enemies (respawn randomly)
+   - **Blue spotlight**: New areas to explore
+   - **Doors**: Lead to deeper maze levels (fixed locations once spawned)
+
+   ![Maze](./media/maze.png)
+
+6. **Combat System**
+   When you encounter enemies, choose your action:
+
+   - **ATTACK**: Deal damage based on your character level
+   - **DEFENSE**: Reduce incoming damage ⚠️ _Under development_
+   - **ITEMS**: Access inventory for healing items
+   - **RUN**: Escape from battle
+
+   ![Battle Screen](./media/battlescreen.png)
+
+7. **Menu System**
+   Press `Space` anywhere to open the menu, then `Enter` to confirm selections:
+
+   - **CONTINUE**: Return to game
+   - **PARTY**: View character stats (HP, Level, etc.)
+   - **HEROES**: Switch between characters ⚠️ _Under development_
+   - **OPTIONS**: Game settings ⚠️ _Under development_
+   - **INVENTORY**: Manage items (potions, phoenix feathers, etc.)
+   - **EXIT**: Return to title screen (save progress first!)
+
+   ![Menu Panel](./media/menupanel.png)
+
+### 💡 Pro Tip
+
+Use **Phoenix Feathers** to instantly escape from dungeons!
+
+---
+
+## <span id="technologies-used">⚙️ Technologies Used</span>
+
+### Frontend 🎨
+
+- **JavaScript/TypeScript**: 100% TypeScript with OOP design patterns for scalability
+- **Canvas API**: Rendering and game graphics
+- **Tween.js**: Smooth animations and transitions
+- **Webpack**: Code compilation and legacy browser compatibility
+- **Node.js**: Development dependencies
+
+### Backend 🔧
+
+- **Go**: Server-side logic
+- **Go Fiber**: Web framework
+- **Firebase Client SDK**: Cloud integration
+
+### Infrastructure ☁️
+
+- **Google Cloud Run**: Serverless deployment
+- **Firebase Firestore**: Player data storage
+- **Google Cloud Storage**: Game assets and images
+- **Docker**: Containerized deployment
+- **GitHub Actions**: Automated CI/CD pipeline
+
+---
+
+## <span id="local-installation">🛠️ Local Installation</span>
+
+> ⚠️ **Warning**: Local installation may not work for everyone due to backend verification and environment variable requirements.
+
+### Prerequisites
+
+- [Git](https://git-scm.com/downloads) installed on your system
+- Node.js and npm
+
+### Installation Steps
+
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/AaronFabian/maze-conquest.git
    ```
 
-2. Open project folder.
+2. **Navigate to project directory**
 
    ```bash
-   cd ./maze-conquest
+   cd maze-conquest
    ```
 
-3. Install the JavaScript dependencies.
+3. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-4. Run locally.
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-## 💬<span id="en-about-project">About Project</span>
+---
 
-This is my first fullstack development project. I tried to combine all my knowledge I have to create this project. Fun fact, RPG game is my favorite game genre ! My next target in the future I could create online game application. Thank you, wish you all the best _- Aaron Fabian_ 😊
+## <span id="about-this-project">👨‍💻 About This Project</span>
+
+This is my first full-stack development project, combining all the knowledge I've acquired into a single application. As an RPG enthusiast, I wanted to create something that captures the essence of classic dungeon-crawling adventures.
+
+**Future Goals**: My next target is to develop a multiplayer online game experience.
+
+Thank you for playing, and I wish you the best of luck in your adventures!
+
+_— Aaron Fabian_ 😊
 
 ---
 
-## 📝<span id="日本語">日本語<span> ドキュメンテーション
+## <span id="日本語">🇯🇵 日本語のドキュメント</span>
 
-## Description
-
-## Technologies
-
-## 🔁 リクエストのルール（ルーター）
-
-関数は、リクエストのパス（`req.path`）を見て、どの処理を行うか決めます。
-
-| パス      | 説明                     |
-| --------- | ------------------------ |
-| `/create` | 新しいデータを作成します |
-| `/update` | データを更新します       |
-| `/delete` | データを削除します       |
+_[Japanese documentation would go here]_
