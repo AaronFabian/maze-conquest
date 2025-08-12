@@ -37,6 +37,7 @@ export class Enemy extends Entity {
 		this.baseDefense = def.baseDefense;
 		this.baseSpeed = def.baseSpeed;
 
+		// IV mean the higher enemy level, with this stats the level up power will calculate
 		this.HPIV = def.HPIV;
 		this.attackIV = def.attackIV;
 		this.defenseIV = def.defenseIV;
@@ -52,7 +53,7 @@ export class Enemy extends Entity {
 		this.currentExp = 0;
 		this.expToLevel = this.level * this.level * 5 * 0.75;
 
-		// this.calculateStats();
+		this.calculateStats();
 
 		this.currentHP = this.HP;
 		this.moveSet = def.moveSet;
@@ -63,7 +64,19 @@ export class Enemy extends Entity {
 		this.currentHP -= value;
 	}
 
-	calculateStats() {}
+	calculateStats() {
+		// Small improvement, if the this Hero at level 1 then no need to calculate use the base stats;
+		for (let i = 2; i <= this.level; i++) {
+			this.statsLevelUp();
+		}
+	}
+
+	statsLevelUp() {
+		this.HP += this.baseHP + this.HPIV * 2;
+		this.attack += this.baseAttack + this.attackIV * 2;
+		this.defense += this.baseDefense + this.defenseIV * 0.5;
+		this.speed += this.baseSpeed + this.speedIV * 1.5;
+	}
 
 	calculateAttack(moveName: string, hero: Hero) {
 		const baseDmg: number | undefined = ENEMY_DEFS[this.name].attackStatsTable.get(moveName);

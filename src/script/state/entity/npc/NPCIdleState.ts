@@ -68,7 +68,7 @@ export class NPCIdleState extends EntityIdleState {
 		super.render();
 
 		// debug-purpose
-		ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-		ctx.fillRect(this.talkTriggerBox.x, this.talkTriggerBox.y, this.talkTriggerBox.width, this.talkTriggerBox.height);
+		// ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+		// ctx.fillRect(this.talkTriggerBox.x, this.talkTriggerBox.y, this.talkTriggerBox.width, this.talkTriggerBox.height);
 	}
 }

@@ -120,8 +120,8 @@ export class Town extends World {
 		this.campfire.render();
 
 		// debug-purpose
-		ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-		for (const rect of this.maps) ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+		// ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+		// for (const rect of this.maps) ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 
 		ctx.restore();
 	}

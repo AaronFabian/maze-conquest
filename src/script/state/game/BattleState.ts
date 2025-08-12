@@ -15,11 +15,12 @@ import { BattleNatatorState } from '@/script/state/game/BattleNatatorState';
 import { StateMachine } from '@/script/state/StateMachine';
 import { User } from '@/script/system/model/User';
 import { Level } from '@/script/world/Level';
+import { WorldType } from '@/script/world/World';
 
 const _window = window as any;
 
 /*
-	* 01 BattleState -> 
+	* 01 BattleState ->
 	02 BattleInformationState ->
 	03 SelectionState ->
 */
@@ -48,13 +49,19 @@ export class BattleState extends BaseState {
 
 		// Opponent Party
 		this.enemyParty = this.generateEnemyParty();
+
+		console.log(this.level);
 	}
 	private generateEnemyParty(): Party {
+		// The deeper player go the stronger enemy level is
+		// Should be != undefined, otherwise it cause an error
+		const enemyLevel = this.user.worlds.get(WorldType.Level)!;
+
 		const enemies: Entity[] = [];
 
 		// orc
 		const orcDef: EnemyDef = ENEMY_DEFS.orc;
-		const orc = new Enemy(orcDef, 1);
+		const orc = new Enemy(orcDef, enemyLevel);
 
 		const orcState = new Map<string, () => EntityBaseState>();
 		orcState.set('idle', () => new EntityIdleState(orc));
@@ -72,7 +79,7 @@ export class BattleState extends BaseState {
 
 		// skeleton
 		const skeletonDef: EnemyDef = ENEMY_DEFS.skeleton;
-		const skeleton = new Enemy(skeletonDef, 1);
+		const skeleton = new Enemy(skeletonDef, enemyLevel);
 
 		const skeletonState = new Map<string, () => EntityBaseState>();
 		skeletonState.set('idle', () => new EntityIdleState(skeleton));

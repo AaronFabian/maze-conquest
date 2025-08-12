@@ -179,10 +179,10 @@ export class Portal extends GameObject {
 		}
 
 		// debug-purpose
-		ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+		// ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+		// ctx.fillRect(this.x, this.y, this.width, this.height);
 
-		ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
-		ctx.fillRect(this.triggerBtnX, this.triggerBtnY, this.triggerBtnWidth, this.triggerBtnHeight);
+		// ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+		// ctx.fillRect(this.triggerBtnX, this.triggerBtnY, this.triggerBtnWidth, this.triggerBtnHeight);
 	}
 }

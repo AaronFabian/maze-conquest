@@ -433,26 +433,31 @@ export class Path {
 			this.door.render();
 		}
 
-		for (let y = 0; y <= 4; y++) {
-			for (let x = 0; x <= 4; x++) {
-				const block = this.structure![y][x];
+		/**
+		 * Uncomment this code below to see collision detection
+		 * - Dungeon wall
+		 * - Dungeon enemy trigger
+		 */
+		// for (let y = 0; y <= 4; y++) {
+		// 	for (let x = 0; x <= 4; x++) {
+		// 		const block = this.structure![y][x];
 
-				ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-				if (block === BlockType.RED)
-					// For debugging purpose
-					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
+		// ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+		// if (block === BlockType.RED)
+		// 	// For debugging purpose
+		// 	ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
 
-				ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
-				if (block === BlockType.WAY)
-					// For debugging purpose
-					ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
-			}
-		}
+		// ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
+		// if (block === BlockType.WAY)
+		// 	// For debugging purpose
+		// 	ctx.fillRect(this.renderPosX * 80 + 16 * x, this.renderPosY * 80 + 16 * y, 16, 16);
+		// 	}
+		// }
 
-		// For debugging purpose
-		if (this.mazeObjectType === MazeObjectType.ENEMY) {
-			ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
-			ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
-		}
+		// // For debugging purpose
+		// if (this.mazeObjectType === MazeObjectType.ENEMY) {
+		// 	ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+		// 	ctx.fillRect(this.renderPosX * 80, this.renderPosY * 80, 80, 80);
+		// }
 	}
 }
