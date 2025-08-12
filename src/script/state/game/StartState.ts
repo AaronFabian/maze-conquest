@@ -213,7 +213,7 @@ export class StartState extends BaseState {
 					// pop StartState (this)
 					_window.gStateStack.pop();
 
-					_window.gStateStack.push(new TutorialState());
+					_window.gStateStack.push(new GameState(new User(initData)));
 
 					_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 				})
@@ -308,7 +308,7 @@ export class StartState extends BaseState {
 				// pop StartState (this)
 				_window.gStateStack.pop();
 
-				_window.gStateStack.push(new TutorialState());
+				_window.gStateStack.push(new GameState(new User(initData)));
 
 				_window.gStateStack.push(new FadeOutState({ r: 155, g: 155, b: 155 }, 2000, () => {}));
 			})
