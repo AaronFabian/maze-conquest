@@ -31,9 +31,9 @@ export class CommandMenu implements CanvasRendering {
 
 	update() {
 		if (keyWasPressed('w')) {
-			this.cursor += this.cursor - 1 < 0 ? 3 : -1;
+			this.cursor += this.cursor - 1 < 0 ? this.menu.length - 1 : -1;
 		} else if (keyWasPressed('s')) {
-			this.cursor += this.cursor + 1 > 3 ? -3 : 1;
+			this.cursor += this.cursor + 1 > this.menu.length - 1 ? -(this.menu.length - 1) : 1;
 		}
 
 		if (keyWasPressed('Enter')) {

@@ -11,12 +11,16 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-import { canvas, ctx, firebaseConfig, input, TWEEN } from '@/global';
+import { canvas, ctx, firebaseConfig, GUEST_DATA, input, TWEEN } from '@/global';
 import { StartState } from '@/script/state/game/StartState';
 import { SystemError } from '@/script/system/error/SystemError';
 import { FatalErrorScreen } from '@/script/system/screen/FatalErrorScreen';
 import { _LoadingAssetsScreen } from '@/script/system/screen/LoadingAssetScreen';
 import { generateQuads, newImage } from '@/utils';
+
+// Dev purposes
+import { GameState } from './script/state/game/GameState';
+import { User } from './script/system/model/User';
 
 const _window = window as any;
 let _msPrev: number = window.performance.now();
@@ -69,8 +73,8 @@ async function init() {
 	_window.gFrames.set('level1-tileset', generateQuads(_window.gImages.get('level1-tileset'), 16, 16));
 
 	// _window.gStateStack.push(new LeaderboardState());
-	_window.gStateStack.push(new StartState());
-	// _window.gStateStack.push(new GameState(new User(GUEST_DATA)));
+	// _window.gStateStack.push(new StartState());
+	_window.gStateStack.push(new GameState(new User(GUEST_DATA)));
 
 	animation();
 }

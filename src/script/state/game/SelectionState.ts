@@ -12,6 +12,8 @@ import { SelectEnemyPartyState } from '@/script/state/game/SelectEnemyPartyState
 import { ShowItemDrawerState } from '@/script/state/game/ShowItemDrawerState';
 import { SystemError } from '@/script/system/error/SystemError';
 import { SelectPartyState } from '@/script/state/game/SelectPartyState';
+import { FadeInState } from '@/script/state/game/FadeInState';
+import { FadeOutState } from '@/script/state/game/FadeOutState';
 
 const _window = window as any;
 
@@ -71,13 +73,13 @@ export class SelectionState extends BaseState {
 					);
 				},
 			},
-			{
-				// This is hero special move; summary: every turn this command will be different
-				text: HERO_DEFS[this.currentHeroTurn.name].heroCommand.text,
-				onSelect: () => {
-					HERO_DEFS[this.currentHeroTurn.name].heroCommand.onAction(this.currentHeroTurn);
-				},
-			},
+			// {
+			// 	// This is hero special move; summary: every turn this command will be different
+			// 	text: HERO_DEFS[this.currentHeroTurn.name].heroCommand.text,
+			// 	onSelect: () => {
+			// 		HERO_DEFS[this.currentHeroTurn.name].heroCommand.onAction(this.currentHeroTurn);
+			// 	},
+			// },
 			{
 				text: 'Items',
 				onSelect: () => {
@@ -115,7 +117,18 @@ export class SelectionState extends BaseState {
 			{
 				text: 'Run',
 				onSelect: () => {
-					console.log('Run');
+					_window.gStateStack.push(
+						new FadeInState({ r: 255, g: 255, b: 255 }, 2000, () => {
+							// Remove menu
+							_window.gStateStack.pop();
+
+							// Remove Hero menu, in result back to dungeon
+							_window.gStateStack.pop();
+							_window.gStateStack.pop();
+
+							_window.gStateStack.push(new FadeOutState({ r: 255, g: 255, b: 255 }, 2000, () => {}));
+						})
+					);
 				},
 			},
 		]);

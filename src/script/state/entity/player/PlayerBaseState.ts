@@ -5,8 +5,8 @@ export class PlayerBaseState extends EntityBaseState {
 	override render() {
 		super.render();
 
-		// debug-purpose
-		ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
-		ctx.fillRect(this.entity.x, this.entity.y, this.entity.width, this.entity.height);
+		// debug-purpose, will see player collision detection
+		// ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
+		// ctx.fillRect(this.entity.x, this.entity.y, this.entity.width, this.entity.height);
 	}
 }
